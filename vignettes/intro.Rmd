@@ -1,0 +1,120 @@
+---
+title: "Diffusion in a nutshell"
+author: "Sergio Picart-Armada"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{Diffusion in a nutshell}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, error = FALSE, 
+  fig.width = 7, fig.height = 6)
+```
+
+## Getting started
+
+`diffusion` is an R package providing several scores for diffusion in networks. 
+While its original purpose lies on biological networks, its usage is not limited to that scope. 
+In general terms, `diffusion` builds several propagation algorithms on the \code{igraph} package classes and methods. 
+
+To get started, we will load a toy graph included in the package. 
+
+```{r}
+library(diffusion)
+data("graph_toy")
+```
+
+Let's take a look in the graph:
+
+```{r}
+graph_toy
+plot(graph_toy)
+```
+
+In the next section, we will be running diffusion algorithms on this tiny lattice graph. 
+
+## Specifying the input
+
+The package `diffusion` is flexible and allows several inputs at once for a given network. 
+The input format is a list of matrices, where each matrix contains measured nodes in rows and specific scores in columns. 
+**Differents sets of scores may have different backgrounds**, meaning that we can specifically tag sets of nodes as **unlabelled**. 
+If we dispose of a unique list of nodes for label propagation, we should provide a list with a unique column vector that contains `1`'s in the labels in the list and `0`'s otherwise.
+
+In this example data, the graph contains one input already. 
+```{r}
+input <- graph_toy$input
+
+head(input)
+```
+
+Let's check how many nodes have values
+
+```{r}
+dim(input)
+```
+
+We see that all the nodes have a measure in each of the four score sets. 
+In practice, these score sets could be disease genes, pathways, et cetera.
+Each one of these columns will be *smoothed* using the network and new value will be derived - unlabelled nodes are also scored.
+
+```{r}
+output <- diffuse(
+  graph = graph_toy, 
+  method = "raw", 
+  scores = list(myInputs = input))
+
+head(output$myInputs)
+```
+
+The best way to visualise the scores is overlaying them in the original lattice. 
+`diffusion` also comes with basic mapping functions for graphical purposes. 
+Let's see an example:
+
+```{r}
+score_col <- 2
+igraph::plot.igraph(
+  graph_toy, 
+  vertex.color = diffusion::scores2colours(output$myInputs[, score_col]),
+  vertex.shape = diffusion::scores2shapes(input[, score_col]),
+  main = "Diffusion scores in our lattice"
+)
+```
+
+Here, we have mapped the scores to colours using `scores2colours` and we have highlighted the nodes that were in the original input using `scores2shapes` on the original scores.
+Square nodes were originally tagged as relevant, and the diffusion algorithm smoothed these tags over the network - the guilt-by-association principle!
+
+```{r}
+score_col <- 3
+igraph::plot.igraph(
+  graph_toy, 
+  vertex.color = diffusion::scores2colours(output$myInputs[, score_col]),
+  vertex.shape = diffusion::scores2shapes(input[, score_col]),
+  main = "Diffusion scores in our lattice"
+)
+```
+
+There are a variety of methods to compute the diffusion scores. 
+At the moment, the following: `raw`, `ml` and `gm` for classical propagation; `z` and `mc` for scores normalised through a statistical model, and similarly `ber_s` and `ber_p`, as described in [@mosca]. 
+The scoring methods `mc` and `ber_p` require permutations, whereas the rest are deterministic. 
+
+```{r}
+output_mc <- diffuse(
+  graph = graph_toy, 
+  method = "mc", 
+  scores = list(myInputs = input))
+
+score_col <- 3
+igraph::plot.igraph(
+  graph_toy, 
+  vertex.color = diffusion::scores2colours(output_mc$myInputs[, score_col]),
+  vertex.shape = diffusion::scores2shapes(input[, score_col]),
+  main = "Diffusion scores in our lattice"
+)
+```
+
+Each method has its particularities and, in the end, it is all about the question being asked to the data. 
