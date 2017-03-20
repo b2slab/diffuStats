@@ -1,0 +1,130 @@
+---
+title: "01_synthetic_examples"
+author: "Sergio Picart-Armada"
+date: "March 8, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Generate the graphs
+
+```{r}
+library(diffusion)
+library(igraph)
+library(ggplot2)
+
+class_label <- rep(c("source", "filler", "end"), 
+                   times = c(50, 450, 500))
+list_params <- list(
+  barabasi = list(
+    fun_gen = barabasi.game,
+    param_gen = list(n = 1000, m = 3, directed = F)
+  ),
+  lattice = list(
+    fun_gen = graph.lattice,
+    param_gen = list(length = 10, dim = 3, directed = F)
+  ),
+  watts = list(
+    fun_gen = watts.strogatz.game,
+    param_gen = list(
+      dim = 3, size = 10, nei = 1,
+      p = .1, loops = F, multiple = F)
+  ),
+  erdos = list(
+    fun_gen = erdos.renyi.game,
+    param_gen = list(
+      n = 1000, p.or.m = 3000, type = "gnm",
+      directed = F, loops = F)
+  )
+)
+list_methods <- c("raw", "ml", "gm", "ber_s", "z")
+lst <- list_params[[1]]
+lst$class_label <- sample(class_label)
+n_g <- 3
+
+set.seed(1)
+list_g <- plyr::ldply(
+  setNames(1:n_g, 1:n_g), 
+  function(x) {
+    # browser()
+    
+    n_rep <- 100
+    orders <- 1:5
+    g <- do.call(generate_graph, lst)
+    
+    message("Generating graph...")
+    list_orders <- plyr::llply(
+      setNames(orders, paste0("order", orders)), 
+      function(ord) {
+        # if (x == 7 & ord == 1) browser()
+        ans <- generate_input(
+          g,
+          order = setNames(rep(ord, n_rep), paste0("Case", 1:n_rep)), 
+          length_inputs = 50, return_matrix = TRUE
+        )
+        # browser()
+        if (any(apply(ans$mat_input, 2, sd) == 0)) browser()
+        ans
+      }
+    )
+    
+    # iterate over methods
+    message("Computing scores...")
+    plyr::ldply(
+      setNames(list_methods, list_methods), 
+      function(method) {
+        message("Diffusing...")
+        d <- diffuse(
+          graph = g, 
+          scores = lapply(list_orders, function(x) x$mat_input), 
+          method = method)
+        message("Done")
+        # iterate over neighbourhood orders
+        plyr::ldply(
+          setNames(orders, orders), 
+          function(ord) {
+            message("Order: ", ord)
+            
+            mat_truth <- list_orders[[ord]]$mat_source
+            mat_predict <- d[[ord]][rownames(mat_truth), ]
+            
+            
+            plyr::ldply(
+              setNames(1:n_rep, 1:n_rep), 
+              function(column) {
+                # if (any(is.nan(mat_predict[, column]))) browser()
+                response <- mat_truth[, column]
+                predict <- mat_predict[, column]
+                
+                if (any(is.nan(predict))) {
+                  col_auc <- NaN
+                } else {
+                  col_auc <- pROC::auc(
+                    response = response, 
+                    predict = predict, 
+                    direction = "<") %>% as.numeric
+                }
+                data.frame(auc = col_auc, stringsAsFactors = FALSE)
+              }, 
+              .id = "rep_input"
+            )
+          }, 
+          .id = "order"
+        )
+      },
+      .id = "method"
+    ) 
+  }, 
+  .id = "rep_graph", 
+  .progress = "text"
+)
+
+
+ggplot(list_g, aes(y = auc, x = order)) + 
+  geom_boxplot(aes(fill = method))
+
+```
+

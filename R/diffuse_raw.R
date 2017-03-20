@@ -57,8 +57,10 @@ diffuse_raw <- function(
       bkgd.names <- rownames(scores[[scores.name]])
       input.names <- colnames(scores[[scores.name]])
 
+      # input scores
       scores.mat <- methods::as(scores[[scores.name]], "sparseMatrix")
 
+      # raw scores
       diff.raw <- K[, bkgd.names] %*% scores.mat
 
       # browser()
@@ -77,12 +79,30 @@ diffuse_raw <- function(
       const_mean <- .rowSums/n
       const_var <-  (n*.rowSums2 - .rowSums**2)/((n - 1)*(n**2))
 
-      diff.z <- apply(
-        diff.raw,
-        2,
-        function(col) {
-          s1 <- sum(col)
-          s2 <- sum(col**2)
+      # diff.z <- apply(
+      #   diff.raw,
+      #   2,
+      #   function(col) {
+      #     s1 <- sum(col)
+      #     s2 <- sum(col**2)
+      #
+      #     # means and vars depend on first and second moments
+      #     # of the input. This should be valid for non-binary
+      #     # inputs as well
+      #     score_means <- const_mean*s1
+      #     score_vars <- const_var*(n*s2 - s1**2)
+      #
+      #     (col - score_means)/sqrt(score_vars)
+      #   }
+      # )
+      diff.z <- sapply(
+        1:ncol(diff.raw),
+        function(col_ind) {
+          col_in <- scores.mat[, col_ind]
+          col_raw <- diff.raw[, col_ind]
+
+          s1 <- sum(col_in)
+          s2 <- sum(col_in**2)
 
           # means and vars depend on first and second moments
           # of the input. This should be valid for non-binary
@@ -90,9 +110,14 @@ diffuse_raw <- function(
           score_means <- const_mean*s1
           score_vars <- const_var*(n*s2 - s1**2)
 
-          (col - score_means)/sqrt(score_vars)
+          (col_raw - score_means)/sqrt(score_vars)
         }
       )
+      # Give correct names
+      dimnames(diff.z) <- dimnames(diff.raw)
+
+      # browser()
+      # if (any(is.na(diff.z))) browser()
       return(diff.z)
     }
   )

@@ -3,6 +3,8 @@ context("Input transforms for diffusion")
 library(igraph)
 #library(magrittr)
 
+set.seed(3)
+
 # Generate disconnected graph...
 # so that output equals input
 g <- graph.empty(n = 5, directed = FALSE)
@@ -34,6 +36,7 @@ test_that("Transforms on the input are accurate", {
     function(method) {
       # message(method)
       expect_error({
+        # if (method == "z") browser()
         ans <- diffusion::diffuse(
           graph = g,
           scores = list(bkgd1 = mat),

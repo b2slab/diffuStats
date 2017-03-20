@@ -1,5 +1,21 @@
 # Version log
 
+## Version 0.0.4
+
+* Added synthetic input generator
+* Fixed a bug in z-score - sums were computed over the raw scores and not the input
+* Changed internal representation of default values for graph generation
+* Added more unit testing (still missing some)
+* Started synthetic example, see `data-raw`
+
+### TODO
+
+* Exhaustive unit testing
+* Add kernels
+* Add biological example - search for a Bioconductor package with a network in igraph format
+* Add example
+* Investigate: are `raw` and `ber_s` the same? They should be similar but not the same
+
 ## Version 0.0.2
 
 First version of the package. Includes: 

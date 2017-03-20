@@ -18,6 +18,11 @@
   )
 }
 
+#' Default proportions for randomly generated graphs
+#'
+#' @rdname default_graph_param
+.default_prop <- c(source = .05, filler = .45, end = .5)
+
 #' Function to connect a non connected graph
 #'
 #' @param g an igraph object
@@ -62,9 +67,11 @@
 #' \code{\link[igraph]{erdos.renyi.game}},
 #' \code{\link[igraph]{make_lattice}}, etc.
 #' @param param_gen list with parameters to pass to \code{fun_gen}
-#' @param class_prop named character, proportions of each vertex class
-#' (is internally normalised to sum up one). Default class names are
-#' \code{c("source", "filler", "end")}.
+#' @param class_label character vector with length equal to
+#' the number of nodes in the graph to generate.
+#' If left to \code{NULL}, the default classes  are
+#' \code{c("source", "filler", "end")} with proportions of
+#' \code{c(0.05, 0.45, 0.5)}.
 #' @param class_attr data.frame with vertex classes as rownames and a column
 #' for each vertex attribute. The name of the column will be used as the
 #' attribute name.
@@ -72,6 +79,7 @@
 #' Can be set to \code{identity} or \code{NULL} to skip this step.
 #' By default, the graph is connected: nodes not belonging to the
 #' largest connected component are randomly wired to a node in it.
+#' @param seed numeric, seed for random number generator
 #'
 #' @return An \code{\link[igraph]{igraph}} object
 #'
@@ -80,31 +88,46 @@
 generate_graph <- function(
   fun_gen,
   param_gen,
-  class_prop,
+  class_label = NULL,
   class_attr = .default_graph_param(),
-  fun_curate = .connect_undirected_graph
+  fun_curate = .connect_undirected_graph,
+  seed = NULL
 ) {
   # browser()
+  if (!is.null(seed)) set.seed(seed)
 
   # Generate network
   g <- do.call(fun_gen, param_gen)
   n <- vcount(g)
+  V(g)$name <- paste0("V", 1:n)
 
   # Assign vertex classes
-  class <- (class_prop/sum(class_prop))*n
-  class_char <- character()
-  for (i in names(class))
-    class_char <- c(
-      class_char,
-      rep(i, class[i]))
-  n_out <- length(class_char)
-  if (n_out < n) {
-    n_diff <- n - n_out
-    class_char <- c(
-      class_char,
-      rep(utils::tail(names(class), 1), n_diff))
+  # class <- (class_prop/sum(class_prop))*n
+  # class_char <- character()
+  # for (i in names(class))
+  #   class_char <- c(
+  #     class_char,
+  #     rep(i, class[i]))
+  # n_out <- length(class_char)
+  # if (n_out < n) {
+  #   n_diff <- n - n_out
+  #   class_char <- c(
+  #     class_char,
+  #     rep(utils::tail(names(class), 1), n_diff))
+  # }
+  if (is.null(class_label)) {
+    message("Using default class proportions...")
+    class <- rep(names(.default_prop), times = .default_prop*n)
+    last_prop <- utils::tail(names(.default_prop), 1)
+    class <- c(class, rep(last_prop, length(class) - n))
+
+    V(g)$class <- class
+  } else {
+    if (length(class_label) != n) {
+      stop("'class_label' must have its length equalling the number of nodes.")
+    }
+    V(g)$class <- class_label
   }
-  V(g)$class <- class_char
 
   # Assign vertex attributes
   for (col in names(class_attr)) {

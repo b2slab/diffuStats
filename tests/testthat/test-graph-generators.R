@@ -2,6 +2,8 @@ context("Graph generator")
 
 library(igraph)
 
+set.seed(1)
+
 test_that("helpers", {
   # Generate disconnected graph
   g <- graph.empty(n = 100, directed = FALSE) +
@@ -14,7 +16,7 @@ test_that("helpers", {
 })
 
 test_that("generate_graph", {
-  class_prop <- c(source = 50, filler = 450, end = 500)
+  # class_prop <- c(source = 50, filler = 450, end = 500)
   list_params <- list(
     barabasi = list(
       fun_gen = barabasi.game,
@@ -43,7 +45,7 @@ test_that("generate_graph", {
     function(lst) {
       # Generate graph flawlessly
       expect_error({
-        lst$class_prop = class_prop
+        # lst$class_prop = class_prop
         g <- do.call(generate_graph, lst)
       }, NA)
       # ALl must be connected, with 3 vertices and with vertex class
@@ -52,4 +54,36 @@ test_that("generate_graph", {
       expect_length(table(V(g)$class), 3)
     }
   )
+})
+
+test_that("generate_input", {
+  # generate graph flawlessly
+  expect_error({
+    g <- generate_graph(
+      fun_gen = barabasi.game,
+      param_gen = list(n = 1000, m = 5, directed = F)
+    )
+  }, NA)
+
+  # Check that scores are not constant, meaning that they have some
+  # 0s and 1s
+  list_ord <- 1:5
+  n_rep <- 100
+  plyr::llply(
+    list_ord,
+    function(ord) {
+      expect_error({
+        g_in <- generate_input(
+          g,
+          order = setNames(rep(1, length.out = n_rep), paste0("Case", 1:n_rep)),
+          length_inputs = 50, return_matrix = TRUE
+        )
+      }, NA)
+      expect_false(any(apply(g_in$mat_input, 2, sd) == 0))
+      expect_false(any(colSums(g_in$mat_source) == 0))
+    }
+  )
+
+  # browser()
+
 })

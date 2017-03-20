@@ -4,6 +4,8 @@ library(igraph)
 library(Matrix)
 library(Rcpp)
 
+set.seed(2)
+
 # Small example
 n <- 1e3
 n.perm <- 1e3
@@ -94,7 +96,9 @@ test_that("'diffuse' consistency check", {
     setNames(methods_raw, methods_raw),
     function(method) {
       # Apply main function
+      # message(method)
       expect_error({
+        # if (method == "z") browser()
         final <- diffuse(
           graph = graph,
           scores = scores,

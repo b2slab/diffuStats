@@ -48,6 +48,8 @@ diffuse <- function(
         n_tot <- vcount(graph)
         n_bkgd <- nrow(mat)
 
+        # normalisation has to be performed for each column, as it depends
+        # on the number of positives and negatives...
         mat_complete <- apply(
           mat,
           2,
@@ -63,6 +65,7 @@ diffuse <- function(
         )
         rownames(mat_complete) <- c(rownames(mat), ids_nobkgd)
 
+        # sort the names as in the original graph
         mat_complete[V(graph)$name, ]
       }
     )
@@ -94,10 +97,23 @@ diffuse <- function(
     scores_ber_s <- plyr::llply(
       setNames(names(scores), names(scores)),
       function(scores_name) {
-        mat_in <- scores[[scores_name]]
+        # each list can have a different background...
+        # nodes outside the background will be assigned a prior score of 0
         mat_out <- scores_raw[[scores_name]]
+        mat_in <- scores[[scores_name]]
 
-        mat_out/(mat_in + eps)
+        # matrix with correct dimnames but populated with eps
+        mat_in_fill <- matrix(
+          data = eps,
+          nrow = nrow(mat_out),
+          ncol = ncol(mat_out),
+          dimnames = dimnames(mat_out))
+
+        # add the original input: only in the rows that match
+        mat_in_fill[rownames(mat_in), ] <-
+          mat_in_fill[rownames(mat_in), ] + mat_in
+
+        mat_out/mat_in_fill
       }
     )
     return(scores_ber_s)

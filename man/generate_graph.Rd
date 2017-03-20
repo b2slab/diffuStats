@@ -4,9 +4,9 @@
 \alias{generate_graph}
 \title{Generate a random graph}
 \usage{
-generate_graph(fun_gen, param_gen, class_prop,
+generate_graph(fun_gen, param_gen, class_label = NULL,
   class_attr = .default_graph_param(),
-  fun_curate = .connect_undirected_graph)
+  fun_curate = .connect_undirected_graph, seed = NULL)
 }
 \arguments{
 \item{fun_gen}{function to generate the graphs. Typically from
@@ -17,9 +17,11 @@ generate_graph(fun_gen, param_gen, class_prop,
 
 \item{param_gen}{list with parameters to pass to \code{fun_gen}}
 
-\item{class_prop}{named character, proportions of each vertex class
-(is internally normalised to sum up one). Default class names are
-\code{c("source", "filler", "end")}.}
+\item{class_label}{character vector with length equal to
+the number of nodes in the graph to generate.
+If left to \code{NULL}, the default classes  are
+\code{c("source", "filler", "end")} with proportions of
+\code{c(0.05, 0.45, 0.5)}.}
 
 \item{class_attr}{data.frame with vertex classes as rownames and a column
 for each vertex attribute. The name of the column will be used as the
@@ -29,6 +31,8 @@ attribute name.}
 Can be set to \code{identity} or \code{NULL} to skip this step.
 By default, the graph is connected: nodes not belonging to the
 largest connected component are randomly wired to a node in it.}
+
+\item{seed}{numeric, seed for random number generator}
 }
 \value{
 An \code{\link[igraph]{igraph}} object
