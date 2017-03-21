@@ -66,7 +66,7 @@ diffuse <- function(
         rownames(mat_complete) <- c(rownames(mat), ids_nobkgd)
 
         # sort the names as in the original graph
-        mat_complete[V(graph)$name, ]
+        mat_complete[V(graph)$name, , drop = FALSE]
       }
     )
     return(diffuse_raw(graph = graph, scores = scores_gm, ...))
@@ -103,7 +103,7 @@ diffuse <- function(
         mat_in <- scores[[scores_name]]
 
         # matrix with correct dimnames but populated with eps
-        mat_in_fill <- matrix(
+        mat_in_fill <- Matrix::Matrix(
           data = eps,
           nrow = nrow(mat_out),
           ncol = ncol(mat_out),

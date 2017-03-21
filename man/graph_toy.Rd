@@ -4,9 +4,12 @@
 \name{graph_toy}
 \alias{graph_toy}
 \title{Toy graph to play with diffusion}
-\format{An \code{\link[igraph]{igraph}} object}
+\format{An object of class \code{igraph} of length 10.}
 \usage{
 graph_toy
+}
+\value{
+An \code{\link[igraph]{igraph}} object
 }
 \description{
 Small graph that can easily be plotted and experimented with.

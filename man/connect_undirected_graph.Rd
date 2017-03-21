@@ -9,6 +9,9 @@
 \arguments{
 \item{g}{an igraph object}
 }
+\value{
+a connected igraph object
+}
 \description{
 Function to connect a non connected graph
 }

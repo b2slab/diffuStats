@@ -90,15 +90,15 @@ test_that("'diffuse_raw' consistency check", {
 
 
 test_that("'diffuse' consistency check", {
-  methods_raw <- c("raw", "ml", "gm")
+  methods_raw <- c("raw", "ml", "gm", "ber_s", "ber_p")
   # Try diffusion with several methods
   plyr::l_ply(
     setNames(methods_raw, methods_raw),
     function(method) {
       # Apply main function
-      # message(method)
+      message(method)
       expect_error({
-        # if (method == "z") browser()
+        # if (method == "ber_s") browser()
         final <- diffuse(
           graph = graph,
           scores = scores,
@@ -107,6 +107,8 @@ test_that("'diffuse' consistency check", {
 
       # Dimensions are as expected
       expect_equal(dim(final$bkgd1), dim(final$bkgd2))
+      expect_equal(colnames(final$bkgd1), colnames(scores$bkgd1))
+      expect_true(all(rownames(scores$bkgd1) %in% rownames(final$bkgd1)))
     }
   )
 })

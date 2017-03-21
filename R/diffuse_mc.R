@@ -51,8 +51,8 @@ diffuse_mc <- function(
     message("Matrix not supplied. Computing conductance...")
     L <- graph.laplacian(
       graph = graph,
-      normalized = F,
-      sparse = T)
+      normalized = FALSE,
+      sparse = TRUE)
     # Connect pathways to boundary
     Matrix::diag(L) <- Matrix::diag(L) + diag.sum
 
@@ -126,10 +126,10 @@ diffuse_mc <- function(
             x = seq_along(bkgd.names),
             prob = prob,
             size = max.sample,
-            replace = F
+            replace = FALSE
           )
         },
-        .parallel = F))
+        .parallel = FALSE))
         # .parallel = F, .progress = "text"))
       # snow::stopCluster(cl)
       gc()

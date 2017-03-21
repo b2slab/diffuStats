@@ -4,5 +4,5 @@
 #' It has graphical parameters included, such as the vertex colour
 #' and the layout. It also includes an example input.
 #'
-#' @format An \code{\link[igraph]{igraph}} object
+#' @return An \code{\link[igraph]{igraph}} object
 "graph_toy"

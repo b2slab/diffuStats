@@ -29,8 +29,8 @@ diffuse_raw <- function(
     message("Matrix not supplied. Computing conductance...")
     L <- graph.laplacian(
       graph = graph,
-      normalized = F,
-      sparse = T)
+      normalized = FALSE,
+      sparse = TRUE)
     # Connect pathways to boundary
     Matrix::diag(L) <- Matrix::diag(L) + diag.sum
 
@@ -126,8 +126,9 @@ diffuse_raw <- function(
 
 
     # temp.means.whole <- rowSums.OBS*s1.OBS/n.pool.OBS
-    # temp.vars.OBS <- (n.pool.OBS*s2.OBS - s1.OBS^2)/(n.pool.OBS*(n.pool.OBS - 1))*(rowSquaredSums.OBS
-    #                                                                                - (rowSums.OBS^2)/n.pool.OBS)
+    # temp.vars.OBS <- (n.pool.OBS*s2.OBS - s1.OBS^2)/
+    # (n.pool.OBS*(n.pool.OBS - 1))*(rowSquaredSums.OBS - (rowSums.OBS^2)/
+    # n.pool.OBS)
 
 
 
@@ -146,10 +147,12 @@ diffuse_raw <- function(
   # message("Checking scores and backgrounds...")
   #
   # # scorenames.length <- lapply(scores, length)
-  # # if (length(table(unlist(scorenames.length))) > 1) stop("Score vectors differ on length...")
+  # # if (length(table(unlist(scorenames.length))) > 1)
+  # stop("Score vectors differ on length...")
   # #
   # # allnames.scores <- table(sapply(scores, names))
-  # # if (any(allnames.scores != length(scores))) stop("Different names between score vectors...")
+  # # if (any(allnames.scores != length(scores)))
+  # stop("Different names between score vectors...")
   # #
   # # names.scores <- names(scores[[1]])
   # # scores <- lapply(scores, function(x) x[[names.scores]])
@@ -161,7 +164,8 @@ diffuse_raw <- function(
   # if (is.null(g_boundary)) {
   #   # by default, the nodes outside the pool absorbe heat
   #   id.boun.whole <- setdiff(V(graph.whole)$name, id.pool.whole)
-  #   if (length(id.boun.whole) == 0) stop("Default pool would be empty. Please specify one...")
+  #   if (length(id.boun.whole) == 0) stop("Default pool would be empty.
+  #   Please specify one...")
   # } else {
   #   id.boun.whole <- intersect(V(graph.whole)$name, id.boundary)
   # }
@@ -208,10 +212,12 @@ diffuse_raw <- function(
   #   s2.LAT <- s2.OBS*n.pool.LAT/n.pool.OBS
   #
   #   temp.means.whole <- rowSums.OBS*s1.OBS/n.pool.OBS
-  #   temp.vars.OBS <- (n.pool.OBS*s2.OBS - s1.OBS^2)/(n.pool.OBS*(n.pool.OBS - 1))*(rowSquaredSums.OBS
-  #                                                                                  - (rowSums.OBS^2)/n.pool.OBS)
-  #   temp.vars.LAT <- (n.pool.LAT*s2.LAT - s1.LAT^2)/(n.pool.LAT*(n.pool.LAT - 1))*(rowSquaredSums.LAT
-  #                                                                                  - (rowSums.LAT^2)/n.pool.LAT)
+  #   temp.vars.OBS <- (n.pool.OBS*s2.OBS - s1.OBS^2)/
+  #   (n.pool.OBS*(n.pool.OBS - 1))*(rowSquaredSums.OBS - (rowSums.OBS^2)/
+  #   n.pool.OBS)
+  #   temp.vars.LAT <- (n.pool.LAT*s2.LAT - s1.LAT^2)/
+  #   (n.pool.LAT*(n.pool.LAT - 1))*(rowSquaredSums.LAT - (rowSums.LAT^2)/
+  #   n.pool.LAT)
   #
   #   temp.vars.whole <- temp.vars.OBS + 2*temp.vars.LAT
   #   temp.vars.PROPORTION <- temp.vars.OBS/temp.vars.whole
@@ -232,11 +238,14 @@ diffuse_raw <- function(
   #
   #   #p-vals for the WHOLE latent model
   #   if (!is.null(id.pool.LAT)) {
-  #     my.score.whole <- (temp.final.whole - temp.means.whole)/sqrt(temp.vars.whole)
+  #     my.score.whole <- (temp.final.whole - temp.means.whole)/
+  #
+  #     sqrt(temp.vars.whole)
   #     #       my.pvals.whole <- pnorm(q = my.score.whole,
   #     #                               lower.tail = F)
   #     #       my.fdr.whole <- p.adjust(my.pvals.whole, method = p.adjust)
-  #     #       my.fdr.sig.whole <- names(my.fdr.whole)[my.fdr.whole < p.threshold]
+  #     #       my.fdr.sig.whole <- names(my.fdr.whole)[my.fdr.whole <
+  #     p.threshold]
   #   }
   #
   #   # Return the interesting results...

@@ -1,0 +1,300 @@
+---
+title: "Propagation of MIPS terms in the yeast PPI"
+author: "Sergio Picart-Armada"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{Diffusion in a nutshell}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, message = FALSE, error = FALSE, 
+  fig.width = 7, fig.height = 6)
+```
+
+## Getting started
+
+This vignette contains a classical example of label propagation 
+on a biological network. The core tools for this analysis are 
+the `igraph` R package [@igraph] and the `diffusion` package. 
+
+The data for this example is the `yeast` interactome with 
+GO annotations, as found in the data package `igraphdata` [@igraphdata]. 
+
+
+```{r}
+# Core
+library(igraph)
+library(igraphdata)
+library(diffusion)
+
+# Plotting
+library(ggplot2)
+library(ggsci)
+
+# Data
+data(yeast)
+set.seed(1)
+```
+
+## The data
+
+A summary of the network object can be obtained by just 
+showing the object
+
+```{r}
+yeast
+```
+
+This shows a graph with `r format(vcount(yeast))` nodes and 
+`r format(ecount(yeast))` edges. 
+There are several attributes that can be of interest. 
+First of all, the **name** of the protein nodes:
+
+```{r}
+head(V(yeast)$name)
+```
+
+Furthermore, the corresponding aliases and complete names can 
+be found in **Description**
+
+```{r}
+head(V(yeast)$Description)
+```
+
+The labels to perform network propagation are MIPS categories 
+[@mips], which provide means to classify proteins regarding their 
+function. These functions are coded as characters in the `yeast` 
+object, in the node attribute **Class**
+
+```{r}
+table_classes <- table(V(yeast)$Class, useNA = "always")
+table_classes
+```
+
+To map these abbreviations to the actual category, we can access
+the graph attribute **Classes**:
+
+```{r}
+head(yeast$Classes)
+```
+
+Finally, the graph edges have a **Confidence** attribute that 
+assesses the amount of evidence supporting the interaction. 
+
+```{r}
+table(E(yeast)$Confidence)
+```
+
+More on the yeast object can be found through `?yeast`. 
+
+## The analysis: protein ranking
+
+The application of label propagation algorithms [@labelpropagation] is based on
+the *guilt by association* principle [@gba]. This principle can be
+rephrased in the protein-protein interaction context as 
+"proteins that interact are more likely to share biological functions". 
+However, this principle is extremely general and has numerous applications 
+in bioinformatics alone, for example prioritising genome-wide 
+association studies hits [@diffusion_gwas] and finding relevant 
+modules from gene expression and mutation data [@mosca].
+
+In this case, we will apply the diffusion scores to 
+another well-known challenge: protein function prediction. 
+Let's assume that 50% of the labelled proteins in the graph as 
+**transport and sensing** (category `A`)
+are actually unlabelled. 
+Now, using the labels of the known positive and negative 
+examples for **transport and sensing**, 
+can we correctly label the remaining 50%?
+First of all, we generate the list of known and unknown positives. 
+The function `diffuse` uses (row)names in the input scores matrix
+so that unlabelled nodes are accounted as so.
+
+```{r}
+perc <- .5
+
+# transport and sensing is class A
+nodes_A <- V(yeast)[Class %in% "A"]$name 
+nodes_unlabelled <- V(yeast)[Class %in% c(NA, "U")]$name 
+nodes_notA <- setdiff(V(yeast)$name, c(nodes_A, nodes_unlabelled)) 
+
+# known labels
+known_A <- sample(nodes_A, perc*length(nodes_A))
+known_notA <- sample(nodes_notA, perc*length(nodes_notA))
+known <- c(known_A, known_notA)
+
+# unknown targets
+target_A <- setdiff(nodes_A, known_A)
+target_notA <- setdiff(nodes_notA, known_notA)
+target <- c(target_A, target_notA)
+target_id <- V(yeast)$name %in% target
+
+# true scores
+scores_true <- V(yeast)$Class %in% "A"
+```
+
+Now that the input is computed, we can apply the diffusion algorithm
+to rank all the proteins. As a first approach, we will compute the 
+*vanilla* diffusion scores through the `raw` method
+
+```{r}
+# matrix of scores
+scores_mat <- matrix(
+  (known %in% known_A)*1, 
+  ncol = 1, 
+  nrow = length(known))
+rownames(scores_mat) <- known
+colnames(scores_mat) <- "ClassA"
+
+# diffusion
+diff <- diffuse(
+  yeast, 
+  scores = list(Example1 = scores_mat), 
+  method = "raw"
+)
+```
+
+Diffusion scores are ready
+
+```{r}
+str(diff)
+
+scores_diff <- as.vector(diff$Example1)
+```
+
+Now, we can compare the scores obtained by the proteins
+actually belonging to **transport and sensing** 
+and the other labelled target proteins.
+
+```{r}
+# Compare 
+df_plot <- data.frame(
+  Protein = V(yeast)$name, 
+  Class = ifelse(scores_true, "Transport and sensing", "Other"), 
+  DiffusionScore = scores_diff, 
+  Target = target_id, 
+  Method = "raw",
+  stringsAsFactors = FALSE
+)
+
+ggplot(subset(df_plot, Target), 
+       aes(x = Class, y = DiffusionScore)) + 
+  geom_boxplot(aes(fill = Method)) + 
+  theme_bw() + 
+  scale_y_log10() + 
+  xlab("Protein class") +
+  ylab("Diffusion score") + 
+  ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
+
+```
+
+## Applying different diffusion scores
+
+There are a variety of methods to compute the diffusion scores. 
+
+### Classical propagation and variations
+
+At the moment, the following methods are implemented: `raw`, 
+as a 1/0 heat generation problem (positive examples generate one unit
+and negative examples do not generate), `ml` uses a 1/-1 heat generation 
+and is inspired in classical machine learning labelling, 
+and `gm` for a 1/-1 scheme that 
+also assigns a weight to unabelled nodes, 
+see the original GeneMANIA publication [@genemania]
+In addition, `ber_s` [@mosca] uses a 1/0 approach that 
+normalises the diffusion score by the prior data, enhancing nodes 
+that get a high score but were not a source of heat.
+
+### Statistically normalised propagation 
+
+On the other hand, we include scores normalised 
+through a statistical model:  `mc` (empirical p-value
+for the score of a node being higher than scores with random permutations 
+in the input) and `z`, z-scores that use the exact mean value and 
+standard deviation for the node score if the input was permuted.
+Similarly to `mc`, `ber_p` [@mosca] combines the diffusion score `raw`
+with the empirical p-value from `mc`.
+
+### Examples
+
+```{r, fig.height=3.5}
+list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
+
+df_methods <- plyr::ldply(
+  list_methods, 
+  function(method) {
+    diff <- diffuse(
+      yeast, 
+      scores = list(Example1 = scores_mat), 
+      method = method
+    )
+    
+    data.frame(
+      Protein = V(yeast)$name, 
+      Class = ifelse(scores_true, "Transport and sensing", "Other"), 
+      DiffusionScore = as.vector(diff$Example1), 
+      Target = target_id, 
+      Method = method,
+      stringsAsFactors = FALSE
+    )
+  }
+)
+df_methods$Method <- factor(
+  df_methods$Method, 
+  levels = list_methods)
+
+ggplot(subset(df_methods, Target), 
+       aes(x = Class, y = DiffusionScore)) + 
+  geom_boxplot(aes(fill = Method)) + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
+  facet_wrap( ~ Method, nrow = 1, scales = "free") + 
+  xlab("Protein class") +
+  ylab("Diffusion score") + 
+  ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
+```
+
+Notice that `z` can give NaN (a total of 
+`r nrow(subset(df_methods, Method == "z" & is.na(DiffusionScore)))`
+in all of its `r nrow(subset(df_methods, Method == "z"))` scores)
+when the observed nodes are disconnected from the scored node.
+
+## Scaling up the analysis
+
+The package `diffusion` is conceived to perform several 
+screenings at once. To prove its usefulness, we will repeat 
+the procedure in the last section but screening all the 
+MIPS categories in the yeast graph. 
+
+First of all, we need to prepare the data in the 
+adequate format. 
+
+```{r}
+# All classes except NA and unlabelled
+names_classes <- setdiff(names(table_classes), c("U", NA))
+
+# matrix format
+mat_classes <- sapply(
+  names_classes, 
+  function(class) {
+    
+    V(yeast)$Class %in% class
+  }
+)*1
+rownames(mat_classes) <- V(yeast)$name
+colnames(mat_classes) <- names_classes
+```
+
+We can keep the former 50% known / 50% unknown approach, and screen 
+the performance of all the methods
+
+
+
+
+
+## References

@@ -1,5 +1,7 @@
 #' Generate data.frame with default vertex attributes
 #'
+#' @return data.frame with default node class attributes
+#'
 #' @rdname default_graph_param
 #'
 # #' @importFrom ggsci pal_npg
@@ -20,12 +22,16 @@
 
 #' Default proportions for randomly generated graphs
 #'
+#' @return named numeric with default class proportions
+#'
 #' @rdname default_graph_param
 .default_prop <- c(source = .05, filler = .45, end = .5)
 
 #' Function to connect a non connected graph
 #'
 #' @param g an igraph object
+#'
+#' @return a connected igraph object
 #'
 #' @rdname connect_undirected_graph
 #'
@@ -50,7 +56,7 @@
   g <- add.edges(
     graph = g,
     edges = rbind(V(g)[nodes.addEdges], V(g)[g.newEdges]),
-    directed = F)
+    directed = FALSE)
 
   g
 }

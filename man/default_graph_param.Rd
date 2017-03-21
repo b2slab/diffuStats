@@ -11,6 +11,11 @@
 
 .default_prop
 }
+\value{
+data.frame with default node class attributes
+
+named numeric with default class proportions
+}
 \description{
 Generate data.frame with default vertex attributes
 

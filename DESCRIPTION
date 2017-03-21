@@ -1,21 +1,34 @@
 Package: diffusion
 Type: Package
 Title: Diffusion methods for networks
-Version: 0.0.4
+Version: 0.0.6
 Author: Sergio Picart-Armada
 Maintainer: Sergio Picart-Armada <sergi.picart@upc.edu>
 Description: Methods to propagate scores in networks. 
   Designed for biological networks but applicable to 
   any other medium-sized networks.
-Depends: R (>= 3.2)
-Imports: igraph, Rcpp, RcppArmadillo, RcppParallel, Matrix, plyr, methods
+Depends: R (>= 3.3)
+Imports: grDevices, 
+    stats, 
+    igraph, 
+    Rcpp, 
+    RcppArmadillo, 
+    RcppParallel, 
+    Matrix, 
+    plyr, 
+    methods
 License: GPL-3
 LazyData: true
 Encoding: UTF-8
 RoxygenNote: 6.0.1
 Suggests: testthat,
     knitr,
-    rmarkdown
+    rmarkdown, 
+    ggplot2, 
+    ggsci, 
+    igraphdata, 
+    pROC
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel 
 SystemRequirements: GNU make
 VignetteBuilder: knitr
+biocViews: Network, GeneExpression
