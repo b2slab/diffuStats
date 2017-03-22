@@ -1,5 +1,20 @@
 # Version log
 
+## Version 0.0.8
+
+* Added `largest_cc` helper
+* First version of the `yeast` vignette. Takes 1:15 to build.
+
+### TODO
+
+* Exhaustive unit testing
+* Add kernels
+* Add examples to each function
+* Test installation on other systems 
+* Should we add wrappers? (cross-validation scores, AUC... 
+We can use `try` to give `NA` as an AUC value for bad data splits)
+
+
 ## Version 0.0.6
 
 * Fixed bug in `ber_s` (both matrices are from `Matrix`)

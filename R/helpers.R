@@ -10,6 +10,23 @@ named.list <- function(...) {
   setNames(list(...), as.character(match.call()[-1]))
 }
 
+#' Largest connected component
+#'
+#' Obtain the largest connected component of an \code{igraph} object
+#'
+#' @param g \code{igraph} object
+#'
+#' @return A connected \code{igraph} object
+#'
+#' @import igraph
+#' @export
+largest_cc <- function(g) {
+  cl <- clusters(g)
+  cl_max <- which.max(cl$csize)
+
+  igraph::induced_subgraph(graph = g, vids = which(cl$membership == cl_max))
+}
+
 #' Translate values into colours
 #'
 #' Create a vector of hex colours from numeric values,

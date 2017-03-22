@@ -80,7 +80,7 @@ but taking into account
 the network structure.
 
 ```{r}
-output <- diffuse(
+output <- diffusion::diffuse(
   graph = graph_toy, 
   method = "raw", 
   scores = list(myInputs = input))
@@ -133,7 +133,7 @@ The scoring methods `mc` and `ber_p` require permutations,
 whereas the rest are deterministic. 
 
 ```{r}
-output_mc <- diffuse(
+output_mc <- diffusion::diffuse(
   graph = graph_toy, 
   method = "mc", 
   scores = list(myInputs = input))

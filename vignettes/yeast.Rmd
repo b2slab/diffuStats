@@ -44,9 +44,17 @@ set.seed(1)
 ## The data
 
 A summary of the network object can be obtained by just 
-showing the object
+showing the object:
 
 ```{r}
+yeast
+```
+
+For this analysis, we will stick to the largest connected 
+component of this graph
+
+```{r}
+yeast <- diffusion::largest_cc(yeast)
 yeast
 ```
 
@@ -152,7 +160,7 @@ rownames(scores_mat) <- known
 colnames(scores_mat) <- "ClassA"
 
 # diffusion
-diff <- diffuse(
+diff <- diffusion::diffuse(
   yeast, 
   scores = list(Example1 = scores_mat), 
   method = "raw"
@@ -193,6 +201,26 @@ ggplot(subset(df_plot, Target),
 
 ```
 
+Furthermore, we can paint the subnetwork of the top 30 diffusion
+scores, highlighting with squares the proteins that were 
+part of the input
+
+```{r}
+vertex_ids <- head(order(df_plot$DiffusionScore, decreasing = TRUE), 50)
+igraph::plot.igraph(
+  igraph::induced.subgraph(yeast, vertex_ids), 
+  vertex.color = diffusion::scores2colours(
+    df_plot$DiffusionScore[vertex_ids]),
+  vertex.shape = diffusion::scores2shapes(
+    df_plot$Protein[vertex_ids] %in% known_A),
+  vertex.label.color = "gray10", 
+  main = "Top 30 proteins from diffusion scores"
+)
+```
+
+
+
+
 ## Applying different diffusion scores
 
 There are a variety of methods to compute the diffusion scores. 
@@ -222,13 +250,13 @@ with the empirical p-value from `mc`.
 
 ### Examples
 
-```{r, fig.height=3.5}
+```{r}
 list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 
 df_methods <- plyr::ldply(
   list_methods, 
   function(method) {
-    diff <- diffuse(
+    diff <- diffusion::diffuse(
       yeast, 
       scores = list(Example1 = scores_mat), 
       method = method
@@ -247,10 +275,15 @@ df_methods <- plyr::ldply(
 df_methods$Method <- factor(
   df_methods$Method, 
   levels = list_methods)
+```
 
+Let's plot the results:
+
+```{r, fig.height=3.5}
 ggplot(subset(df_methods, Target), 
        aes(x = Class, y = DiffusionScore)) + 
   geom_boxplot(aes(fill = Method)) + 
+  scale_fill_npg() + 
   theme_bw() + 
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
   facet_wrap( ~ Method, nrow = 1, scales = "free") + 
@@ -259,10 +292,10 @@ ggplot(subset(df_methods, Target),
   ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
 ```
 
-Notice that `z` can give NaN (a total of 
-`r nrow(subset(df_methods, Method == "z" & is.na(DiffusionScore)))`
-in all of its `r nrow(subset(df_methods, Method == "z"))` scores)
-when the observed nodes are disconnected from the scored node.
+A relevant note here is that `z` can give NaN 
+when the observed nodes are disconnected from the scored node. 
+This is because these are nodes that have 
+nor experimental neither network data.
 
 ## Scaling up the analysis
 
@@ -290,11 +323,65 @@ rownames(mat_classes) <- V(yeast)$name
 colnames(mat_classes) <- names_classes
 ```
 
-We can keep the former 50% known / 50% unknown approach, and screen 
-the performance of all the methods
+We can keep the former 50% known / 50% unknown approach
+with the same split (not all the splits will be balanced now) 
+and screen 
+the performance of all the methods using the area under the ROC curve 
+(**AUC**) as a performance index.
 
+```{r}
+list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 
+mat_known <- mat_classes[known, ]
+df_methods <- plyr::ldply(
+  list_methods, 
+  function(method) {
+    diff <- diffusion::diffuse(
+      yeast, 
+      scores = list(Example1 = mat_known), 
+      method = method
+    )$Example1
+    categories <- colnames(diff)
+    # browser()
+    categ_auc <- plyr::ldply(
+      categories, 
+      function(categ) {
+        # browser()
+        predictor <- diff[target, categ]
+        response <- mat_classes[target, categ]
+        AUC <- pROC::auc(predictor = predictor, response = response)
+        
+        data.frame(
+          Class = categ, 
+          AUC = unlist(AUC), 
+          stringsAsFactors = FALSE
+        )
+      }
+    )
+    categ_auc$Method <- method
+    categ_auc
+  }
+)
+df_methods$Method <- factor(
+  df_methods$Method, 
+  levels = list_methods)
+```
 
+We might plot the AUCs over the categories for each method:
+
+```{r}
+ggplot(df_methods, 
+       aes(x = Method, y = AUC)) + 
+  geom_boxplot(aes(fill = Method)) + 
+  scale_fill_npg() + 
+  theme_bw() + 
+  xlab("Method") +
+  ylab("Area under the curve") + 
+  ggtitle("Methods performance in all categories")
+```
+
+Scaling up the analysis can be useful for assessing 
+how adequate a diffusion score is in the dataset of interest.
 
 
 ## References
