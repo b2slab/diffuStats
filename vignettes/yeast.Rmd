@@ -151,18 +151,13 @@ to rank all the proteins. As a first approach, we will compute the
 *vanilla* diffusion scores through the `raw` method
 
 ```{r}
-# matrix of scores
-scores_mat <- matrix(
-  (known %in% known_A)*1, 
-  ncol = 1, 
-  nrow = length(known))
-rownames(scores_mat) <- known
-colnames(scores_mat) <- "ClassA"
+# vector of scores
+scores_A <- setNames((known %in% known_A)*1, known)
 
 # diffusion
 diff <- diffusion::diffuse(
   yeast, 
-  scores = list(Example1 = scores_mat), 
+  scores = scores_A, 
   method = "raw"
 )
 ```
@@ -170,9 +165,7 @@ diff <- diffusion::diffuse(
 Diffusion scores are ready
 
 ```{r}
-str(diff)
-
-scores_diff <- as.vector(diff$Example1)
+head(diff)
 ```
 
 Now, we can compare the scores obtained by the proteins
@@ -184,7 +177,7 @@ and the other labelled target proteins.
 df_plot <- data.frame(
   Protein = V(yeast)$name, 
   Class = ifelse(scores_true, "Transport and sensing", "Other"), 
-  DiffusionScore = scores_diff, 
+  DiffusionScore = diff, 
   Target = target_id, 
   Method = "raw",
   stringsAsFactors = FALSE
@@ -258,14 +251,14 @@ df_methods <- plyr::ldply(
   function(method) {
     diff <- diffusion::diffuse(
       yeast, 
-      scores = list(Example1 = scores_mat), 
+      scores = scores_A, 
       method = method
     )
     
     data.frame(
       Protein = V(yeast)$name, 
       Class = ifelse(scores_true, "Transport and sensing", "Other"), 
-      DiffusionScore = as.vector(diff$Example1), 
+      DiffusionScore = diff, 
       Target = target_id, 
       Method = method,
       stringsAsFactors = FALSE
@@ -315,7 +308,6 @@ names_classes <- setdiff(names(table_classes), c("U", NA))
 mat_classes <- sapply(
   names_classes, 
   function(class) {
-    
     V(yeast)$Class %in% class
   }
 )*1
@@ -338,9 +330,9 @@ df_methods <- plyr::ldply(
   function(method) {
     diff <- diffusion::diffuse(
       yeast, 
-      scores = list(Example1 = mat_known), 
+      scores = mat_known, 
       method = method
-    )$Example1
+    )
     categories <- colnames(diff)
     # browser()
     categ_auc <- plyr::ldply(

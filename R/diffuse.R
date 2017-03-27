@@ -4,9 +4,19 @@
 #' \code{\link[igraph]{igraph}} format and an initial state
 #' to score all the nodes in the network.
 #'
+#' Input scores can be specified at three complexity levels.
+#' A single set of scores to smooth can be represented as a named
+#' numeric vector, whereas if several of these vectors that share
+#' the node names need to be smoothed, they can be provided as
+#' a column-wise matrix. However, if the number of unlabelled
+#' entities varies from one case to another, a named list of such scores
+#' matrices can be passed to this function. The input format will
+#' be kept in the output.
+#'
 #' @param graph \code{\link[igraph]{igraph}} object for the diffusion
-#' @param scores list of score matrices. For a single input with a
-#' single background, supply a list with a vector column
+#' @param scores scores to be smoothed; either a named numeric vector,
+#' a column-wise matrix whose rownames are nodes and colnames are
+#' different scores, or a named list of such matrices.
 #' @param method character, one of \code{raw}, \code{gm},
 #' \code{ml}, \code{z}, \code{mc}, \code{ber_s}, \code{ber_p}
 #' @param ... additional arguments for the diffusion method
@@ -23,10 +33,33 @@ diffuse <- function(
   method,
   ...) {
 
-  classical <- c("raw", "ml", "gm")
+  # classical <- c("raw", "ml", "gm")
+  #
+  # For data reshaping
+  dummy_column <- "dummy"
+  dummy_list <- "dummy"
+
+  # Format scores
+  is_vector <- is.numeric(scores) & is.null(dim(scores))
+  is_numeric <- is.numeric(scores)
+
+  if (is_vector) {
+    message("Reshaping score vector to matrix...")
+
+    names_scores <- names(scores)
+    scores <- matrix(scores, ncol = 1)
+    rownames(scores) <- names_scores
+    colnames(scores) <- dummy_column
+  }
+  if (is_numeric) {
+    message("Reshaping score matrix to list...")
+
+    scores <- list(scores)
+    names(scores) <- dummy_list
+  }
 
   if (method == "raw") {
-    return(diffuse_raw(graph = graph, scores = scores, ...))
+    ans <- (diffuse_raw(graph = graph, scores = scores, ...))
   }
   if (method == "ml") {
     scores_ml <- lapply(
@@ -37,7 +70,7 @@ diffuse <- function(
       }
     )
     # browser()
-    return(diffuse_raw(graph = graph, scores = scores_ml, ...))
+    ans <- (diffuse_raw(graph = graph, scores = scores_ml, ...))
   }
   if (method == "gm") {
     scores_gm <- lapply(
@@ -69,17 +102,17 @@ diffuse <- function(
         mat_complete[V(graph)$name, , drop = FALSE]
       }
     )
-    return(diffuse_raw(graph = graph, scores = scores_gm, ...))
+    ans <- (diffuse_raw(graph = graph, scores = scores_gm, ...))
   }
 
   # Monte-Carlo simulations
   if (method == "mc") {
-    return(diffuse_mc(graph = graph, scores = scores, ...))
+    ans <- (diffuse_mc(graph = graph, scores = scores, ...))
   }
 
   # z scores
   if (method == "z") {
-    return(diffuse_raw(graph = graph, scores = scores, z = TRUE, ...))
+    ans <- (diffuse_raw(graph = graph, scores = scores, z = TRUE, ...))
   }
 
   # Bersanelli's scores (s)
@@ -116,7 +149,7 @@ diffuse <- function(
         mat_out/mat_in_fill
       }
     )
-    return(scores_ber_s)
+    ans <- (scores_ber_s)
   }
 
   # Bersanelli's scores (p)
@@ -140,11 +173,29 @@ diffuse <- function(
         -log10(s_mc)*s_raw
       }
     )
-    return(scores_ber_p)
+    ans <- (scores_ber_p)
+  }
+  if (!exists("ans")) {
+    message(
+      "The specified method ",
+      method,
+      " is not implemented and will return NULL")
+    return(invisible())
   }
 
-  message(
-    "The specified method ",
-    method,
-    " is not implemented and will return NULL")
+  # reshape back to original
+  if (is_numeric) {
+    # message("Reshaping results list to matrix...")
+
+    ans <- ans[[dummy_list]]
+  }
+  if (is_vector) {
+    # message("Reshaping results matrix to vector...")
+
+    ans <- setNames(as.vector(ans[, dummy_column]), rownames(ans))
+  }
+
+  message("All done")
+  return(ans)
+
 }

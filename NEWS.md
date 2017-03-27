@@ -1,5 +1,24 @@
 # Version log
 
+## Version 0.0.10
+
+* Added first 'wrapper': 
+input scores can be given as vector, matrix or list of matrices. 
+Whatever format was given will be returned. 
+Contains unit testing.
+This simplified vignettes a bit as well.
+* Modified `graph_toy` to contain examples of input vector and matrix.
+Updated doc and first vignette.
+* Dense `Matrix` objects converted to base matrix in diffusion output.
+
+### TODO
+
+* Exhaustive unit testing
+* Add kernels
+* Add examples to each function
+* Test installation on other systems 
+* Add wrappers for several scores screening, AUC, CV(?)
+
 ## Version 0.0.8
 
 * Added `largest_cc` helper

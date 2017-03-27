@@ -56,15 +56,15 @@ that contains `1`'s in the labels in the list and `0`'s otherwise.
 
 In this example data, the graph contains one input already. 
 ```{r}
-input <- graph_toy$input
+input_vec <- graph_toy$input_vec
 
-head(input)
+head(input_vec, 15)
 ```
 
 Let's check how many nodes have values
 
 ```{r}
-dim(input)
+length(input_vec)
 ```
 
 We see that all the nodes have a measure in each of the four score sets. 
@@ -72,22 +72,26 @@ In practice, these score sets could be disease genes, pathways, et cetera.
 
 ## The diffusion algorithm
 
-Each one of these columns in the input will be *smoothed* using the network 
+Each one of these columns in the input can be *smoothed* using the network 
 and new value will be derived - unlabelled nodes are also scored. 
 This is the main purpose of diffusion: to derive new scores that 
 intend to keep the same trends as the scores in the input, 
 but taking into account 
 the network structure.
 
+Let's start with a single column - that would be the case
+where there is only a vector of values to be smoothed. 
+Note that these values must be named and must be a subset or all of  
+the graph nodes.
+
 ```{r}
-output <- diffusion::diffuse(
+output_vec <- diffusion::diffuse(
   graph = graph_toy, 
   method = "raw", 
-  scores = list(myInputs = input))
+  scores = input_vec)
 
-head(output$myInputs)
+head(output_vec, 15)
 ```
-
 
 ## Diffusion scores visualisation
 
@@ -98,11 +102,10 @@ for graphical purposes.
 Let's see an example:
 
 ```{r}
-score_col <- 2
 igraph::plot.igraph(
   graph_toy, 
-  vertex.color = diffusion::scores2colours(output$myInputs[, score_col]),
-  vertex.shape = diffusion::scores2shapes(input[, score_col]),
+  vertex.color = diffusion::scores2colours(output_vec),
+  vertex.shape = diffusion::scores2shapes(input_vec),
   main = "Diffusion scores in our lattice"
 )
 ```
@@ -114,17 +117,27 @@ Square nodes were originally tagged as relevant,
 and the diffusion algorithm smoothed these tags over the network - 
 the guilt-by-association principle!
 
+## Several inputs, several smoothing scores
+
+The input to `diffuse` can be more than a vector with scores. 
+It can be provided with a set of score vectors, stored in a matrix 
+by columns, where rownames should contain 
+the nodes that are being scored. 
+As different score sets might have different labelled/unlabelled nodes,
+`diffuse` also accepts a list of score matrices that may have 
+a different amount of rows.
+
+In this session, we will diffuse using a matrix of scores that 
+contains four sets of scores, with four different names.
+
 ```{r}
-score_col <- 3
-igraph::plot.igraph(
-  graph_toy, 
-  vertex.color = diffusion::scores2colours(output$myInputs[, score_col]),
-  vertex.shape = diffusion::scores2shapes(input[, score_col]),
-  main = "Diffusion scores in our lattice"
-)
+input_mat <- graph_toy$input_mat
+
+head(input_mat)
 ```
 
-There are a variety of methods to compute the diffusion scores. 
+On the other hand, there are a variety of methods 
+to compute the diffusion scores. 
 At the moment, the following: `raw`, `ml` and `gm` for 
 classical propagation; `z` and `mc` for scores normalised 
 through a statistical model, and similarly `ber_s` and `ber_p`, 
@@ -132,20 +145,29 @@ as described in [@mosca].
 The scoring methods `mc` and `ber_p` require permutations, 
 whereas the rest are deterministic. 
 
+For instance, let's smooth through `mc` the input matrix:
+
 ```{r}
 output_mc <- diffusion::diffuse(
   graph = graph_toy, 
   method = "mc", 
-  scores = list(myInputs = input))
+  scores = input_mat)
 
-score_col <- 3
+head(output_mc)
+```
+
+We can plot the result of the fourth column:
+
+```{r}
+score_col <- 4
 igraph::plot.igraph(
   graph_toy, 
-  vertex.color = diffusion::scores2colours(output_mc$myInputs[, score_col]),
-  vertex.shape = diffusion::scores2shapes(input[, score_col]),
+  vertex.color = diffusion::scores2colours(output_mc[, score_col]),
+  vertex.shape = diffusion::scores2shapes(input_mat[, score_col]),
   main = "Diffusion scores in our lattice"
 )
 ```
+
 
 Each method has its particularities and, in the end, 
 it is all about the question being asked to the data. 

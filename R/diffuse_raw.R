@@ -68,7 +68,8 @@ diffuse_raw <- function(
       colnames(diff.raw) <- input.names
 
       gc()
-      if (z == FALSE) return(diff.raw)
+      # Return base matrix if it is raw
+      if (z == FALSE) return(as.matrix(diff.raw))
 
       # If we want z-scores, must compute rowmeans and rowmeans2
       .rowSums <- Matrix::rowSums(K[, bkgd.names])
@@ -118,6 +119,8 @@ diffuse_raw <- function(
 
       # browser()
       # if (any(is.na(diff.z))) browser()
+      #
+      # This is already a base matrix
       return(diff.z)
     }
   )

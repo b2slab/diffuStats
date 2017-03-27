@@ -166,9 +166,10 @@ diffuse_mc <- function(
       # )
 
       gc()
-      if (oneminusHeatRank) return(1 - ans)
+      # Make sure we return a matrix
+      if (oneminusHeatRank) return(as.matrix(1 - ans))
 
-      return(ans)
+      return(as.matrix(ans))
     }
   )
 

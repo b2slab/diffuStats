@@ -9,8 +9,9 @@ diffuse(graph, scores, method, ...)
 \arguments{
 \item{graph}{\code{\link[igraph]{igraph}} object for the diffusion}
 
-\item{scores}{list of score matrices. For a single input with a
-single background, supply a list with a vector column}
+\item{scores}{scores to be smoothed; either a named numeric vector,
+a column-wise matrix whose rownames are nodes and colnames are
+different scores, or a named list of such matrices.}
 
 \item{method}{character, one of \code{raw}, \code{gm},
 \code{ml}, \code{z}, \code{mc}, \code{ber_s}, \code{ber_p}}
@@ -25,4 +26,14 @@ dimensions as \code{scores}
 Function \code{diffuse} takes a network in
 \code{\link[igraph]{igraph}} format and an initial state
 to score all the nodes in the network.
+}
+\details{
+Input scores can be specified at three complexity levels.
+A single set of scores to smooth can be represented as a named
+numeric vector, whereas if several of these vectors that share
+the node names need to be smoothed, they can be provided as
+a column-wise matrix. However, if the number of unlabelled
+entities varies from one case to another, a named list of such scores
+matrices can be passed to this function. The input format will
+be kept in the output.
 }

@@ -37,7 +37,7 @@ test_that("Transforms on the input are accurate", {
       # message(method)
       expect_error({
         # if (method == "z") browser()
-        ans <- diffusion::diffuse(
+        ans <- diffuse(
           graph = g,
           scores = list(bkgd1 = mat),
           method = method)$bkgd1
@@ -52,6 +52,64 @@ test_that("Transforms on the input are accurate", {
     function(method)
       expect_equivalent(
         as.matrix(out[[method]]),
+        sol[[method]])
+  )
+})
+
+test_that("Input can be introduced as a vector", {
+  # Use Input1
+  vec_input <- setNames(mat[, "Input1"], rownames(mat))
+
+  out <- plyr::llply(
+    setNames(methods_raw, methods_raw),
+    function(method) {
+      # message(method)
+      expect_error({
+        # if (method == "z") browser()
+        ans <- diffuse(
+          graph = g,
+          scores = vec_input,
+          method = method)
+      }, NA)
+      ans
+    }
+  )
+
+  # The transforms are correct
+  plyr::l_ply(
+    methods_raw,
+    function(method)
+      expect_equivalent(
+        out[[method]],
+        sol[[method]][, "Input1"])
+  )
+})
+
+test_that("Input can be introduced as a matrix", {
+  # Use mat for inputs
+  mat_input <- mat
+
+  out <- plyr::llply(
+    setNames(methods_raw, methods_raw),
+    function(method) {
+      # message(method)
+      expect_error({
+        # if (method == "z") browser()
+        ans <- diffuse(
+          graph = g,
+          scores = mat_input,
+          method = method)
+      }, NA)
+      ans
+    }
+  )
+
+  # The transforms are correct
+  plyr::l_ply(
+    methods_raw,
+    function(method)
+      expect_equivalent(
+        (out[[method]]),
         sol[[method]])
   )
 })

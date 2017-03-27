@@ -11,7 +11,7 @@ set.seed(seed)
 g <- diffusion::generate_graph(
   make_lattice,
   list(dimvector = c(nx, ny)),
-  class_prop = c(source=0, filler=0, end=01))
+  class_label = rep("end", nx*ny))
 V(g)$name <- paste0("A", 1:vcount(g))
 g$layout <- layout.grid(g, width = nx, height = ny)
 g$asp = ny/nx
@@ -27,18 +27,28 @@ input[sample(nx*ny, nx*ny/2), 4] <- 1
 rownames(input) <- paste0("A", 1:nrow(input))
 colnames(input) <- c("Single", "Row", "Small_sample", "Large_sample")
 
+input_vec <- setNames(input[, 3], rownames(input))
+
 # Diffusion scores
-output_raw <- diffusion::diffuse_raw(
+output_raw_vec <- diffusion::diffuse(
   graph = g,
-  scores = list(bkgd1 = input))$bkgd1
-output_mc <- diffusion::diffuse_mc(
+  scores = input_vec,
+  method = "raw")
+output_raw <- diffusion::diffuse(
   graph = g,
-  scores = list(bkgd1 = input),
-  sample.prob = NULL)$bkgd1
+  scores = input,
+  method = "raw")
+output_mc <- diffusion::diffuse(
+  graph = g,
+  scores = input,
+  method = "mc",
+  sample.prob = NULL)
 
 # Save them to graph
-g$input <- input
-g$output <- output_raw
+g$input_vec <- input_vec
+g$input_mat <- input
+g$output_vec <- output_raw_vec
+g$output_mat <- output_raw
 
 methods_raw <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 output <- plyr::llply(
@@ -46,8 +56,8 @@ output <- plyr::llply(
   function(method) {
     ans <- diffusion::diffuse(
       graph = g,
-      scores = list(bkgd1 = input),
-      method = method)$bkgd1
+      scores = input,
+      method = method)
     ans
   }
 )
