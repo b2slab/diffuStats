@@ -1,5 +1,22 @@
 # Version log
 
+## Version 0.2.0
+
+* Added performance wrapper: `perf` (and its core `perf_eval`) 
+Can apply diffusion over a grid
+of parameters and compute a metric using "target scores". 
+Unit testing written as well.
+* Dropped `pROC` dependency, added `Metrics`
+* Helper functions to deal with the format of the files
+
+### TODO
+
+* Some more unit testing (helpers...). Aim at 100% coverage
+* Add kernels
+* Add examples to each function
+* Test installation on other systems 
+* Sanity check for inputs
+
 ## Version 0.0.10
 
 * Added first 'wrapper': 

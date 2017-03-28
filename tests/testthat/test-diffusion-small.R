@@ -26,7 +26,6 @@ sol <- list(
             "Input2" = c(sqrt(2)/2, sqrt(2)/2, -sqrt(2), NaN, NaN))
 )
 
-
 methods_raw <- c("raw", "ml", "gm", "z")
 
 test_that("Transforms on the input are accurate", {

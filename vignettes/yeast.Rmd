@@ -265,9 +265,7 @@ df_methods <- plyr::ldply(
     )
   }
 )
-df_methods$Method <- factor(
-  df_methods$Method, 
-  levels = list_methods)
+df_methods$Method <- factor(df_methods$Method, levels = list_methods)
 ```
 
 Let's plot the results:
@@ -324,47 +322,20 @@ the performance of all the methods using the area under the ROC curve
 ```{r}
 list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 
-mat_known <- mat_classes[known, ]
-df_methods <- plyr::ldply(
-  list_methods, 
-  function(method) {
-    diff <- diffusion::diffuse(
-      yeast, 
-      scores = mat_known, 
-      method = method
-    )
-    categories <- colnames(diff)
-    # browser()
-    categ_auc <- plyr::ldply(
-      categories, 
-      function(categ) {
-        # browser()
-        predictor <- diff[target, categ]
-        response <- mat_classes[target, categ]
-        AUC <- pROC::auc(predictor = predictor, response = response)
-        
-        data.frame(
-          Class = categ, 
-          AUC = unlist(AUC), 
-          stringsAsFactors = FALSE
-        )
-      }
-    )
-    categ_auc$Method <- method
-    categ_auc
-  }
+df_methods <- perf(
+  graph = yeast, 
+  scores = mat_classes[known, ], 
+  validation = mat_classes[target, ], 
+  grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE)
 )
-df_methods$Method <- factor(
-  df_methods$Method, 
-  levels = list_methods)
 ```
 
 We might plot the AUCs over the categories for each method:
 
 ```{r}
 ggplot(df_methods, 
-       aes(x = Method, y = AUC)) + 
-  geom_boxplot(aes(fill = Method)) + 
+       aes(x = method, y = auc)) + 
+  geom_boxplot(aes(fill = method)) + 
   scale_fill_npg() + 
   theme_bw() + 
   xlab("Method") +

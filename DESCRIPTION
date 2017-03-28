@@ -1,7 +1,7 @@
 Package: diffusion
 Type: Package
 Title: Diffusion methods for networks
-Version: 0.0.10
+Version: 0.2.0
 Author: Sergio Picart-Armada
 Maintainer: Sergio Picart-Armada <sergi.picart@upc.edu>
 Description: Methods to propagate scores in networks. 
@@ -10,13 +10,14 @@ Description: Methods to propagate scores in networks.
 Depends: R (>= 3.3)
 Imports: grDevices, 
     stats, 
+    methods, 
+    Matrix, 
     igraph, 
     Rcpp, 
     RcppArmadillo, 
     RcppParallel, 
-    Matrix, 
     plyr, 
-    methods
+    Metrics
 License: GPL-3
 LazyData: true
 Encoding: UTF-8
@@ -26,8 +27,7 @@ Suggests: testthat,
     rmarkdown, 
     ggplot2, 
     ggsci, 
-    igraphdata, 
-    pROC
+    igraphdata
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel 
 SystemRequirements: GNU make
 VignetteBuilder: knitr

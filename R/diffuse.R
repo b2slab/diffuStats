@@ -36,27 +36,8 @@ diffuse <- function(
   # classical <- c("raw", "ml", "gm")
   #
   # For data reshaping
-  dummy_column <- "dummy"
-  dummy_list <- "dummy"
-
-  # Format scores
-  is_vector <- is.numeric(scores) & is.null(dim(scores))
-  is_numeric <- is.numeric(scores)
-
-  if (is_vector) {
-    message("Reshaping score vector to matrix...")
-
-    names_scores <- names(scores)
-    scores <- matrix(scores, ncol = 1)
-    rownames(scores) <- names_scores
-    colnames(scores) <- dummy_column
-  }
-  if (is_numeric) {
-    message("Reshaping score matrix to list...")
-
-    scores <- list(scores)
-    names(scores) <- dummy_list
-  }
+  format_scores <- which_format(scores)
+  scores <- to_list(scores)
 
   if (method == "raw") {
     ans <- (diffuse_raw(graph = graph, scores = scores, ...))
@@ -146,7 +127,7 @@ diffuse <- function(
         mat_in_fill[rownames(mat_in), ] <-
           mat_in_fill[rownames(mat_in), ] + mat_in
 
-        mat_out/mat_in_fill
+        as.matrix(mat_out/mat_in_fill)
       }
     )
     ans <- (scores_ber_s)
@@ -183,19 +164,7 @@ diffuse <- function(
     return(invisible())
   }
 
-  # reshape back to original
-  if (is_numeric) {
-    # message("Reshaping results list to matrix...")
-
-    ans <- ans[[dummy_list]]
-  }
-  if (is_vector) {
-    # message("Reshaping results matrix to vector...")
-
-    ans <- setNames(as.vector(ans[, dummy_column]), rownames(ans))
-  }
-
   message("All done")
-  return(ans)
-
+  # reshape back to original and return
+  return(to_x_from_list(ans, format_scores))
 }

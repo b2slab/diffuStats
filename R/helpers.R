@@ -78,3 +78,64 @@ scores2shapes <- function(
   ifelse(x == 0, shapes[1], shapes[2])
 }
 
+#' In which format is the input?
+#'
+#' Tell apart vector, matrix or list of matrices
+#'
+#' @param x object to evaluate
+#'
+#' @return character: vector, matrix or list.
+which_format <- function(x) {
+  if (is.numeric(x) & is.null(dim(x))) return("vector")
+  if (is.numeric(x)) return("matrix")
+  if (is.list(x)) return("list")
+
+  stop("Non-recognised format, object of class: ", class(x))
+}
+
+#' Convert input to list format
+#'
+#' Convert any input to list format
+#'
+#' @param scores object to reformat
+#' @param dummy_column,dummy_list character, names for the dummy columns/items
+#'
+#' @return scores in list format
+to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
+  s_format <- which_format(scores)
+
+  if (s_format == "vector") {
+    # message("Reshaping score vector to matrix...")
+
+    names_scores <- names(scores)
+    scores <- matrix(scores, ncol = 1)
+    rownames(scores) <- names_scores
+    colnames(scores) <- dummy_column
+  }
+  if (s_format %in% c("matrix", "vector")) {
+    # message("Reshaping score matrix to list...")
+
+    scores <- list(scores)
+    names(scores) <- dummy_list
+  }
+  return(scores)
+
+  stop("Non-recognised format, object of class: ", class(s_format))
+}
+
+#' Convert list format to desired format
+#'
+#' Convert any list format to the convenient one
+#'
+#' @param scores list to reformat
+#' @param x character, desired format
+#'
+#' @return scores in desired format
+to_x_from_list <- function(scores, x) {
+  if (x == "list") return(scores)
+  if (x == "matrix") return(scores[[1]])
+  if (x == "vector")
+    return(setNames(scores[[1]][, 1], rownames(scores[[1]])))
+
+  stop("Non-recognised desired format: ", x)
+}
