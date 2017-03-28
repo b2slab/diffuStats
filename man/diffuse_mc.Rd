@@ -4,8 +4,8 @@
 \alias{diffuse_mc}
 \title{Compute the heatrank using permutations}
 \usage{
-diffuse_mc(graph, scores, n.perm = 10000, diag.sum = 1,
-  sample.prob = NULL, seed = 1, oneminusHeatRank = TRUE, K = NULL)
+diffuse_mc(graph, scores, n.perm = 10000, sample.prob = NULL, seed = 1,
+  oneminusHeatRank = TRUE, K = NULL)
 }
 \arguments{
 \item{graph}{igraph object}
@@ -13,8 +13,6 @@ diffuse_mc(graph, scores, n.perm = 10000, diag.sum = 1,
 \item{scores}{Recursive list}
 
 \item{n.perm}{Numeric, number of permutations}
-
-\item{diag.sum}{What to sum to the Laplacian diagonal?}
 
 \item{sample.prob}{Numeric, probabilities (needn't be scaled) to permute the
 input. This is passed to \code{\link[base]{sample}}'s \code{prob} argument.

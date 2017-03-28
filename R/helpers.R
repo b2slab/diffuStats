@@ -136,6 +136,21 @@ to_x_from_list <- function(scores, x) {
   if (x == "matrix") return(scores[[1]])
   if (x == "vector")
     return(setNames(scores[[1]][, 1], rownames(scores[[1]])))
+}
 
-  stop("Non-recognised desired format: ", x)
+#' Check if a matrix is a valid kernel
+#'
+#' This function checks whether the eigenvalues are non-negative
+#'
+#' @param x numeric, symmetric matrix to be checked
+#' @param tol numeric, tolerance for zero eigenvalues
+#'
+#' @return scores in desired format
+is_kernel <- function(x, tol = 1e-8) {
+  if (!Matrix::isSymmetric(x))
+    stop("the matrix x must be symmetric")
+  if (tol <= 0)
+    stop("tol must be positive")
+  eig_values <- eigen(x, only.values = TRUE)$values
+  return(all(eig_values >= -tol))
 }

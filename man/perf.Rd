@@ -4,12 +4,10 @@
 \alias{perf}
 \title{Compare diffusions to a target score on a grid of parameters}
 \usage{
-perf(graph, scores, validation, grid_param, metric = list(auc = Metrics::auc,
-  rmse = Metrics::rmse))
+perf(scores, validation, grid_param, metric = list(auc = Metrics::auc, rmse =
+  Metrics::rmse), ...)
 }
 \arguments{
-\item{graph}{\code{\link[igraph]{igraph}} object for the diffusion}
-
 \item{scores}{scores to be smoothed; either a named numeric vector,
 a column-wise matrix whose rownames are nodes and colnames are
 different scores, or a named list of such matrices.}
@@ -25,7 +23,10 @@ The column names should be the names of the parameters.}
 \item{metric}{named list of metrics to apply. Each metric should accept
 the form \code{f(actual, predicted)}}
 
-\item{...}{additional arguments for the diffusion method}
+\item{...}{additional named arguments for the diffusion method.
+It's important
+to input at least a \code{graph} igraph object or, alternative, a
+kernel matrix \code{K}}
 }
 \value{
 A data frame containing the performance of each diffusion score

@@ -15,7 +15,7 @@ seed <- 1
 # Directed graph
 graph <- barabasi.game(n, directed = F)
 V(graph)$name <- paste0("A", 1:n)
-diag.sum <- 1:n/n*150
+# diag.sum <- 1:n/n*150
 
 # Random scores
 scores <- list(
@@ -48,7 +48,6 @@ test_that("'diffuse_mc' consistency check", {
       graph = graph,
       scores = scores,
       n.perm = n.perm,
-      diag.sum = diag.sum,
       sample.prob = sample.prob,
       seed = seed,
       oneminusHeatRank = FALSE,
@@ -76,7 +75,6 @@ test_that("'diffuse_raw' consistency check", {
     raw <- diffuse_raw(
       graph = graph,
       scores = scores,
-      diag.sum = diag.sum,
       K = NULL)
   }, NA)
 

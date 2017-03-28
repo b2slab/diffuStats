@@ -4,16 +4,13 @@
 \alias{diffuse_raw}
 \title{Diffuse scores on a network}
 \usage{
-diffuse_raw(graph, scores, diag.sum = 1, z = FALSE, K = NULL)
+diffuse_raw(graph, scores, z = FALSE, K = NULL)
 }
 \arguments{
 \item{graph}{\code{\link[igraph]{igraph}} object for the diffusion}
 
 \item{scores}{list of score matrices. For a single input with a
 single background, supply a list with a vector column}
-
-\item{diag.sum}{numeric constant or vector, amount
-to add to regularise the Laplacian kernel if computed on the fly}
 
 \item{z}{logical, should z-scores be computed instead of raw scores?}
 

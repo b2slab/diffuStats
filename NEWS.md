@@ -1,5 +1,19 @@
 # Version log
 
+## Version 0.4.0
+
+* Added all the kernels and respective helpers, unit testing. 
+* `diffuse`, `perf` now accept kernels as inputs as well. Also, the 
+default Laplacian kernel is computed using kernel functions
+
+### TODO
+
+* Some more unit testing (helpers...). Aim at 100% coverage
+* Add examples to each function
+* Test installation on other systems 
+* Sanity check for inputs
+* Optional: one kernel wrapper with abbreviations
+
 ## Version 0.2.0
 
 * Added performance wrapper: `perf` (and its core `perf_eval`) 

@@ -7,8 +7,6 @@
 #' @param graph \code{\link[igraph]{igraph}} object for the diffusion
 #' @param scores list of score matrices. For a single input with a
 #' single background, supply a list with a vector column
-#' @param diag.sum numeric constant or vector, amount
-#' to add to regularise the Laplacian kernel if computed on the fly
 #' @param z logical, should z-scores be computed instead of raw scores?
 #' @param K optional matrix, precomputed diffusion kernel
 #'
@@ -20,25 +18,13 @@
 diffuse_raw <- function(
   graph,
   scores,
-  diag.sum = 1,
   z = FALSE,
   K = NULL) {
 
   # Kernel matrix
   if (is.null(K)) {
-    message("Matrix not supplied. Computing conductance...")
-    L <- graph.laplacian(
-      graph = graph,
-      normalized = FALSE,
-      sparse = TRUE)
-    # Connect pathways to boundary
-    Matrix::diag(L) <- Matrix::diag(L) + diag.sum
-
-    message("Done")
-    message("Computing inverse...")
-    K <- as.matrix(Matrix::solve(L))
-    rownames(K) <- colnames(K) <- V(graph)$name
-    rm(L)
+    message("Kernel not supplied. Computing regularised Laplacian kernel ...")
+    K <- regularisedLaplacianKernel(graph = graph)
     gc()
     message("Done")
   } else {

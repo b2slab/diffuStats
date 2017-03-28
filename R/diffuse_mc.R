@@ -11,7 +11,6 @@
 #' @param graph igraph object
 #' @param scores Recursive list
 #' @param n.perm Numeric, number of permutations
-#' @param diag.sum What to sum to the Laplacian diagonal?
 #' @param sample.prob Numeric, probabilities (needn't be scaled) to permute the
 #' input. This is passed to \code{\link[base]{sample}}'s \code{prob} argument.
 #' If \code{NULL}, sampling is uniform.
@@ -38,7 +37,6 @@ diffuse_mc <- function(
   graph,
   scores,
   n.perm = 1e4,
-  diag.sum = 1,
   sample.prob = NULL,
   seed = 1,
   oneminusHeatRank = TRUE,
@@ -47,20 +45,10 @@ diffuse_mc <- function(
   # p.adjust = "fdr")
 {
 
+  # Kernel matrix
   if (is.null(K)) {
-    message("Matrix not supplied. Computing conductance...")
-    L <- graph.laplacian(
-      graph = graph,
-      normalized = FALSE,
-      sparse = TRUE)
-    # Connect pathways to boundary
-    Matrix::diag(L) <- Matrix::diag(L) + diag.sum
-
-    message("Done")
-    message("Computing inverse...")
-    K <- as.matrix(Matrix::solve(L))
-    rownames(K) <- colnames(K) <- V(graph)$name
-    rm(L)
+    message("Kernel not supplied. Computing regularised Laplacian kernel ...")
+    K <- regularisedLaplacianKernel(graph = graph)
     gc()
     message("Done")
   } else {

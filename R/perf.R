@@ -13,7 +13,6 @@
 #' be restricted to this set as well.
 #'
 #'
-#' @param graph \code{\link[igraph]{igraph}} object for the diffusion
 #' @param scores scores to be smoothed; either a named numeric vector,
 #' a column-wise matrix whose rownames are nodes and colnames are
 #' different scores, or a named list of such matrices.
@@ -25,7 +24,10 @@
 #' The column names should be the names of the parameters.
 #' @param metric named list of metrics to apply. Each metric should accept
 #' the form \code{f(actual, predicted)}
-#' @param ... additional arguments for the diffusion method
+#' @param ... additional named arguments for the diffusion method.
+#' It's important
+#' to input at least a \code{graph} igraph object or, alternative, a
+#' kernel matrix \code{K}
 #'
 #' @return A data frame containing the performance of each diffusion score
 #'
@@ -33,11 +35,11 @@
 # ' @import magrittr
 #' @export
 perf <- function(
-  graph,
   scores,
   validation,
   grid_param,
-  metric = list(auc = Metrics::auc, rmse = Metrics::rmse)) {
+  metric = list(auc = Metrics::auc, rmse = Metrics::rmse),
+  ...) {
 
   # parameter names
   names_param <- colnames(grid_param)
@@ -58,7 +60,7 @@ perf <- function(
       # diffuse
       scores_param <- do.call(
         diffuse,
-        c(list(graph = graph, scores = scores), list_param)
+        c(list(...), list(scores = scores), list_param)
       )
 
       # data frame with performance
