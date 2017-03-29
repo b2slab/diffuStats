@@ -26,3 +26,8 @@ Character vector with hex colours
 Create a vector of hex colours from numeric values,
 typically diffusion scores
 }
+\examples{
+set.seed(1)
+scores2colours(runif(20))
+
+}

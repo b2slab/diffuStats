@@ -15,3 +15,8 @@ character: vector, matrix or list.
 \description{
 Tell apart vector, matrix or list of matrices
 }
+\examples{
+data(graph_toy)
+diffusion:::which_format(graph_toy$input_vec)
+diffusion:::which_format(graph_toy$input_mat)
+}

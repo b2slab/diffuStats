@@ -19,3 +19,8 @@ Character vector with shapes
 Translate 0/1 to shapes, by default \code{"circle"} and
 \code{"square"}
 }
+\examples{
+set.seed(1)
+scores2shapes(rbinom(n = 20, size = 1, prob = .5))
+
+}

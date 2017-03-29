@@ -25,3 +25,15 @@ Function \code{diffuse} takes a network in
 \code{\link[igraph]{igraph}} format and an initial state
 to score all the nodes in the network.
 }
+\examples{
+# Using a list as input (needed)
+data(graph_toy)
+list_input <- list(myInput1 = graph_toy$input_mat)
+diff_raw <- diffuse_raw(
+  graph = graph_toy,
+  scores = list_input)
+diff_z <- diffuse_raw(
+  graph = graph_toy,
+  scores = list_input,
+  z = TRUE)
+}

@@ -19,6 +19,19 @@
 #' @return A data frame containing the metrics for each comparable
 #' pair of output-validation.
 #'
+#' @examples
+#' # Using a matrix with four set of scores
+#' # called Single, Row, Small_sample, Large_sample
+#' data(graph_toy)
+#' diff <- diffuse(
+#'   graph = graph_toy,
+#'   scores = graph_toy$input_mat,
+#'   method = "raw")
+#' df_perf <- perf_eval(
+#'   prediction = diff,
+#'   validation = graph_toy$input_mat)
+#' df_perf
+#'
 #' @import plyr
 #' @import Metrics
 # ' @import magrittr
@@ -26,8 +39,9 @@
 perf_eval <- function(
   prediction,
   validation,
-  metric = list(auc = Metrics::auc, rmse = Metrics::rmse)) {
+  metric = list(auc = Metrics::auc)) {
 
+  # find out the input format
   format_pred <- which_format(prediction)
   format_val <- which_format(validation)
   if (format_pred != format_val) {
@@ -35,6 +49,8 @@ perf_eval <- function(
          " but 'validation' is ", format_val)
   }
 
+  # we convert everything to the most general list format
+  # we will undo it in the end
   pred <- to_list(prediction)
   val <- to_list(validation)
   # browser()
@@ -42,7 +58,8 @@ perf_eval <- function(
     # iterate over backgrounds
     names(pred),
     function(bkgd) {
-      # common names
+      # common names for metric computation...
+      # we have to compare the same nodes!
       common_names <- intersect(
         rownames(val[[bkgd]]),
         rownames(pred[[bkgd]]))
@@ -51,6 +68,7 @@ perf_eval <- function(
         stop("Column names in background ", bkgd, " differ. ",
              "Please make sure they are the same columns.")
 
+      # Comparable matrices
       mat_val <- val[[bkgd]][common_names, , drop = FALSE]
       mat_pred <- pred[[bkgd]][common_names, , drop = FALSE]
 

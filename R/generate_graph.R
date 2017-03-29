@@ -32,7 +32,11 @@
 #' @param g an igraph object
 #'
 #' @return a connected igraph object
-#'
+#' @examples
+#' library(igraph)
+#' g <- diffusion:::.connect_undirected_graph(
+#'   graph.empty(10, directed = FALSE))
+#' g
 #' @rdname connect_undirected_graph
 #'
 #' @import igraph
@@ -89,6 +93,16 @@
 #'
 #' @return An \code{\link[igraph]{igraph}} object
 #'
+#' @examples
+#' g <- generate_graph(
+#'   fun_gen = igraph::barabasi.game,
+#'   param_gen = list(n = 100, m = 3, directed = FALSE),
+#'   seed = 1)
+#' g
+#' \dontrun{
+#' plot(g)
+#' }
+#'
 #' @import igraph
 #' @export
 generate_graph <- function(
@@ -102,7 +116,7 @@ generate_graph <- function(
   # browser()
   if (!is.null(seed)) set.seed(seed)
 
-  # Generate network
+  # Generate network using provided function
   g <- do.call(fun_gen, param_gen)
   n <- vcount(g)
   V(g)$name <- paste0("V", 1:n)
@@ -121,11 +135,15 @@ generate_graph <- function(
   #     class_char,
   #     rep(utils::tail(names(class), 1), n_diff))
   # }
+  #
+  # First assign classes
   if (is.null(class_label)) {
     message("Using default class proportions...")
     class <- rep(names(.default_prop), times = .default_prop*n)
     last_prop <- utils::tail(names(.default_prop), 1)
-    class <- c(class, rep(last_prop, length(class) - n))
+
+    # If rounding left the classes vector a bit short... complete it
+    class <- c(class, rep(last_prop, n - length(class)))
 
     V(g)$class <- class
   } else {
@@ -135,7 +153,7 @@ generate_graph <- function(
     V(g)$class <- class_label
   }
 
-  # Assign vertex attributes
+  # Assign vertex attributes through a data_frame and vertex classes
   for (col in names(class_attr)) {
     mapper <- stats::setNames(class_attr[[col]], rownames(class_attr))
     g <- set_vertex_attr(

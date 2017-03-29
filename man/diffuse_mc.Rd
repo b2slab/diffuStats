@@ -33,3 +33,12 @@ A list containing matrices of heatrank scores
 Function \code{diffuse_mc} has an implemented parallelisation of the
 Monte Carlo trials for diffusion in a (sparse) network.
 }
+\examples{
+# Using a list as input (needed)
+data(graph_toy)
+list_input <- list(myInput1 = graph_toy$input_mat)
+diff_mc <- diffuse_mc(
+  graph = graph_toy,
+  scores = list_input)
+
+}

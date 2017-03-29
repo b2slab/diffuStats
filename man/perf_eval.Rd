@@ -4,8 +4,7 @@
 \alias{perf_eval}
 \title{Compute performance of diffusion scores on a single case}
 \usage{
-perf_eval(prediction, validation, metric = list(auc = Metrics::auc, rmse =
-  Metrics::rmse))
+perf_eval(prediction, validation, metric = list(auc = Metrics::auc))
 }
 \arguments{
 \item{prediction}{smoothed scores; either a named numeric vector,
@@ -29,4 +28,18 @@ Function \code{perf_eval} directly compares a desired output
 with the scores from diffusion. It handles the possible
 shapes of the scores (vector, matrix, list of matrices)
 and gives the desired metrics.
+}
+\examples{
+# Using a matrix with four set of scores
+# called Single, Row, Small_sample, Large_sample
+data(graph_toy)
+diff <- diffuse(
+  graph = graph_toy,
+  scores = graph_toy$input_mat,
+  method = "raw")
+df_perf <- perf_eval(
+  prediction = diff,
+  validation = graph_toy$input_mat)
+df_perf
+
 }

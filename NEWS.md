@@ -1,5 +1,17 @@
 # Version log
 
+## Version 0.4.2
+
+* Added examples to all functions. `BiocCheck` not complaining anymore!
+* Fixed small bugs
+
+### TODO
+
+* Some more unit testing (helpers...). Aim at 100% coverage
+* Test installation on other systems 
+* Sanity check for inputs
+* Optional: one kernel wrapper with abbreviations
+
 ## Version 0.4.0
 
 * Added all the kernels and respective helpers, unit testing. 

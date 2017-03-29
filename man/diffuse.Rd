@@ -37,3 +37,27 @@ entities varies from one case to another, a named list of such scores
 matrices can be passed to this function. The input format will
 be kept in the output.
 }
+\examples{
+# Using a vector
+data(graph_toy)
+diff_scores <- diffuse(
+  graph = graph_toy,
+  scores = graph_toy$input_vec,
+  method = "raw")
+
+# Using a matrix
+data(graph_toy)
+diff_scores <- diffuse(
+  graph = graph_toy,
+  scores = graph_toy$input_mat,
+  method = "raw")
+
+# Using a list of matrices
+data(graph_toy)
+diff_scores <- diffuse(
+  graph = graph_toy,
+  scores = list(myScores1 = graph_toy$input_mat,
+                myScores2 = graph_toy$input_mat),
+  method = "raw")
+
+}

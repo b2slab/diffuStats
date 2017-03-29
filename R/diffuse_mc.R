@@ -32,6 +32,14 @@
 #' @importFrom methods as
 # ' @useDynLib diffusion ParallelHeatrank
 #'
+#' @examples
+#' # Using a list as input (needed)
+#' data(graph_toy)
+#' list_input <- list(myInput1 = graph_toy$input_mat)
+#' diff_mc <- diffuse_mc(
+#'   graph = graph_toy,
+#'   scores = list_input)
+#'
 #' @export
 diffuse_mc <- function(
   graph,
@@ -56,6 +64,7 @@ diffuse_mc <- function(
   }
 
   # browser()
+  # Iterate over all scores backgrounds
   ans.all <- plyr::llply(
     stats::setNames(names(scores), names(scores)),
     function(scores.name) {
@@ -104,6 +113,7 @@ diffuse_mc <- function(
 
       # doParallel::registerDoParallel(cl)
       # parallel::clusterExport(cl, c("prob", "max.sample"))
+      # Generate permutations with R
       message("Permuting...")
       set.seed(seed)
       perms <- t(plyr::laply(
@@ -122,6 +132,7 @@ diffuse_mc <- function(
       # snow::stopCluster(cl)
       gc()
 
+      # .. and compute scores using c++ code
       message(paste0(scores.name, ": computing heatRank..."))
       ans <- ParallelHeatrank(
         K[, bkgd.names],

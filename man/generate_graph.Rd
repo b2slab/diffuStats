@@ -42,3 +42,14 @@ Function \code{generate_graph} generates a random network
 using \code{\link[igraph]{igraph}} graph generators. Several models are
 available, and
 }
+\examples{
+g <- generate_graph(
+  fun_gen = igraph::barabasi.game,
+  param_gen = list(n = 100, m = 3, directed = FALSE),
+  seed = 1)
+g
+\dontrun{
+plot(g)
+}
+
+}

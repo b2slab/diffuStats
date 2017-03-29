@@ -15,3 +15,10 @@ A connected \code{igraph} object
 \description{
 Obtain the largest connected component of an \code{igraph} object
 }
+\examples{
+library(igraph)
+set.seed(1)
+g <- erdos.renyi.game(30, p.or.m = .05)
+largest_cc(g)
+
+}

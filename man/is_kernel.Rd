@@ -17,3 +17,10 @@ scores in desired format
 \description{
 This function checks whether the eigenvalues are non-negative
 }
+\examples{
+data(graph_toy)
+K <- regularisedLaplacianKernel(graph_toy)
+is_kernel(K)
+is_kernel(K - 1)
+
+}

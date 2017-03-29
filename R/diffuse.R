@@ -24,6 +24,29 @@
 #' @return A list of scores, with the same length and
 #' dimensions as \code{scores}
 #'
+#' @examples
+#' # Using a vector
+#' data(graph_toy)
+#' diff_scores <- diffuse(
+#'   graph = graph_toy,
+#'   scores = graph_toy$input_vec,
+#'   method = "raw")
+#'
+#' # Using a matrix
+#' data(graph_toy)
+#' diff_scores <- diffuse(
+#'   graph = graph_toy,
+#'   scores = graph_toy$input_mat,
+#'   method = "raw")
+#'
+#' # Using a list of matrices
+#' data(graph_toy)
+#' diff_scores <- diffuse(
+#'   graph = graph_toy,
+#'   scores = list(myScores1 = graph_toy$input_mat,
+#'                 myScores2 = graph_toy$input_mat),
+#'   method = "raw")
+#'
 #' @import igraph
 # ' @import magrittr
 #' @export

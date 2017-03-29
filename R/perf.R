@@ -31,6 +31,24 @@
 #'
 #' @return A data frame containing the performance of each diffusion score
 #'
+#' @examples
+#' # Using a single vector of scores
+#' data(graph_toy)
+#' df_perf <- perf(
+#'   graph = graph_toy,
+#'   scores = graph_toy$input_vec,
+#'   validation = graph_toy$input_vec,
+#'   grid_param = expand.grid(method = c("raw", "ml")))
+#' df_perf
+#' # Using a matrix with four set of scores
+#' # called Single, Row, Small_sample, Large_sample
+#' df_perf <- perf(
+#'   graph = graph_toy,
+#'   scores = graph_toy$input_mat,
+#'   validation = graph_toy$input_mat,
+#'   grid_param = expand.grid(method = c("raw", "ml")))
+#' df_perf
+#'
 #' @import plyr
 # ' @import magrittr
 #' @export
@@ -38,7 +56,7 @@ perf <- function(
   scores,
   validation,
   grid_param,
-  metric = list(auc = Metrics::auc, rmse = Metrics::rmse),
+  metric = list(auc = Metrics::auc),
   ...) {
 
   # parameter names

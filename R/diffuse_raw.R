@@ -13,6 +13,17 @@
 #' @return A list of scores, with the same length and
 #' dimensions as \code{scores}
 #'
+#' @examples
+#' # Using a list as input (needed)
+#' data(graph_toy)
+#' list_input <- list(myInput1 = graph_toy$input_mat)
+#' diff_raw <- diffuse_raw(
+#'   graph = graph_toy,
+#'   scores = list_input)
+#' diff_z <- diffuse_raw(
+#'   graph = graph_toy,
+#'   scores = list_input,
+#'   z = TRUE)
 #' @import igraph
 #' @export
 diffuse_raw <- function(
@@ -55,6 +66,7 @@ diffuse_raw <- function(
 
       gc()
       # Return base matrix if it is raw
+      # Continue if we want z-scores
       if (z == FALSE) return(as.matrix(diff.raw))
 
       # If we want z-scores, must compute rowmeans and rowmeans2

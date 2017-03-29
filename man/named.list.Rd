@@ -16,3 +16,6 @@ A list of variables
 Create a list with variables and name the slots using
 the variables names
 }
+\examples{
+diffusion:::named.list(LETTERS, mean)
+}

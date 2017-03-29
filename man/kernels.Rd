@@ -61,3 +61,12 @@ the regularised Laplacian kernel, which is a standard in
 biological networks. It allows to control the constant terms summed
 to the diagonal
 }
+\examples{
+data(graph_toy)
+K_lap <- regularisedLaplacianKernel(graph_toy)
+K_diff <- diffusionKernel(graph_toy)
+K_pstep <- pStepKernel(graph_toy)
+K_ct <- commuteTimeKernel(graph_toy)
+K_ic <- inverseCosineKernel(graph_toy)
+is_kernel(K_lap)
+}

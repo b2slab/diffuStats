@@ -19,6 +19,17 @@
 #' nodes that did not generate signal and \code{input} for the
 #' signal itself
 #'
+#' @examples
+#' g <- generate_graph(
+#'   fun_gen = igraph::barabasi.game,
+#'   param_gen = list(n = 200, m = 3, directed = FALSE),
+#'   seed = 1)
+#' synth_input <- generate_input(
+#'   g,
+#'   order = 2,
+#'   length_inputs = 3, return_matrix = TRUE)
+#' str(synth_input)
+#'
 #' @importFrom plyr llply
 #' @import igraph
 #' @export
@@ -35,6 +46,7 @@ generate_input <- function(
   id.source <- as.numeric(V(graph)[class == "source"])
   id.end <- as.numeric(V(graph)[class == "end"])
 
+  if (is.null(names(order))) names(order) <- paste0("X", seq_along(order))
   ans <- plyr::llply(
     order,
     function(ord) {
@@ -103,7 +115,8 @@ generate_input <- function(
       ans,
       function(iter) {
         (id.end %in% iter$input)*1
-      }
+      },
+      .drop = FALSE
     ))
     if ("name" %in% list.vertex.attributes(graph)) {
       rownames(mat_input) <- V(graph)[id.end]$name
@@ -118,7 +131,8 @@ generate_input <- function(
       ans,
       function(iter) {
         (id.source %in% iter$pos)*1
-      }
+      },
+      .drop = FALSE
     ))
     if ("name" %in% list.vertex.attributes(graph)) {
       rownames(mat_source) <- V(graph)[id.source]$name

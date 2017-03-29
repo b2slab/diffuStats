@@ -33,3 +33,15 @@ It also specifies the true solution generating the
 list. The graph object needs to have some attributes
 (automatically added through \code{generate_graph})
 }
+\examples{
+g <- generate_graph(
+  fun_gen = igraph::barabasi.game,
+  param_gen = list(n = 200, m = 3, directed = FALSE),
+  seed = 1)
+synth_input <- generate_input(
+  g,
+  order = 2,
+  length_inputs = 3, return_matrix = TRUE)
+str(synth_input)
+
+}
