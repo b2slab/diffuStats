@@ -62,6 +62,15 @@ diffuse <- function(
   format_scores <- which_format(scores)
   scores <- to_list(scores)
 
+  # Check if we have a graph or a kernel
+  if (!missing("graph")) {
+    format_network <- "graph"
+  } else {
+    if (!("K" %in% names(list(...))))
+      stop("Neither a graph 'graph' or a kernel 'K' were provided")
+    format_network <- "kernel"
+  }
+
   if (method == "raw") {
     ans <- (diffuse_raw(graph = graph, scores = scores, ...))
   }
@@ -81,8 +90,17 @@ diffuse <- function(
       scores,
       function(mat) {
         # browser()
-        ids_nobkgd <- setdiff(V(graph)$name, rownames(mat))
-        n_tot <- vcount(graph)
+        # Have to match rownames with background
+        # If the kernel is provided...
+        if (format_network == "graph") {
+          names_ordered <- V(graph)$name
+        } else if (format_network == "kernel") {
+          names_ordered <- rownames(list(...)[["K"]])
+        }
+        #
+        # If the graph is defined...
+        ids_nobkgd <- setdiff(names_ordered, rownames(mat))
+        n_tot <- length(names_ordered)
         n_bkgd <- nrow(mat)
 
         # normalisation has to be performed for each column, as it depends
@@ -103,7 +121,7 @@ diffuse <- function(
         rownames(mat_complete) <- c(rownames(mat), ids_nobkgd)
 
         # sort the names as in the original graph
-        mat_complete[V(graph)$name, , drop = FALSE]
+        mat_complete[names_ordered, , drop = FALSE]
       }
     )
     ans <- (diffuse_raw(graph = graph, scores = scores_gm, ...))

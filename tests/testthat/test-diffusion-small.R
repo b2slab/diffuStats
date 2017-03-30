@@ -27,6 +27,7 @@ sol <- list(
 )
 
 methods_raw <- c("raw", "ml", "gm", "z")
+methods_all <- c(methods_raw, "mc", "ber_s", "ber_p")
 
 test_that("Transforms on the input are accurate", {
   # Diffusion does not fail
@@ -104,6 +105,38 @@ test_that("Input can be introduced as a matrix", {
   )
 
   # The transforms are correct
+  plyr::l_ply(
+    methods_raw,
+    function(method)
+      expect_equivalent(
+        (out[[method]]),
+        sol[[method]])
+  )
+})
+
+K <- regularisedLaplacianKernel(g)
+set.seed(1)
+test_that("Graph can be introduced as a kernel (deterministic)", {
+  # Use mat for inputs
+  mat_input <- mat
+
+  # Check ALL the methods for execution errors
+  out <- plyr::llply(
+    setNames(methods_all, methods_all),
+    function(method) {
+      # message(method)
+      expect_error({
+        # if (method == "z") browser()
+        ans <- diffuse(
+          K = K,
+          scores = mat_input,
+          method = method)
+      }, NA)
+      ans
+    }
+  )
+
+  # The transforms are correct (deterministic only)
   plyr::l_ply(
     methods_raw,
     function(method)

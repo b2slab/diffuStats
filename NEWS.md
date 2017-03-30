@@ -1,5 +1,17 @@
 # Version log
 
+## Version 0.4.3
+
+* Fixed small bug in `gm`
+* Added unit testing for inputs using kernels
+
+### TODO
+
+* Some more unit testing (helpers...). Aim at 100% coverage
+* Test installation on other systems 
+* Sanity check for inputs
+* Optional: one kernel wrapper with abbreviations
+
 ## Version 0.4.2
 
 * Added examples to all functions. `BiocCheck` not complaining anymore!
