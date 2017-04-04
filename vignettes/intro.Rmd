@@ -5,15 +5,15 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
-  %\VignetteIndexEntry{Diffusion in a nutshell}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{Diffusion in a nutshell}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE, message = FALSE, error = FALSE, 
-  fig.width = 7, fig.height = 6)
+    echo = TRUE, message = FALSE, error = FALSE, 
+    fig.width = 7, fig.height = 6)
 ```
 
 ## Getting started
@@ -86,9 +86,9 @@ the graph nodes.
 
 ```{r}
 output_vec <- diffusion::diffuse(
-  graph = graph_toy, 
-  method = "raw", 
-  scores = input_vec)
+    graph = graph_toy, 
+    method = "raw", 
+    scores = input_vec)
 
 head(output_vec, 15)
 ```
@@ -103,10 +103,10 @@ Let's see an example:
 
 ```{r}
 igraph::plot.igraph(
-  graph_toy, 
-  vertex.color = diffusion::scores2colours(output_vec),
-  vertex.shape = diffusion::scores2shapes(input_vec),
-  main = "Diffusion scores in our lattice"
+    graph_toy, 
+    vertex.color = diffusion::scores2colours(output_vec),
+    vertex.shape = diffusion::scores2shapes(input_vec),
+    main = "Diffusion scores in our lattice"
 )
 ```
 
@@ -149,9 +149,9 @@ For instance, let's smooth through `mc` the input matrix:
 
 ```{r}
 output_mc <- diffusion::diffuse(
-  graph = graph_toy, 
-  method = "mc", 
-  scores = input_mat)
+    graph = graph_toy, 
+    method = "mc", 
+    scores = input_mat)
 
 head(output_mc)
 ```
@@ -161,10 +161,10 @@ We can plot the result of the fourth column:
 ```{r}
 score_col <- 4
 igraph::plot.igraph(
-  graph_toy, 
-  vertex.color = diffusion::scores2colours(output_mc[, score_col]),
-  vertex.shape = diffusion::scores2shapes(input_mat[, score_col]),
-  main = "Diffusion scores in our lattice"
+    graph_toy, 
+    vertex.color = diffusion::scores2colours(output_mc[, score_col]),
+    vertex.shape = diffusion::scores2shapes(input_mat[, score_col]),
+    main = "Diffusion scores in our lattice"
 )
 ```
 

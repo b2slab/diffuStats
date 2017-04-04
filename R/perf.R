@@ -35,60 +35,60 @@
 #' # Using a single vector of scores
 #' data(graph_toy)
 #' df_perf <- perf(
-#'   graph = graph_toy,
-#'   scores = graph_toy$input_vec,
-#'   validation = graph_toy$input_vec,
-#'   grid_param = expand.grid(method = c("raw", "ml")))
+#'     graph = graph_toy,
+#'     scores = graph_toy$input_vec,
+#'     validation = graph_toy$input_vec,
+#'     grid_param = expand.grid(method = c("raw", "ml")))
 #' df_perf
 #' # Using a matrix with four set of scores
 #' # called Single, Row, Small_sample, Large_sample
 #' df_perf <- perf(
-#'   graph = graph_toy,
-#'   scores = graph_toy$input_mat,
-#'   validation = graph_toy$input_mat,
-#'   grid_param = expand.grid(method = c("raw", "ml")))
+#'     graph = graph_toy,
+#'     scores = graph_toy$input_mat,
+#'     validation = graph_toy$input_mat,
+#'     grid_param = expand.grid(method = c("raw", "ml")))
 #' df_perf
 #'
 #' @import plyr
 # ' @import magrittr
 #' @export
 perf <- function(
-  scores,
-  validation,
-  grid_param,
-  metric = list(auc = Metrics::auc),
-  ...) {
-
-  # parameter names
-  names_param <- colnames(grid_param)
-
-  # function names are needed
-  if (is.null(names(metric))) {
-    names(metric) <- sapply(metric, function(f) deparse(quote(f)))
-  }
-
-  plyr::adply(
+    scores,
+    validation,
     grid_param,
-    1,
-    function(row_param) {
-      # browser()
-      # params for do.call
-      list_param <- as.list(setNames(row_param, names_param))
+    metric = list(auc = Metrics::auc),
+    ...) {
 
-      # diffuse
-      scores_param <- do.call(
-        diffuse,
-        c(list(...), list(scores = scores), list_param)
-      )
+    # parameter names
+    names_param <- colnames(grid_param)
 
-      # data frame with performance
-      df_param <- perf_eval(
-        prediction = scores_param,
-        validation = validation,
-        metric = metric)
-
-      # add param column
-      data.frame(df_param, list_param)
+    # function names are needed
+    if (is.null(names(metric))) {
+        names(metric) <- sapply(metric, function(f) deparse(quote(f)))
     }
-  )
+
+    plyr::adply(
+        grid_param,
+        1,
+        function(row_param) {
+            # browser()
+            # params for do.call
+            list_param <- as.list(setNames(row_param, names_param))
+
+            # diffuse
+            scores_param <- do.call(
+                diffuse,
+                c(list(...), list(scores = scores), list_param)
+            )
+
+            # data frame with performance
+            df_param <- perf_eval(
+                prediction = scores_param,
+                validation = validation,
+                metric = metric)
+
+            # add param column
+            data.frame(df_param, list_param)
+        }
+    )
 }

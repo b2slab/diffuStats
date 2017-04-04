@@ -10,7 +10,7 @@
 #' @examples
 #' diffusion:::named.list(LETTERS, mean)
 named.list <- function(...) {
-  setNames(list(...), as.character(match.call()[-1]))
+    setNames(list(...), as.character(match.call()[-1]))
 }
 
 #' Largest connected component
@@ -30,10 +30,10 @@ named.list <- function(...) {
 #' @import igraph
 #' @export
 largest_cc <- function(g) {
-  cl <- clusters(g)
-  cl_max <- which.max(cl$csize)
+    cl <- clusters(g)
+    cl_max <- which.max(cl$csize)
 
-  igraph::induced_subgraph(graph = g, vids = which(cl$membership == cl_max))
+    igraph::induced_subgraph(graph = g, vids = which(cl$membership == cl_max))
 }
 
 #' Translate values into colours
@@ -58,19 +58,19 @@ largest_cc <- function(g) {
 #' @importFrom grDevices colorRampPalette
 #' @export
 scores2colours <- function(
-  x,
-  range = c(min(0, min(x)), max(x)),
-  n.colors = 10,
-  # number 4 and 1 from ggsci::pal_npg()(5)
-  palette = colorRampPalette(c("#3C5488FF", "white", "#F39B7FFF"))) {
-  pal <- do.call(palette, list(n.colors))
+    x,
+    range = c(min(0, min(x)), max(x)),
+    n.colors = 10,
+    # number 4 and 1 from ggsci::pal_npg()(5)
+    palette = colorRampPalette(c("#3C5488FF", "white", "#F39B7FFF"))) {
+    pal <- do.call(palette, list(n.colors))
 
-  x[x < range[1]] <- range[1]
-  x[x > range[2]] <- range[2]
+    x[x < range[1]] <- range[1]
+    x[x > range[2]] <- range[2]
 
-  y <- (x - range[1])/(range[2] - range[1])*(n.colors - 1)
-  z <- round(y) + 1
-  pal[z]
+    y <- (x - range[1])/(range[2] - range[1])*(n.colors - 1)
+    z <- round(y) + 1
+    pal[z]
 }
 
 #' Translate values into shapes
@@ -90,10 +90,10 @@ scores2colours <- function(
 #'
 #' @export
 scores2shapes <- function(
-  x,
-  shapes = c("circle", "square")){
+    x,
+    shapes = c("circle", "square")){
 
-  ifelse(x == 0, shapes[1], shapes[2])
+    ifelse(x == 0, shapes[1], shapes[2])
 }
 
 #' In which format is the input?
@@ -109,11 +109,11 @@ scores2shapes <- function(
 #' diffusion:::which_format(graph_toy$input_vec)
 #' diffusion:::which_format(graph_toy$input_mat)
 which_format <- function(x) {
-  if (is.numeric(x) & is.null(dim(x))) return("vector")
-  if (is.numeric(x)) return("matrix")
-  if (is.list(x)) return("list")
+    if (is.numeric(x) & is.null(dim(x))) return("vector")
+    if (is.numeric(x)) return("matrix")
+    if (is.list(x)) return("list")
 
-  stop("Non-recognised format, object of class: ", class(x))
+    stop("Non-recognised format, object of class: ", class(x))
 }
 
 #' Convert input to list format
@@ -130,25 +130,25 @@ which_format <- function(x) {
 #' x_v <- diffusion:::to_list(graph_toy$input_vec)
 #' x_m <- diffusion:::to_list(graph_toy$input_mat)
 to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
-  s_format <- which_format(scores)
+    s_format <- which_format(scores)
 
-  if (s_format == "vector") {
-    # message("Reshaping score vector to matrix...")
+    if (s_format == "vector") {
+        # message("Reshaping score vector to matrix...")
 
-    names_scores <- names(scores)
-    scores <- matrix(scores, ncol = 1)
-    rownames(scores) <- names_scores
-    colnames(scores) <- dummy_column
-  }
-  if (s_format %in% c("matrix", "vector")) {
-    # message("Reshaping score matrix to list...")
+        names_scores <- names(scores)
+        scores <- matrix(scores, ncol = 1)
+        rownames(scores) <- names_scores
+        colnames(scores) <- dummy_column
+    }
+    if (s_format %in% c("matrix", "vector")) {
+        # message("Reshaping score matrix to list...")
 
-    scores <- list(scores)
-    names(scores) <- dummy_list
-  }
-  return(scores)
+        scores <- list(scores)
+        names(scores) <- dummy_list
+    }
+    return(scores)
 
-  stop("Non-recognised format, object of class: ", class(s_format))
+    stop("Non-recognised format, object of class: ", class(s_format))
 }
 
 #' Convert list format to desired format
@@ -163,14 +163,14 @@ to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
 #' @examples
 #' data(graph_toy)
 #' x_v <- diffusion:::to_x_from_list(
-#'   diffusion:::to_list(graph_toy$input_vec), "vector")
+#'     diffusion:::to_list(graph_toy$input_vec), "vector")
 #' x_m <- diffusion:::to_x_from_list(
-#'   diffusion:::to_list(graph_toy$input_vec), "matrix")
+#'     diffusion:::to_list(graph_toy$input_vec), "matrix")
 to_x_from_list <- function(scores, x) {
-  if (x == "list") return(scores)
-  if (x == "matrix") return(scores[[1]])
-  if (x == "vector")
-    return(setNames(scores[[1]][, 1], rownames(scores[[1]])))
+    if (x == "list") return(scores)
+    if (x == "matrix") return(scores[[1]])
+    if (x == "vector")
+        return(setNames(scores[[1]][, 1], rownames(scores[[1]])))
 }
 
 #' Check if a matrix is a valid kernel
@@ -190,10 +190,10 @@ to_x_from_list <- function(scores, x) {
 #'
 #' @export
 is_kernel <- function(x, tol = 1e-8) {
-  if (!Matrix::isSymmetric(x))
-    stop("the matrix x must be symmetric")
-  if (tol <= 0)
-    stop("tol must be positive")
-  eig_values <- eigen(x, only.values = TRUE)$values
-  return(all(eig_values >= -tol))
+    if (!Matrix::isSymmetric(x))
+        stop("the matrix x must be symmetric")
+    if (tol <= 0)
+        stop("tol must be positive")
+    eig_values <- eigen(x, only.values = TRUE)$values
+    return(all(eig_values >= -tol))
 }

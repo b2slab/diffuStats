@@ -48,18 +48,18 @@ be restricted to this set as well.
 # Using a single vector of scores
 data(graph_toy)
 df_perf <- perf(
-  graph = graph_toy,
-  scores = graph_toy$input_vec,
-  validation = graph_toy$input_vec,
-  grid_param = expand.grid(method = c("raw", "ml")))
+    graph = graph_toy,
+    scores = graph_toy$input_vec,
+    validation = graph_toy$input_vec,
+    grid_param = expand.grid(method = c("raw", "ml")))
 df_perf
 # Using a matrix with four set of scores
 # called Single, Row, Small_sample, Large_sample
 df_perf <- perf(
-  graph = graph_toy,
-  scores = graph_toy$input_mat,
-  validation = graph_toy$input_mat,
-  grid_param = expand.grid(method = c("raw", "ml")))
+    graph = graph_toy,
+    scores = graph_toy$input_mat,
+    validation = graph_toy$input_mat,
+    grid_param = expand.grid(method = c("raw", "ml")))
 df_perf
 
 }

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+$error
+character(0)
+
+$warning
+[1] "Remove vignette sources from inst/doc; they belong in vignettes/."
+[2] "Update R version dependency from 3.3 to 3.4."
+
+$note
+character(0)
+---------------------------------------------------------------------------
+R CMD check results
+0 errors | 0 warnings | 1 note
+checking for GNU extensions in Makefiles ... NOTE
+GNU make is a SystemRequirements.

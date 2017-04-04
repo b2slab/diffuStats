@@ -1,12 +1,12 @@
 Package: diffusion
 Type: Package
 Title: Diffusion methods for networks
-Version: 0.4.3
+Version: 0.5.0
 Author: Sergio Picart-Armada
 Maintainer: Sergio Picart-Armada <sergi.picart@upc.edu>
 Description: Methods to propagate scores in networks. 
-  Designed for biological networks but applicable to 
-  any other medium-sized networks.
+    Designed for biological networks but applicable to 
+    any other medium-sized networks.
 Depends: R (>= 3.3)
 Imports: grDevices, 
     stats, 

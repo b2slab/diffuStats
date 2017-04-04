@@ -18,6 +18,6 @@ Function to connect a non connected graph
 \examples{
 library(igraph)
 g <- diffusion:::.connect_undirected_graph(
-  graph.empty(10, directed = FALSE))
+    graph.empty(10, directed = FALSE))
 g
 }

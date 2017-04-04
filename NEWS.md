@@ -1,5 +1,12 @@
 # Version log
 
+## Version 0.5.0
+
+* Fixed devel version numbering x.y.z, y must be odd
+* Added correct indentation, built indentation-fixing function for Rd files
+* Fixed CRAN's NOTE on R 3.4 about the c++ code
+* Added NEWS file
+
 ## Version 0.4.3
 
 * Fixed small bug in `gm`

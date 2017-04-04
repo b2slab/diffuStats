@@ -5,7 +5,7 @@
 \title{Generate a random input for graph diffusion}
 \usage{
 generate_input(graph, order, length_inputs, return_matrix = TRUE,
-  seed = NULL)
+    seed = NULL)
 }
 \arguments{
 \item{graph}{an \code{\link[igraph]{igraph}} object, typically from
@@ -35,13 +35,13 @@ list. The graph object needs to have some attributes
 }
 \examples{
 g <- generate_graph(
-  fun_gen = igraph::barabasi.game,
-  param_gen = list(n = 200, m = 3, directed = FALSE),
-  seed = 1)
+    fun_gen = igraph::barabasi.game,
+    param_gen = list(n = 200, m = 3, directed = FALSE),
+    seed = 1)
 synth_input <- generate_input(
-  g,
-  order = 2,
-  length_inputs = 3, return_matrix = TRUE)
+    g,
+    order = 2,
+    length_inputs = 3, return_matrix = TRUE)
 str(synth_input)
 
 }

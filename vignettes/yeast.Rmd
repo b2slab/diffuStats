@@ -1,20 +1,24 @@
 ---
 title: "Propagation of MIPS terms in the yeast PPI"
-author: "Sergio Picart-Armada"
+author: "Sergio Picart-Armada and Alexandre Perera-Lluna"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
-  %\VignetteIndexEntry{Diffusion in a nutshell}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{MIPS terms propagation}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = TRUE, message = FALSE, error = FALSE, 
-  fig.width = 7, fig.height = 6)
+    echo = TRUE, message = FALSE, error = FALSE, 
+    fig.width = 7, fig.height = 6)
 ```
+
+## Introduction
+
+
 
 ## Getting started
 
@@ -156,9 +160,9 @@ scores_A <- setNames((known %in% known_A)*1, known)
 
 # diffusion
 diff <- diffusion::diffuse(
-  yeast, 
-  scores = scores_A, 
-  method = "raw"
+    yeast, 
+    scores = scores_A, 
+    method = "raw"
 )
 ```
 
@@ -175,22 +179,21 @@ and the other labelled target proteins.
 ```{r}
 # Compare 
 df_plot <- data.frame(
-  Protein = V(yeast)$name, 
-  Class = ifelse(scores_true, "Transport and sensing", "Other"), 
-  DiffusionScore = diff, 
-  Target = target_id, 
-  Method = "raw",
-  stringsAsFactors = FALSE
+    Protein = V(yeast)$name, 
+    Class = ifelse(scores_true, "Transport and sensing", "Other"), 
+    DiffusionScore = diff, 
+    Target = target_id, 
+    Method = "raw",
+    stringsAsFactors = FALSE
 )
 
-ggplot(subset(df_plot, Target), 
-       aes(x = Class, y = DiffusionScore)) + 
-  geom_boxplot(aes(fill = Method)) + 
-  theme_bw() + 
-  scale_y_log10() + 
-  xlab("Protein class") +
-  ylab("Diffusion score") + 
-  ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
+ggplot(subset(df_plot, Target), aes(x = Class, y = DiffusionScore)) + 
+    geom_boxplot(aes(fill = Method)) + 
+    theme_bw() + 
+    scale_y_log10() + 
+    xlab("Protein class") +
+    ylab("Diffusion score") + 
+    ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
 
 ```
 
@@ -201,13 +204,13 @@ part of the input
 ```{r}
 vertex_ids <- head(order(df_plot$DiffusionScore, decreasing = TRUE), 50)
 igraph::plot.igraph(
-  igraph::induced.subgraph(yeast, vertex_ids), 
-  vertex.color = diffusion::scores2colours(
+    igraph::induced.subgraph(yeast, vertex_ids), 
+        vertex.color = diffusion::scores2colours(
     df_plot$DiffusionScore[vertex_ids]),
-  vertex.shape = diffusion::scores2shapes(
+        vertex.shape = diffusion::scores2shapes(
     df_plot$Protein[vertex_ids] %in% known_A),
-  vertex.label.color = "gray10", 
-  main = "Top 30 proteins from diffusion scores"
+        vertex.label.color = "gray10", 
+    main = "Top 30 proteins from diffusion scores"
 )
 ```
 
@@ -247,23 +250,25 @@ with the empirical p-value from `mc`.
 list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 
 df_methods <- plyr::ldply(
-  list_methods, 
-  function(method) {
-    diff <- diffusion::diffuse(
-      yeast, 
-      scores = scores_A, 
-      method = method
-    )
-    
-    data.frame(
-      Protein = V(yeast)$name, 
-      Class = ifelse(scores_true, "Transport and sensing", "Other"), 
-      DiffusionScore = diff, 
-      Target = target_id, 
-      Method = method,
-      stringsAsFactors = FALSE
-    )
-  }
+    list_methods, 
+    function(method) {
+        diff <- diffusion::diffuse(
+            yeast, 
+            scores = scores_A, 
+            method = method
+        )
+        
+        data.frame(
+            Protein = V(yeast)$name, 
+            Class = ifelse(
+                scores_true, 
+                "Transport and sensing", "Other"), 
+            DiffusionScore = diff, 
+            Target = target_id, 
+            Method = method,
+            stringsAsFactors = FALSE
+        )
+    }
 )
 df_methods$Method <- factor(df_methods$Method, levels = list_methods)
 ```
@@ -271,16 +276,15 @@ df_methods$Method <- factor(df_methods$Method, levels = list_methods)
 Let's plot the results:
 
 ```{r, fig.height=3.5}
-ggplot(subset(df_methods, Target), 
-       aes(x = Class, y = DiffusionScore)) + 
-  geom_boxplot(aes(fill = Method)) + 
-  scale_fill_npg() + 
-  theme_bw() + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
-  facet_wrap( ~ Method, nrow = 1, scales = "free") + 
-  xlab("Protein class") +
-  ylab("Diffusion score") + 
-  ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
+ggplot(subset(df_methods, Target), aes(x = Class, y = DiffusionScore)) + 
+    geom_boxplot(aes(fill = Method)) + 
+    scale_fill_npg() + 
+    theme_bw() + 
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + 
+    facet_wrap( ~ Method, nrow = 1, scales = "free") + 
+    xlab("Protein class") +
+    ylab("Diffusion score") + 
+    ggtitle("Diffusion scores for target proteins in 'transport and sensing'")
 ```
 
 A relevant note here is that `z` can give NaN 
@@ -304,10 +308,10 @@ names_classes <- setdiff(names(table_classes), c("U", NA))
 
 # matrix format
 mat_classes <- sapply(
-  names_classes, 
-  function(class) {
-    V(yeast)$Class %in% class
-  }
+    names_classes, 
+    function(class) {
+        V(yeast)$Class %in% class
+    }
 )*1
 rownames(mat_classes) <- V(yeast)$name
 colnames(mat_classes) <- names_classes
@@ -323,24 +327,23 @@ the performance of all the methods using the area under the ROC curve
 list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 
 df_methods <- perf(
-  graph = yeast, 
-  scores = mat_classes[known, ], 
-  validation = mat_classes[target, ], 
-  grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE)
+    graph = yeast, 
+    scores = mat_classes[known, ], 
+    validation = mat_classes[target, ], 
+    grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE)
 )
 ```
 
 We might plot the AUCs over the categories for each method:
 
 ```{r}
-ggplot(df_methods, 
-       aes(x = method, y = auc)) + 
-  geom_boxplot(aes(fill = method)) + 
-  scale_fill_npg() + 
-  theme_bw() + 
-  xlab("Method") +
-  ylab("Area under the curve") + 
-  ggtitle("Methods performance in all categories")
+ggplot(df_methods, aes(x = method, y = auc)) + 
+    geom_boxplot(aes(fill = method)) + 
+    scale_fill_npg() + 
+    theme_bw() + 
+    xlab("Method") +
+    ylab("Area under the curve") + 
+    ggtitle("Methods performance in all categories")
 ```
 
 Scaling up the analysis can be useful for assessing 

@@ -13,12 +13,12 @@
 #' @import igraph
 #' @export
 commuteTimeKernel <- function(graph, normalized = FALSE) {
-  L <- graph.laplacian(graph = graph, normalized = normalized) %>% as.matrix
+    L <- graph.laplacian(graph = graph, normalized = normalized) %>% as.matrix
 
-  # pseudo-inverse (moore-penrose)
-  ans <- MASS::ginv(L)
-  rownames(ans) <- colnames(ans) <- V(graph)$name
-  ans
+    # pseudo-inverse (moore-penrose)
+    ans <- MASS::ginv(L)
+    rownames(ans) <- colnames(ans) <- V(graph)$name
+    ans
 }
 
 #' @description Function \code{diffusionKernel}
@@ -32,10 +32,10 @@ commuteTimeKernel <- function(graph, normalized = FALSE) {
 #' @import igraph
 #' @export
 diffusionKernel <- function(graph, sigma2 = 1, normalized = TRUE) {
-  L <- graph.laplacian(graph = graph, normalized = normalized)
+    L <- graph.laplacian(graph = graph, normalized = normalized)
 
-  EL <- -sigma2/2*L
-  as.matrix(Matrix::expm(EL))
+    EL <- -sigma2/2*L
+    as.matrix(Matrix::expm(EL))
 }
 
 #' @description Function \code{inverseCosineKernel}
@@ -49,14 +49,14 @@ diffusionKernel <- function(graph, sigma2 = 1, normalized = TRUE) {
 #' @import igraph
 #' @export
 inverseCosineKernel <- function(graph) {
-  L <- graph.laplacian(graph = graph, normalized = TRUE) %>% as.matrix
+    L <- graph.laplacian(graph = graph, normalized = TRUE) %>% as.matrix
 
-  # need to decompose
-  svd.L <- base::svd(L*(pi/4))
-  ans <- tcrossprod(svd.L$u %*% diag(cos(svd.L$d)), svd.L$u)
-  rownames(ans) <- colnames(ans) <- V(graph)$name
-  ans
-  # matrixcalc::is.positive.semi.definite(round(kk, 10))
+    # need to decompose
+    svd.L <- base::svd(L*(pi/4))
+    ans <- tcrossprod(svd.L$u %*% diag(cos(svd.L$d)), svd.L$u)
+    rownames(ans) <- colnames(ans) <- V(graph)$name
+    ans
+    # matrixcalc::is.positive.semi.definite(round(kk, 10))
 }
 
 #' @description Function \code{pStepKernel}
@@ -70,19 +70,19 @@ inverseCosineKernel <- function(graph) {
 #' @import igraph
 #' @export
 pStepKernel <- function(graph, a = 2, p = 5L) {
-  minusL <- -graph.laplacian(graph = graph, normalized = TRUE)
+    minusL <- -graph.laplacian(graph = graph, normalized = TRUE)
 
-  # Not optimal but kept for clarity
-  # here we restrict to the normalised version, as the eigenvalues are
-  # between 0 and 2 -> restriction a >= 2
-  stopifnot(a >= 2)
-  p <- as.integer(p)
-  stopifnot(p > 0)
+    # Not optimal but kept for clarity
+    # here we restrict to the normalised version, as the eigenvalues are
+    # between 0 and 2 -> restriction a >= 2
+    stopifnot(a >= 2)
+    p <- as.integer(p)
+    stopifnot(p > 0)
 
-  Matrix::diag(minusL) <- Matrix::diag(minusL) + a
+    Matrix::diag(minusL) <- Matrix::diag(minusL) + a
 
-  if (p == 1L) return(as.matrix(minusL))
-  do.call(expm::`%^%`, list(as.matrix(minusL), p))
+    if (p == 1L) return(as.matrix(minusL))
+    do.call(expm::`%^%`, list(as.matrix(minusL), p))
 }
 
 #' @description Function \code{regularisedLaplacianKernel} computes
@@ -96,16 +96,16 @@ pStepKernel <- function(graph, a = 2, p = 5L) {
 #' @import igraph
 #' @export
 regularisedLaplacianKernel <- function(
-  graph,
-  sigma2 = 1,
-  add_diag = 1,
-  normalized = FALSE) {
-  L <- graph.laplacian(graph = graph, normalized = normalized)
+    graph,
+    sigma2 = 1,
+    add_diag = 1,
+    normalized = FALSE) {
+    L <- graph.laplacian(graph = graph, normalized = normalized)
 
-  RL <- sigma2*L
-  Matrix::diag(RL) <- Matrix::diag(RL) + 1
+    RL <- sigma2*L
+    Matrix::diag(RL) <- Matrix::diag(RL) + 1
 
-  ans <- as.matrix(Matrix::solve(RL, sparse = FALSE))
-  rownames(ans) <- colnames(ans) <- V(graph)$name
-  ans
+    ans <- as.matrix(Matrix::solve(RL, sparse = FALSE))
+    rownames(ans) <- colnames(ans) <- V(graph)$name
+    ans
 }

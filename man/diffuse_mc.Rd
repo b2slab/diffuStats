@@ -5,7 +5,7 @@
 \title{Compute the heatrank using permutations}
 \usage{
 diffuse_mc(graph, scores, n.perm = 10000, sample.prob = NULL, seed = 1,
-  oneminusHeatRank = TRUE, K = NULL)
+    oneminusHeatRank = TRUE, K = NULL)
 }
 \arguments{
 \item{graph}{igraph object}
@@ -38,7 +38,7 @@ Monte Carlo trials for diffusion in a (sparse) network.
 data(graph_toy)
 list_input <- list(myInput1 = graph_toy$input_mat)
 diff_mc <- diffuse_mc(
-  graph = graph_toy,
-  scores = list_input)
+    graph = graph_toy,
+    scores = list_input)
 
 }

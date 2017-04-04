@@ -30,10 +30,10 @@ to score all the nodes in the network.
 data(graph_toy)
 list_input <- list(myInput1 = graph_toy$input_mat)
 diff_raw <- diffuse_raw(
-  graph = graph_toy,
-  scores = list_input)
+    graph = graph_toy,
+    scores = list_input)
 diff_z <- diffuse_raw(
-  graph = graph_toy,
-  scores = list_input,
-  z = TRUE)
+    graph = graph_toy,
+    scores = list_input,
+    z = TRUE)
 }

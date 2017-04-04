@@ -5,8 +5,8 @@
 \title{Generate a random graph}
 \usage{
 generate_graph(fun_gen, param_gen, class_label = NULL,
-  class_attr = .default_graph_param(),
-  fun_curate = .connect_undirected_graph, seed = NULL)
+    class_attr = .default_graph_param(),
+    fun_curate = .connect_undirected_graph, seed = NULL)
 }
 \arguments{
 \item{fun_gen}{function to generate the graphs. Typically from
@@ -44,9 +44,9 @@ available, and
 }
 \examples{
 g <- generate_graph(
-  fun_gen = igraph::barabasi.game,
-  param_gen = list(n = 100, m = 3, directed = FALSE),
-  seed = 1)
+    fun_gen = igraph::barabasi.game,
+    param_gen = list(n = 100, m = 3, directed = FALSE),
+    seed = 1)
 g
 \dontrun{
 plot(g)

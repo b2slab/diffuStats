@@ -7,17 +7,17 @@
 # #' @importFrom ggsci pal_npg
 #' @import igraph
 .default_graph_param <- function(){
-  data.frame(
-    # class = c("source", "filler", "end"),
-    # color = ggsci::pal_npg()(3),
-    color = c("#E64B35FF", "#4DBBD5FF", "#00A087FF"),
-    shape = "circle",
-    frame.color = "gray20",
-    label.color = "gray5",
-    size = 12,
-    stringsAsFactors = FALSE,
-    row.names = c("source", "filler", "end")
-  )
+    data.frame(
+        # class = c("source", "filler", "end"),
+        # color = ggsci::pal_npg()(3),
+        color = c("#E64B35FF", "#4DBBD5FF", "#00A087FF"),
+        shape = "circle",
+        frame.color = "gray20",
+        label.color = "gray5",
+        size = 12,
+        stringsAsFactors = FALSE,
+        row.names = c("source", "filler", "end")
+    )
 }
 
 #' Default proportions for randomly generated graphs
@@ -35,34 +35,34 @@
 #' @examples
 #' library(igraph)
 #' g <- diffusion:::.connect_undirected_graph(
-#'   graph.empty(10, directed = FALSE))
+#'     graph.empty(10, directed = FALSE))
 #' g
 #' @rdname connect_undirected_graph
 #'
 #' @import igraph
 .connect_undirected_graph <- function(g) {
-  # browser()
-  g.clusters <- clusters(g)
+    # browser()
+    g.clusters <- clusters(g)
 
-  # Partition nodes: in/out largest cc
-  nodes.largest.cc <- which(
-    g.clusters$membership == which.max(g.clusters$csize))
-  nodes.addEdges <- which(
-    g.clusters$membership != which.max(g.clusters$csize))
+    # Partition nodes: in/out largest cc
+    nodes.largest.cc <- which(
+        g.clusters$membership == which.max(g.clusters$csize))
+    nodes.addEdges <- which(
+        g.clusters$membership != which.max(g.clusters$csize))
 
-  if (length(nodes.addEdges) == 0) return(g)
+    if (length(nodes.addEdges) == 0) return(g)
 
-  # For each node out, add one edge to a random node in
-  g.newEdges <- sapply(
-    nodes.addEdges,
-    function(dummy) sample(nodes.largest.cc, 1))
+    # For each node out, add one edge to a random node in
+    g.newEdges <- sapply(
+        nodes.addEdges,
+        function(dummy) sample(nodes.largest.cc, 1))
 
-  g <- add.edges(
-    graph = g,
-    edges = rbind(V(g)[nodes.addEdges], V(g)[g.newEdges]),
-    directed = FALSE)
+    g <- add.edges(
+        graph = g,
+        edges = rbind(V(g)[nodes.addEdges], V(g)[g.newEdges]),
+        directed = FALSE)
 
-  g
+    g
 }
 
 #' Generate a random graph
@@ -95,9 +95,9 @@
 #'
 #' @examples
 #' g <- generate_graph(
-#'   fun_gen = igraph::barabasi.game,
-#'   param_gen = list(n = 100, m = 3, directed = FALSE),
-#'   seed = 1)
+#'     fun_gen = igraph::barabasi.game,
+#'     param_gen = list(n = 100, m = 3, directed = FALSE),
+#'     seed = 1)
 #' g
 #' \dontrun{
 #' plot(g)
@@ -106,63 +106,65 @@
 #' @import igraph
 #' @export
 generate_graph <- function(
-  fun_gen,
-  param_gen,
-  class_label = NULL,
-  class_attr = .default_graph_param(),
-  fun_curate = .connect_undirected_graph,
-  seed = NULL
+    fun_gen,
+    param_gen,
+    class_label = NULL,
+    class_attr = .default_graph_param(),
+    fun_curate = .connect_undirected_graph,
+    seed = NULL
 ) {
-  # browser()
-  if (!is.null(seed)) set.seed(seed)
+    # browser()
+    if (!is.null(seed)) set.seed(seed)
 
-  # Generate network using provided function
-  g <- do.call(fun_gen, param_gen)
-  n <- vcount(g)
-  V(g)$name <- paste0("V", 1:n)
+    # Generate network using provided function
+    g <- do.call(fun_gen, param_gen)
+    n <- vcount(g)
+    V(g)$name <- paste0("V", 1:n)
 
-  # Assign vertex classes
-  # class <- (class_prop/sum(class_prop))*n
-  # class_char <- character()
-  # for (i in names(class))
-  #   class_char <- c(
-  #     class_char,
-  #     rep(i, class[i]))
-  # n_out <- length(class_char)
-  # if (n_out < n) {
-  #   n_diff <- n - n_out
-  #   class_char <- c(
-  #     class_char,
-  #     rep(utils::tail(names(class), 1), n_diff))
-  # }
-  #
-  # First assign classes
-  if (is.null(class_label)) {
-    message("Using default class proportions...")
-    class <- rep(names(.default_prop), times = .default_prop*n)
-    last_prop <- utils::tail(names(.default_prop), 1)
+    # Assign vertex classes
+    # class <- (class_prop/sum(class_prop))*n
+    # class_char <- character()
+    # for (i in names(class))
+    #   class_char <- c(
+    #     class_char,
+    #     rep(i, class[i]))
+    # n_out <- length(class_char)
+    # if (n_out < n) {
+    #   n_diff <- n - n_out
+    #   class_char <- c(
+    #     class_char,
+    #     rep(utils::tail(names(class), 1), n_diff))
+    # }
+    #
+    # First assign classes
+    if (is.null(class_label)) {
+        message("Using default class proportions...")
+        class <- rep(names(.default_prop), times = .default_prop*n)
+        last_prop <- utils::tail(names(.default_prop), 1)
 
-    # If rounding left the classes vector a bit short... complete it
-    class <- c(class, rep(last_prop, n - length(class)))
+        # If rounding left the classes vector a bit short... complete it
+        class <- c(class, rep(last_prop, n - length(class)))
 
-    V(g)$class <- class
-  } else {
-    if (length(class_label) != n) {
-      stop("'class_label' must have its length equalling the number of nodes.")
+        V(g)$class <- class
+    } else {
+        if (length(class_label) != n) {
+            stop(
+                "'class_label' must have its length ",
+                "equalling the number of nodes.")
+        }
+        V(g)$class <- class_label
     }
-    V(g)$class <- class_label
-  }
 
-  # Assign vertex attributes through a data_frame and vertex classes
-  for (col in names(class_attr)) {
-    mapper <- stats::setNames(class_attr[[col]], rownames(class_attr))
-    g <- set_vertex_attr(
-      g,
-      name = col,
-      value = mapper[V(g)$class])
-  }
+    # Assign vertex attributes through a data_frame and vertex classes
+    for (col in names(class_attr)) {
+        mapper <- stats::setNames(class_attr[[col]], rownames(class_attr))
+        g <- set_vertex_attr(
+            g,
+            name = col,
+            value = mapper[V(g)$class])
+    }
 
-  # Connect graph (optional)
-  if (is.null(fun_curate)) return(g)
-  else return(do.call(fun_curate, list(g)))
+    # Connect graph (optional)
+    if (is.null(fun_curate)) return(g)
+    else return(do.call(fun_curate, list(g)))
 }

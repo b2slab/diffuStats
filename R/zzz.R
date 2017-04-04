@@ -5,5 +5,5 @@
 NULL
 
 .onUnload <- function(libpath) {
-  library.dynam.unload("diffusion", libpath)
+    library.dynam.unload("diffusion", libpath)
 }

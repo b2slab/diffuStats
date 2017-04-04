@@ -20,7 +20,7 @@ Convert any list format to the convenient one
 \examples{
 data(graph_toy)
 x_v <- diffusion:::to_x_from_list(
-  diffusion:::to_list(graph_toy$input_vec), "vector")
+    diffusion:::to_list(graph_toy$input_vec), "vector")
 x_m <- diffusion:::to_x_from_list(
-  diffusion:::to_list(graph_toy$input_vec), "matrix")
+    diffusion:::to_list(graph_toy$input_vec), "matrix")
 }

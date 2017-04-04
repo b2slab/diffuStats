@@ -34,12 +34,12 @@ and gives the desired metrics.
 # called Single, Row, Small_sample, Large_sample
 data(graph_toy)
 diff <- diffuse(
-  graph = graph_toy,
-  scores = graph_toy$input_mat,
-  method = "raw")
+    graph = graph_toy,
+    scores = graph_toy$input_mat,
+    method = "raw")
 df_perf <- perf_eval(
-  prediction = diff,
-  validation = graph_toy$input_mat)
+    prediction = diff,
+    validation = graph_toy$input_mat)
 df_perf
 
 }
