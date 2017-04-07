@@ -1,5 +1,10 @@
 # Version log
 
+## Version 0.5.1
+
+* Vignette has been added a "proper" introduction
+* Now main vignette is in sweave
+
 ## Version 0.5.0
 
 * Fixed devel version numbering x.y.z, y must be odd

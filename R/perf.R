@@ -26,7 +26,7 @@
 #' the form \code{f(actual, predicted)}
 #' @param ... additional named arguments for the diffusion method.
 #' It's important
-#' to input at least a \code{graph} igraph object or, alternative, a
+#' to input at least an \code{igraph} object or, alternative, a
 #' kernel matrix \code{K}
 #'
 #' @return A data frame containing the performance of each diffusion score

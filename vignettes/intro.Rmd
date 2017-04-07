@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: bibliography.bib
 vignette: >
-    %\VignetteIndexEntry{Diffusion in a nutshell}
+    %\VignetteIndexEntry{Quick start}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -46,7 +46,8 @@ on this tiny lattice graph.
 
 The package `diffusion` is flexible and allows 
 several inputs at once for a given network. 
-The input format is a list of matrices, where each matrix contains 
+The input format is, in its most general form, 
+a list of matrices, where each matrix contains 
 measured nodes in rows and specific scores in columns. 
 **Differents sets of scores may have different backgrounds**, 
 meaning that we can specifically tag sets of nodes as **unlabelled**. 
@@ -76,13 +77,12 @@ Each one of these columns in the input can be *smoothed* using the network
 and new value will be derived - unlabelled nodes are also scored. 
 This is the main purpose of diffusion: to derive new scores that 
 intend to keep the same trends as the scores in the input, 
-but taking into account 
-the network structure.
+but taking into account the network structure.
 
-Let's start with a single column - that would be the case
-where there is only a vector of values to be smoothed. 
-Note that these values must be named and must be a subset or all of  
-the graph nodes.
+Let's start with the simplest case of diffusion: 
+only a vector of values is to be smoothed. 
+Note that these 
+**values must be named and must be a subset or all of the graph nodes**.
 
 ```{r}
 output_vec <- diffusion::diffuse(
@@ -113,9 +113,9 @@ igraph::plot.igraph(
 Here, we have mapped the scores to colours using `scores2colours` 
 and we have highlighted the nodes that were in the 
 original input using `scores2shapes` on the original scores.
-Square nodes were originally tagged as relevant, 
-and the diffusion algorithm smoothed these tags over the network - 
-the guilt-by-association principle!
+Square nodes were labelled as relevant in the input, 
+and the diffusion algorithm smoothed these labels over the network - 
+as in the guilt-by-association principle.
 
 ## Several inputs, several smoothing scores
 
@@ -127,8 +127,16 @@ As different score sets might have different labelled/unlabelled nodes,
 `diffuse` also accepts a list of score matrices that may have 
 a different amount of rows.
 
-In this session, we will diffuse using a matrix of scores that 
-contains four sets of scores, with four different names.
+In this section, we will diffuse using a matrix of scores that 
+contains four sets of scores, with four different names. 
+These example names refer to what the input contains:
+
+* Single: a single node is labelled as positive
+* Row: a row of nodes in the lattice graph are positives
+* Small_sample: a randomly generated small sample of the lattice nodes 
+are positives
+* Large_sample: a randomly generated sample with half of the lattice nodes 
+are positives
 
 ```{r}
 input_mat <- graph_toy$input_mat
@@ -142,7 +150,7 @@ At the moment, the following: `raw`, `ml` and `gm` for
 classical propagation; `z` and `mc` for scores normalised 
 through a statistical model, and similarly `ber_s` and `ber_p`, 
 as described in [@mosca]. 
-The scoring methods `mc` and `ber_p` require permutations, 
+The scoring methods `mc` and `ber_p` require permutations -thus being computationally intense- 
 whereas the rest are deterministic. 
 
 For instance, let's smooth through `mc` the input matrix:
@@ -156,7 +164,7 @@ output_mc <- diffusion::diffuse(
 head(output_mc)
 ```
 
-We can plot the result of the fourth column:
+We can plot the result of the fourth column *Large_sample*:
 
 ```{r}
 score_col <- 4
@@ -168,8 +176,38 @@ igraph::plot.igraph(
 )
 ```
 
-
 Each method has its particularities and, in the end, 
-it is all about the question being asked to the data. 
+it is all about the question being asked to the data and 
+the particularities of the dataset. 
+
+## Benchmarking
+
+Package `diffusion` offers the option to assess the performance
+of the diffusion scores given user-defined target scores or labels. 
+
+The validation must be supplied with the same format as 
+the input scores, but 
+the labels of the nodes might be different. 
+For example, we can diffuse labels on all the nodes of a 
+graph but evaluate using only a specific subset of nodes 
+and target labels. 
+A small example: we want to evaluate how good the diffusion scores 
+`raw` and `ml` are at recovering the original labels of the 
+first 15 nodes 
+when diffusing in the example network. 
+
+```{r}
+df_perf <- perf(
+    graph = graph_toy,
+    scores = graph_toy$input_mat,
+    validation = graph_toy$input_mat[1:15, ],
+    grid_param = expand.grid(method = c("raw", "ml")))
+df_perf
+```
+
+This indicates that both methods have a very high 
+area under the curve in this example: the ordering of 
+the diffusion scores is very aligned to the class label.
+
 
 ## References

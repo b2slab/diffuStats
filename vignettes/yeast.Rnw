@@ -1,0 +1,660 @@
+\documentclass[12pt]{article}
+
+\usepackage{booktabs}
+\usepackage{fixltx2e} %subscripts
+%\usepackage{hyperref}
+
+
+\newcommand{\textq}[1]{``#1''}
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+\newcommand{\Robject}[1]{{\texttt{#1}}}
+\newcommand{\Rfunction}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textit{#1}}}
+\newcommand{\Rclass}[1]{{\textit{#1}}}
+\newcommand{\Rmethod}[1]{{\textit{#1}}}
+\newcommand{\Rfunarg}[1]{{\textit{#1}}}
+
+%\textwidth=6.2in \textheight=8.5in
+%\parskip=.3cm \oddsidemargin=.1in \evensidemargin=.1in
+%\headheight=-.3in
+
+\begin{document}
+\SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE, fig=FALSE, prefix.string=yeast_latexfiles/}
+%\setkeys{Gin}{width=1\textwidth}
+\title{An R package to compute diffusion-based scores on biological networks: diffusion}
+\small{\author{Serio Picart-Armada and Alexandre Perera-Lluna}}
+\maketitle %\VignetteIndexEntry{MAIT Vignette}
+
+\section{Abstract}
+
+Label propagation approaches are a standard and ubiquitous
+procedure in computational biology for giving context
+to molecular entities.
+Node labels, which can derive from gene expression,
+genome-wide association studies,
+protein domains or a metabolomics profiling,
+are propagated to its neighbours,
+effectively smoothing the scores through
+prior annotated knowledge and prioritising novel candidates.
+However, there are several settings
+when defining the diffusion process,
+including the diffusion kernel and
+a recently proposed statistical normalisation of the scores.
+This can have an impact on the results and
+there is no software gathering these possibilities
+to screen their performance in the application of interest.
+This work provides a collection of diffusion scores,
+as well as a parallel permutation analysis for the normalised scores,
+that scales up the analysis of several sets of molecular entities at once.
+
+\section{Introduction}
+
+The application of label propagation algorithms \cite{labelpropagation}
+is based on the guilt by association principle \cite{gba}.
+This principle can be
+rephrased in the protein-protein interaction context as
+\textq{proteins that interact are more likely to share biological functions}.
+However, this principle is extremely general and has numerous applications
+in bioinformatics alone, for example prioritising genome-wide
+association studies hits \cite{diffusion_gwas} and finding relevant
+modules from gene expression and mutation data \cite{mosca}.
+
+\section{Methodology}
+
+One of the main purposes of \Rpackage{diffusion} is to offer
+a battery of approaches to compute and compare diffusion scores.
+The diffusion scores $f$ using an input vector $y$ and
+a diffusion kernel $K$ are generally computed as $$ f = K\cdot y$$
+possibly followed by a normalisation.
+
+The decisions taken in the definition of $K$, $y$ and the posterior
+normalisation generally give rise to
+different priorisations due to a different treatment of
+the balance between positive and negative examples,
+the unlabelled data and the network structure.
+The following sections cover the implemented choices
+for the kernel $K$ and the initial labels $y$.
+
+\subsection{Diffusion kernels and regularisation}
+
+The representation of any kind of data in a network model
+allows the definition of notions like distance or similarity
+based on the links in the network.
+This section will follow the notation in \cite{smola} and
+summarise the kernels proposed by the authors.
+In general, an undirected graph $G = (V, E)$ consists of a set
+of $n$ nodes $V$ and a set of edges $E$ of unordered pairs of nodes.
+This can be extended to weighted, undirected graphs, where each
+edge $i \sim j$ has a weight attribute $W_{ij} \in [0, \infty)$.
+The degree matrix of $G$ is defined as the $n \times n$
+diagonal matrix so that $D{ii} = \sum_{j=1}^n W_{ij}$.
+The (unnormalised) Laplacian of $G$ is defined as
+the $n \times n$ matrix $L = D - W$,
+whereas its normalised version is
+$\tilde{L} = D^{-\frac{1}{2}}\cdot L \cdot D^{-\frac{1}{2}}$.
+
+The graph Laplacian is diagonalisable and
+can be written in terms of its eigenvalues $v_j$
+and eigenvectors $\lambda_j$,
+as $L = \sum_{j=1}^n \lambda_j v_j v_j^T$.
+The proposed kernels stem from
+a family of regularisation functions $r(\lambda)$
+on the spectrum of the graph Laplacian:
+$$K = \sum_{j=1}^n r^{-1}(\lambda_j) v_j v_j^T$$
+
+Well known graph kernels belong to this family because
+they can be written as transformations on the Laplacian spectrum.
+The following table summarises them, assuming
+the usage of the normalised Laplacian -
+the unnormalised Laplacian can also be used
+as long as the resulting kernel is still positive semidefinite:
+
+\begin{table}[!t]
+\label{tab:kernels}
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Kernel & Function  \\\midrule
+Regularised Laplacian &
+    $r(\lambda) = 1 + \sigma^2\lambda$  \\
+Diffusion process &
+    $r(\lambda) = \exp(\frac{\sigma^2}{2}\lambda)$  \\
+$p$-Step random walk &
+    $r(\lambda) = (a - \lambda)^{-p}$ with $a \geq 2$, $p \geq 1$ \\
+Inverse cosine &
+    $r(\lambda) = (cos(\lambda \frac{\pi}{4}))^{-1}$ \\\bottomrule
+\end{tabular}
+\caption{Implemented diffusion kernels from \cite{smola}}
+\end{center}
+\end{table}
+
+Further details about this family of kernels,
+all available in our package `diffusion`,can be found
+in the original manuscript \cite{smola}.
+
+On the other hand,
+the commute time kernel, introduced in \cite{ctkernel}
+can be found in our package as well.
+This kernel, also writable in terms of a regularisation function,
+is simply the pseudoinverse
+of the graph Laplacian, $K = L^+$.
+
+The default option in the \Rpackage{diffusion} package is
+the regularised Laplacian kernel, as it is widely used
+and describes many physical models, for instance \cite{hotnet}.
+
+\subsection{Diffusion scores}
+
+Besides choosing a graph kernel, the codification of the input and
+the presence of a statistical normalisation can lead to important
+differences in the results.
+Table \ref{tab:scores} gives an overview of the implemented scores,
+which will be detailed in the following sections.
+The labels of the
+positive, negative and unlabelled examples are
+respectively $y^+$, $y^-$ and $y^u$.
+Column \textq{normalised} refers to the application of a statistical
+model involving permutations, whereas \textq{stochastic}
+enumerates the normalised scores that need actual
+Monte Carlo permutations.
+
+\begin{table}[!t]
+\label{tab:scores}
+\begin{center}
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+Score & $y^+$ & $y^-$ & $y^u$ & Normalised & Stochastic & Reference \\\midrule
+raw & 1 & 0 & 0 & No & No & \cite{hotnet} \\
+ml & 1 & -1 & 0 & No & No & \cite{labelpropagation} \\
+gm & 1 & -1 & $k$ & No & No & \cite{genemania} \\
+ber\textsubscript{s} & 1 & 0 & 0 & No & No & \cite{mosca} \\
+ber\textsubscript{p} & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
+mc & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
+z & 1 & 0 & 0* & Yes & No & \cite{kerneltesting} \\\bottomrule
+\end{tabular}
+\caption{Implemented diffusion scores}
+\end{center}
+\end{table}
+
+\subsubsection{Scores without statistical normalisation}
+
+The base diffusion score \Rcode{raw}, which has been used in
+algorithms like HotNet \cite{hotnet} and TieDIE \cite{tiedie},
+solves a diffusion problem in terms of the
+regularised Laplacian kernel \cite{smola}.
+$$ f_{raw} = K\cdot y_{raw} $$
+The positively labelled nodes
+introduce one flow unit in the network ($y^{+}=1$),
+whereas the negative and unlabelled nodes are treated
+equivalently and do not introduce anything
+($y^{-}=y^{u}=0$).
+In the physical model,
+the flow can be evacuated from the graph due to the presence of
+first-order leaking in every node.
+
+On the other hand, the classical label propagation
+\cite{labelpropagation} treats positives
+as $y^{+}=1$ and negatives as $y^{-}=-1$, while unlabelled nodes
+remain as $y^{u}=0$, thus making a distinction between the last two.
+This option is available as \Rcode{ml}, and intuitively scores a
+node by counting if the majority of its neighbours
+vote positive or negative:
+$$ f_{ml} = K\cdot y_{ml} $$
+
+The authors of GeneMANIA \cite{genemania} propose a modification
+on the \Rcode{ml} input - they adhere to
+$y^{+}=1$ and $y^{-}=-1$, but introduce a bias term in the
+unlabelled nodes
+$$y^{u} = \frac{n^{+}-n^{-}}{n^{+}+n^{-}+n^{u}}$$
+being $n^{+}$, $n^{-}$ and $n^{u}$ the number of positives,
+negatives and unlabelled entities.
+The \Rcode{gm} score is then computed through
+$$ f_{gm} = K\cdot y_{gm} $$
+
+The last option in this part, named \Rcode{ber\textsubscript{s}} \cite{mosca},
+is a quantification of the relative change in the node score
+before and after the network smoothing. The score for a
+particular node $i$ can be written as
+$$ f_{ber_s, i} = \frac{f_{raw, i}}{y_{raw, i} + \epsilon}$$
+
+where $\epsilon > 0$ is a parameter.
+
+\subsubsection{Scores with statistical normalisation}
+
+Recently, the combination of a permutation analysis with
+diffusion processes has been suggested \cite{mosca}.
+This is a way to quantify how the diffusion score
+of a certain node compares to its score if the
+input was randomised - nodes that might have systematically
+high or low scores regardless of the input are
+normalised accordingly.
+
+The cornerstone of normalised scores is
+the empirical p-value \cite{empiricalpvalue}
+that indicates, for a node $i$,
+the proportion of input permutations
+that led to a diffusion score as high as the
+original diffusion score.
+Specifically, $f_{raw}$ is compared
+to scores from random trials $j$,
+$f_{raw}^{null, j} = K\cdot \pi_j(y_{raw})$,
+where $\pi_j(y_{raw})$ is a permutation
+of $y_{raw}$ on the labelled entities.
+The empirical p-value for node $i$ is therefore defined as in
+\cite{empiricalpvalue}:
+$$p_i = \frac{r_i + 1}{n + 1}$$
+being $r_i$ the number of trials $j$ in which
+$f_{raw, i}^{null, j} \geq f_{raw, i}$,
+and $n$ the total number of trials.
+
+To be consistent with the
+increasing direction of the scores,
+the \Rcode{mc} scores are defined as
+$$f_{mc, i} = 1 - p_i$$
+
+Importantly, the permutation has been applied only to the
+observed nodes.
+Therefore, any node outside the labelled
+background cannot receive a different input
+score in a permuted input.
+This implies that even if both negatives and unlabelled nodes
+are assigned the same input value ($y^{-}=y^{u}=0$),
+the negatives are actually permuted and eventually exchanged
+for a $1$ in some permutations provided that
+the number of runs is large enough.
+For this reason, negatives and unlabelled nodes are not
+equivalent in these scores.
+
+On the other hand, the \Rcode{z} scores are a parametric alternative
+to $f_{mc}$, so that node $i$ is scored through
+the following z-score:
+
+$$f_{z,i} = \frac{f_{raw, i} - E(f_{raw, i}^{null, j})}
+{\sqrt{V(f_{raw, i}^{null, j})}}$$
+
+The expectation and variance are computed in a closed form
+and these scores do not require running actual permutations,
+therefore saving on computational time and avoiding
+stochastic models.
+
+Finally, the authors in \cite{mosca} also suggest a
+combination of a classical score with an statistically normalised one.
+Available as \Rcode{ber\textsubscript{p}}, the score of node $i$ is
+defined as
+$$f_{ber_p, i} = -\log_{10}(p_i)\cdot f_{raw, i}$$
+This approach corrects the original diffusion scores by
+the effect of the network, in order to mitigate the effect of
+structures like hubs.
+
+\subsection{Implementation, functions and classes}
+
+Package \Rpackage{diffusion} is mainly implemented in R \cite{r}, but
+takes advantage of existing classes in \Rpackage{igraph} \cite{igraph} and
+basic data types, thus not introducing any new class.
+Inputs and outputs are conceived to require minimal
+formatting effort in the whole analysis.
+The computationally intense
+stochastic part of the permutation analysis is
+implemented in C++ through the packages
+\Rpackage{Rcpp} \cite{rcpp}, \Rpackage{RcppArmadillo} \cite{rcpparmadillo}
+and parallelised through \Rpackage{RcppParallel} \cite{rcppparallel}.
+
+Below is a diagram containing the main functions in the R
+package \Rpackage{diffusion}.
+
+\begin{figure}[!tpb]%figure1
+\centerline{\includegraphics[scale=1]{yeast_img/overview3_text2path.eps}}
+\caption{Overview of the main package functions.}
+\label{fig:overview}
+\end{figure}
+
+The main funcion is \Rcode{diffuse}, a wrapper for computing diffusion scores
+from several categories at once, stemming from possibly different observed
+backgrounds. Function \Rcode{diffuse} makes use of the deterministic
+\Rcode{diffuse\_raw} or the stochastic \Rcode{diffuse\_mc} implementations
+and combines them to give the desired scores for all the nodes
+in each of the observed backgrounds.
+
+The second wrapper \Rcode{perf} compares the
+result of the diffusion scores to target validation scores.
+Validation scores might include only part of the nodes of the network
+and these nodes can be background-specific.
+
+\section{Getting started}
+
+This vignette contains a classical example of label propagation
+on a biological network. The core tools for this analysis are
+the \Rpackage{igraph} R package \cite{igraph} and the
+\Rpackage{diffusion} package,
+whereas \Rpackage{ggplot2} \cite{ggplot2} is a convenient tool to
+plot the results.
+
+The data for this example is the \Rcode{yeast} interactome with
+GO annotations, as found in the data package \Rcode{igraphdata}
+\cite{igraphdata}.
+
+<<01_imports>>=
+# Core
+library(igraph)
+library(diffusion)
+
+# Plotting
+library(ggplot2)
+library(ggsci)
+
+# Data
+library(igraphdata)
+data(yeast)
+set.seed(1)
+@
+
+\subsection{Data description}
+
+A summary of the network object can be obtained by just
+showing the object:
+
+<<02_data1>>=
+summary(yeast)
+@
+
+For this analysis, only the largest connected
+component of this graph will be used,
+although the algorithms can handle graphs
+with several connected components.
+
+<<02_data2>>=
+yeast <- diffusion::largest_cc(yeast)
+@
+
+This yields to a graph with \Sexpr{format(vcount(yeast))} nodes and
+\Sexpr{format(ecount(yeast))} edges.
+There are several attributes that can be of interest.
+First of all, the \Rcode{name} of the protein nodes:
+
+<<02_data3>>=
+head(V(yeast)$name)
+@
+
+Furthermore, the corresponding aliases and complete names can
+be found in \Rcode{Description}
+
+<<02_data4>>=
+head(V(yeast)$Description)
+@
+
+The labels to perform network propagation are MIPS categories
+\cite{mips}, which provide means to classify proteins regarding their
+function. These functions are coded as characters in the \Rcode{yeast}
+object, in the node attribute \Rcode{Class}
+
+<<02_data5>>=
+table_classes <- table(V(yeast)$Class, useNA = "always")
+table_classes
+@
+
+The graph attribute \Rcode{Classes} maps
+these abbreviations to the actual category:
+
+<<02_data6>>=
+head(yeast$Classes)
+@
+
+Finally, the graph edges have a \Rcode{Confidence} attribute that
+assesses the amount of evidence supporting the interaction.
+All the edges will be kept in this analysis, but
+different confidences might be represented with edge weights.
+
+<<02_data7>>=
+table(E(yeast)$Confidence)
+@
+
+More on the yeast object can be found through \Rcode{?yeast}.
+
+\subsection{First analysis: protein ranking}
+
+In this first case, the diffusion scores will be applied to
+the prediction of a single protein function.
+Let's assume that 50\% of the labelled proteins in the graph as
+\Rcode{transport and sensing} (category \Rcode{A})
+are actually unlabelled.
+Now, using the labels of the known positive and negative
+examples for \Rcode{transport and sensing},
+can we correctly label the remaining 50\%?
+First of all, the list of known and unknown positives is generated.
+The function \Rcode{diffuse} uses (row)names in the input scores matrix
+so that unlabelled nodes are accounted as so.
+
+<<03_datasplit>>=
+perc <- .5
+
+# Transport and sensing is class A
+nodes_A <- V(yeast)[Class %in% "A"]$name
+nodes_unlabelled <- V(yeast)[Class %in% c(NA, "U")]$name
+nodes_notA <- setdiff(V(yeast)$name, c(nodes_A, nodes_unlabelled))
+
+# Known labels
+known_A <- sample(nodes_A, perc*length(nodes_A))
+known_notA <- sample(nodes_notA, perc*length(nodes_notA))
+known <- c(known_A, known_notA)
+
+# Unknown target nodes
+target_A <- setdiff(nodes_A, known_A)
+target_notA <- setdiff(nodes_notA, known_notA)
+target <- c(target_A, target_notA)
+target_id <- V(yeast)$name %in% target
+
+# True scores
+scores_true <- V(yeast)$Class %in% "A"
+@
+
+Now that the input is ready, the diffusion algorithm can be applied
+to rank all the proteins. As a first approach, the
+vanilla diffusion scores will be computed through the \Rcode{raw} method
+and the default regularised Laplacian kernel,
+which is computed on the fly.
+
+<<03_diffuse>>=
+# Vector of scores
+scores_A <- setNames((known %in% known_A)*1, known)
+
+# Diffusion
+diff <- diffusion::diffuse(
+    yeast,
+    scores = scores_A,
+    method = "raw"
+)
+@
+
+Diffusion scores are ready and
+in the same format they were introduced:
+
+<<03_diff1>>=
+head(diff)
+@
+
+Now, the scores obtained by the proteins
+actually belonging to \Rcode{transport and sensing}
+can be compared to proteins with other labels.
+
+<<03_diff2, fig=TRUE>>=
+# Compare scores
+df_plot <- data.frame(
+    Protein = V(yeast)$name,
+    Class = ifelse(scores_true, "Transport and sensing", "Other"),
+    DiffusionScore = diff,
+    Target = target_id,
+    Method = "raw",
+    stringsAsFactors = FALSE
+)
+
+ggplot(subset(df_plot, Target), aes(x = Class, y = DiffusionScore)) +
+    geom_boxplot(aes(fill = Method)) +
+    theme_bw() +
+    scale_y_log10() +
+    xlab("Protein class") +
+    ylab("Diffusion score") +
+    ggtitle("Target proteins in 'transport and sensing'")
+@
+
+The last plot justifies the usefulness of label propagation,
+as proteins in \Rcode{transport and sensing} obtain
+higher diffusion scores than the rest.
+The network analysis can be deepened by examining, for instance,
+the subnetwork containing the proteins with the top 30 diffusion
+scores, highlighting with squares the ones that were
+part of the input
+
+<<03_diff3, fig=TRUE>>=
+# Top scores subnetwork
+vertex_ids <- head(order(df_plot$DiffusionScore, decreasing = TRUE), 30)
+yeast_top <- igraph::induced.subgraph(yeast, vertex_ids)
+
+# Overlay desired properties
+# use tkplot for interactive plotting
+igraph::plot.igraph(
+    yeast_top,
+    vertex.color = diffusion::scores2colours(
+        df_plot$DiffusionScore[vertex_ids]),
+    vertex.shape = diffusion::scores2shapes(
+        df_plot$Protein[vertex_ids] %in% known_A),
+    vertex.label.color = "gray10",
+    main = "Top 30 proteins from diffusion scores"
+)
+@
+
+\subsection{Second example: comparing scores with single protein ranking}
+
+The proposed diffusion scores can be easily applied and compared.
+The regularised Laplacian kernel will be used
+to compute all the implemented scores for the
+target nodes in \Rcode{transport and sensing}.
+
+<<04_kernel>>=
+K_rl <- diffusion::regularisedLaplacianKernel(yeast)
+@
+
+Functions \Rcode{diffusion} and \Rcode{perf} do accept,
+however, an \Rcode{igraph} object as well, and compute the kernel
+automatically.
+For medium networks (10,000 nodes or more)
+the kernel computation can be computationally expensive in
+memory and time, so precomputing it avoids unnecessary
+recalculations.
+
+<<04_diff>>=
+list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
+
+df_methods <- plyr::ldply(
+    list_methods,
+    function(method) {
+        diff <- diffusion::diffuse(
+            K = K_rl,
+            scores = scores_A,
+            method = method
+        )
+
+        data.frame(
+            Protein = V(yeast)$name,
+            Class = ifelse(
+                scores_true,
+                "Transport and sensing", "Other"),
+            DiffusionScore = diff,
+            Target = target_id,
+            Method = method,
+            stringsAsFactors = FALSE
+        )
+    }
+)
+df_methods$Method <- factor(df_methods$Method, levels = list_methods)
+@
+
+The results can be directly plotted:
+
+<<04_plot, fig=TRUE>>=
+ggplot(subset(df_methods, Target), aes(x = Class, y = DiffusionScore)) +
+    geom_boxplot(aes(fill = Method)) +
+    scale_fill_npg() +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+    facet_wrap( ~ Method, nrow = 1, scales = "free") +
+    xlab("Protein class") +
+    ylab("Diffusion score") +
+    ggtitle("Target proteins in 'transport and sensing'")
+@
+
+As expected, all the diffusion scores show differences
+between positive and negative labels, but the quality
+of class separation will generally
+depend on the dataset and scoring method.
+
+\subsection{Third example: benchmarking scores with multiple protein functions}
+
+The package \Rpackage{diffusion} is conceived to perform several
+screenings at once. To prove its usefulness, we will generalise
+the procedure in the last section but screening all the
+MIPS categories in the yeast graph.
+
+First of all, the data must meet the
+adequate format.
+
+<<05_scores>>=
+# All classes except NA and unlabelled
+names_classes <- setdiff(names(table_classes), c("U", NA))
+
+# matrix format
+mat_classes <- sapply(
+    names_classes,
+    function(class) {
+        V(yeast)$Class %in% class
+    }
+)*1
+rownames(mat_classes) <- V(yeast)$name
+colnames(mat_classes) <- names_classes
+@
+
+The former 50\% known / 50\% unknown approach will be kept
+with the same split - although not all the categories will be
+totally balanced in the splits now - and screen
+the performance of all the methods using the area under the ROC curve
+(AUC) as a performance index.
+
+<<05_perf>>=
+list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
+
+df_methods <- perf(
+    K = K_rl,
+    scores = mat_classes[known, ],
+    validation = mat_classes[target, ],
+    grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE)
+)
+@
+
+This allows plotting of the AUCs over the categories for each method
+in one step:
+
+<<05_plot, fig=TRUE>>=
+ggplot(df_methods, aes(x = method, y = auc)) +
+    geom_boxplot(aes(fill = method)) +
+    scale_fill_npg() +
+    theme_bw() +
+    xlab("Method") +
+    ylab("Area under the curve") +
+    ggtitle("Methods performance in all categories")
+@
+
+Scaling up the analysis can be useful for assessing
+how adequate a diffusion score is in the dataset of interest.
+These results suggest that, for the current \Rcode{yeast} interactome
+and MIPS protein functions, the best priorisations are those
+obtained through a statistical normalisation,
+which might motivate the usage of such scores in other biological
+networks.
+
+\newpage
+\bibliographystyle{plain}
+
+\bibliography{bibliography}
+
+
+
+\end{document}
