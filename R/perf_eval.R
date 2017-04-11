@@ -54,6 +54,12 @@ perf_eval <- function(
     # we will undo it in the end
     pred <- to_list(prediction)
     val <- to_list(validation)
+
+    # sanity check
+    .check_scores(pred)
+    .check_scores(val)
+    .check_metric(metric)
+
     # browser()
     ans <- plyr::ldply(
         # iterate over backgrounds

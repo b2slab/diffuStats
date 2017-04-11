@@ -5,7 +5,7 @@
 \title{Compute the heatrank using permutations}
 \usage{
 diffuse_mc(graph, scores, n.perm = 10000, sample.prob = NULL, seed = 1,
-    oneminusHeatRank = TRUE, K = NULL)
+    oneminusHeatRank = TRUE, K = NULL, ...)
 }
 \arguments{
 \item{graph}{igraph object}
@@ -16,7 +16,9 @@ diffuse_mc(graph, scores, n.perm = 10000, sample.prob = NULL, seed = 1,
 
 \item{sample.prob}{Numeric, probabilities (needn't be scaled) to permute the
 input. This is passed to \code{\link[base]{sample}}'s \code{prob} argument.
-If \code{NULL}, sampling is uniform.}
+If \code{NULL}, sampling is uniform. It has to be in a list format,
+with the same names as \code{scores}, and each element of the list
+must be the sampling probability of each background.}
 
 \item{seed}{Numeric, seed for random number generator}
 
@@ -25,6 +27,8 @@ be returned instead of \code{heatrank}?}
 
 \item{K}{Kernel matrix (if precomputed). If \code{K} is not supplied,
 the regularised Laplacian will be computed on the fly and used.}
+
+\item{...}{currently ignored arguments}
 }
 \value{
 A list containing matrices of heatrank scores

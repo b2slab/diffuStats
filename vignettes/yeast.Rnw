@@ -19,9 +19,11 @@
 %\headheight=-.3in
 
 \begin{document}
-\SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE, fig=FALSE, prefix.string=yeast_latexfiles/}
+\SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE}
+\SweaveOpts{fig=FALSE, prefix.string=yeast_latexfiles/}
 %\setkeys{Gin}{width=1\textwidth}
-\title{An R package to compute diffusion-based scores on biological networks: diffusion}
+\title{An R package to compute diffusion-based scores
+on biological networks: diffusion}
 \small{\author{Serio Picart-Armada and Alexandre Perera-Lluna}}
 \maketitle %\VignetteIndexEntry{MAIT Vignette}
 
@@ -550,7 +552,8 @@ df_methods <- plyr::ldply(
         diff <- diffusion::diffuse(
             K = K_rl,
             scores = scores_A,
-            method = method
+            method = method,
+            n.perm = 1000
         )
 
         data.frame(
@@ -625,7 +628,8 @@ df_methods <- perf(
     K = K_rl,
     scores = mat_classes[known, ],
     validation = mat_classes[target, ],
-    grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE)
+    grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE),
+    n.perm = 1000
 )
 @
 

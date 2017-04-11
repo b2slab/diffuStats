@@ -1,5 +1,14 @@
 # Version log
 
+## Version 0.5.2
+
+* Added basic sanity checking
+* Fixed small bug: `ml` could be wrongly codified
+* Sanity also checks the variance in the input - useful to detect
+pathological cases
+* Reduced n.perm in vignettes and examples - they should build faster
+* Added unit testing for sanity checkers
+
 ## Version 0.5.1
 
 * Vignette has been added a "proper" introduction

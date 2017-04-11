@@ -36,6 +36,10 @@ a column-wise matrix. However, if the number of unlabelled
 entities varies from one case to another, a named list of such scores
 matrices can be passed to this function. The input format will
 be kept in the output.
+A relevant note here is that \code{z} can give NaN for a particular node
+when the observed nodes are disconnected from the node being scored.
+This is because these nodes have
+nor experimental neither network data.
 }
 \examples{
 # Using a vector

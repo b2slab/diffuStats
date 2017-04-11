@@ -13,12 +13,15 @@
 #' @param n.perm Numeric, number of permutations
 #' @param sample.prob Numeric, probabilities (needn't be scaled) to permute the
 #' input. This is passed to \code{\link[base]{sample}}'s \code{prob} argument.
-#' If \code{NULL}, sampling is uniform.
+#' If \code{NULL}, sampling is uniform. It has to be in a list format,
+#' with the same names as \code{scores}, and each element of the list
+#' must be the sampling probability of each background.
 #' @param seed Numeric, seed for random number generator
 #' @param oneminusHeatRank Logical, should \code{1 - heatrank}
 #' be returned instead of \code{heatrank}?
 #' @param K Kernel matrix (if precomputed). If \code{K} is not supplied,
 #' the regularised Laplacian will be computed on the fly and used.
+#' @param ... currently ignored arguments
 #'
 #' @return A list containing matrices of heatrank scores
 #'
@@ -48,13 +51,19 @@ diffuse_mc <- function(
     sample.prob = NULL,
     seed = 1,
     oneminusHeatRank = TRUE,
-    K = NULL)
+    K = NULL,
+    ...)
     # id.latent,
     # p.adjust = "fdr")
 {
+    # sanity checks
+    # if (!missing(graph))
+    # if (!is.null(K))
+    .check_scores(scores)
 
     # Kernel matrix
     if (is.null(K)) {
+        .check_graph(graph)
         message(
             "Kernel not supplied. ",
             "Computing regularised Laplacian kernel ...")
@@ -62,6 +71,7 @@ diffuse_mc <- function(
         gc()
         message("Done")
     } else {
+        .check_K(K)
         message("Using supplied kernel matrix...")
     }
 
@@ -77,6 +87,15 @@ diffuse_mc <- function(
             bkgd.names <- rownames(scores[[scores.name]])
             input.names <- colnames(scores[[scores.name]])
 
+            if (!all(bkgd.names %in% rownames(K)))
+                stop(
+                    "In background ",
+                    scores.name,
+                    ", some of the input node names ",
+                    "are not found in the kernel! ",
+                    "Check that the rownames of the input are ",
+                    "contained in the names of the graph nodes."
+                )
             # bkgd <- as.numeric(names(sample.prob[[scores.name]]))
             # prob <- as.numeric(sample.prob[[scores.name]])
             prob <- (sample.prob[[scores.name]])

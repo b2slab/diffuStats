@@ -9,6 +9,7 @@
 #' single background, supply a list with a vector column
 #' @param z logical, should z-scores be computed instead of raw scores?
 #' @param K optional matrix, precomputed diffusion kernel
+#' @param ... currently ignored arguments
 #'
 #' @return A list of scores, with the same length and
 #' dimensions as \code{scores}
@@ -30,10 +31,16 @@ diffuse_raw <- function(
     graph,
     scores,
     z = FALSE,
-    K = NULL) {
+    K = NULL,
+    ...) {
+    # sanity checks
+    # if (!missing(graph))
+    # if (!is.null(K))
+    .check_scores(scores)
 
     # Kernel matrix
     if (is.null(K)) {
+        .check_graph(graph)
         message(
             "Kernel not supplied. ",
             "Computing regularised Laplacian kernel ...")
@@ -41,6 +48,7 @@ diffuse_raw <- function(
         gc()
         message("Done")
     } else {
+        .check_K(K)
         message("Using supplied kernel matrix...")
     }
 

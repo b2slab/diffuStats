@@ -150,7 +150,8 @@ At the moment, the following: `raw`, `ml` and `gm` for
 classical propagation; `z` and `mc` for scores normalised 
 through a statistical model, and similarly `ber_s` and `ber_p`, 
 as described in [@mosca]. 
-The scoring methods `mc` and `ber_p` require permutations -thus being computationally intense- 
+The scoring methods `mc` and `ber_p` require permutations 
+-thus being computationally intense- 
 whereas the rest are deterministic. 
 
 For instance, let's smooth through `mc` the input matrix:

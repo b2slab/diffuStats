@@ -59,9 +59,9 @@ diffuse <- function(
     scores,
     method,
     ...) {
+    # check sanity
+    .check_method(method)
 
-    # classical <- c("raw", "ml", "gm")
-    #
     # For data reshaping
     format_scores <- which_format(scores)
     scores <- to_list(scores)

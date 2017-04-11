@@ -113,7 +113,7 @@ which_format <- function(x) {
     if (is.numeric(x)) return("matrix")
     if (is.list(x)) return("list")
 
-    stop("Non-recognised format, object of class: ", class(x))
+    stop("Non-recognised input scores format, object of class: ", class(x))
 }
 
 #' Convert input to list format
@@ -148,7 +148,9 @@ to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
     }
     return(scores)
 
-    stop("Non-recognised format, object of class: ", class(s_format))
+    stop(
+        "Non-recognised input scores format, object of class: ",
+        class(s_format))
 }
 
 #' Convert list format to desired format

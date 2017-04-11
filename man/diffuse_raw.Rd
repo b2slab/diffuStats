@@ -4,7 +4,7 @@
 \alias{diffuse_raw}
 \title{Diffuse scores on a network}
 \usage{
-diffuse_raw(graph, scores, z = FALSE, K = NULL)
+diffuse_raw(graph, scores, z = FALSE, K = NULL, ...)
 }
 \arguments{
 \item{graph}{\code{\link[igraph]{igraph}} object for the diffusion}
@@ -15,6 +15,8 @@ single background, supply a list with a vector column}
 \item{z}{logical, should z-scores be computed instead of raw scores?}
 
 \item{K}{optional matrix, precomputed diffusion kernel}
+
+\item{...}{currently ignored arguments}
 }
 \value{
 A list of scores, with the same length and

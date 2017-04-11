@@ -1,4 +1,5 @@
 # find bad indentation
+# hacked from BiocCheck:::checkFormatting
 tellLines <- function (pkgdir)
 {
     files <- c(file.path(pkgdir, "NAMESPACE"), dir(file.path(pkgdir,
@@ -26,6 +27,13 @@ tellLines <- function (pkgdir)
             names(n) <- seq_along(1:length(n))
             long <- n[n > 80]
             if (length(long)) {
+                message(
+                    "Lines in file ",
+                    file,
+                    " with >80 characters: ",
+                    paste(long, collapse = " ")
+                )
+
                 longlines <- longlines + length(long)
             }
             tabs <- grepl("\t", lines)
