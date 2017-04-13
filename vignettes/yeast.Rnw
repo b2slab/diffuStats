@@ -38,28 +38,71 @@ protein domains or a metabolomics profiling,
 are propagated to its neighbours,
 effectively smoothing the scores through
 prior annotated knowledge and prioritising novel candidates.
-However, there are several settings
+However, there are several settings to tune
 when defining the diffusion process,
 including the diffusion kernel and
 a recently proposed statistical normalisation of the scores.
 This can have an impact on the results and
 there is no software gathering these possibilities
 to screen their performance in the application of interest.
-This work provides a collection of diffusion scores,
+This work provides \Rpackage{diffusion}, an R package with a
+collection of diffusion kernels and scores,
 as well as a parallel permutation analysis for the normalised scores,
-that scales up the analysis of several sets of molecular entities at once.
+that eases the analysis of several sets of molecular entities at once.
 
 \section{Introduction}
 
 The application of label propagation algorithms \cite{labelpropagation}
-is based on the guilt by association principle \cite{gba}.
-This principle can be
-rephrased in the protein-protein interaction context as
+is based on the guilt by association principle \cite{gba},
+which can be rephrased in the protein-protein interaction context as
 \textq{proteins that interact are more likely to share biological functions}.
-However, this principle is extremely general and has numerous applications
-in bioinformatics alone, for example prioritising genome-wide
-association studies hits \cite{diffusion_gwas} and finding relevant
-modules from gene expression and mutation data \cite{mosca}.
+However, this principle is extremely general and has experienced
+success in numerous applications in bioinformatics.
+
+HotNet \cite{hotnet} uses a diffusion process with mutated genes as
+seed nodes to find modules with a statistically high number of mutated genes
+in cancer.
+Another attempt to find relevant
+modules from gene expression and mutation data
+can be found in \cite{mosca},
+where the authors propose a diffusion process followed
+by a statistical normalisation and an automatic process
+to extract a subnetwork.
+TieDIE \cite{tiedie} runs two diffusion processes to
+link perturbation in the genome with changes in the transcriptome,
+effectively linking two sets of genes.
+GeneMANIA \cite{genemania} is a web server that predicts
+gene function using label propagation with a bias on the
+unlabelled nodes.
+Network-based learning sharing a background with diffusion
+has been also applied to protein classification using
+multiple networks
+\cite{fastprotein}.
+Label propagation using graph kernels
+has been proven successful in gene-disease
+association \cite{valentini, diffusion_gwas}.
+
+The \Rpackage{RANKS}
+R package contains a variety of diffusion kernels and kernelised
+scores for label propagation using a binary input vector.
+Despite easing kernelised scores benchmarking,
+the effect of unlabelled nodes is not explored,
+neither is the possible numeric codifications of the labels
+or the option to include quantitative data in the labels.
+In addition, statistical normalisations such as in \cite{mosca}
+remove the effect of network structures like hubs and
+should be taken into account when choosing a diffusion scoring
+method.
+This motivates the introduction of our \Rpackage{diffusion}
+R package, which collects widely adopted input codifications and
+explicitly accounts for unlabelled nodes.
+It also includes three statistically normalised scores,
+which can be obtained through Monte Carlo trials or
+a parametric alternative.
+The \Rpackage{diffusion} package uses existent classes and
+provides high-level functions to screen the performance of
+several diffusion scores, in order to facilitate their choice
+in any computational biology study.
 
 \section{Methodology}
 
@@ -89,7 +132,7 @@ of $n$ nodes $V$ and a set of edges $E$ of unordered pairs of nodes.
 This can be extended to weighted, undirected graphs, where each
 edge $i \sim j$ has a weight attribute $W_{ij} \in [0, \infty)$.
 The degree matrix of $G$ is defined as the $n \times n$
-diagonal matrix so that $D{ii} = \sum_{j=1}^n W_{ij}$.
+diagonal matrix so that $D_{ii} = \sum_{j=1}^n W_{ij}$.
 The (unnormalised) Laplacian of $G$ is defined as
 the $n \times n$ matrix $L = D - W$,
 whereas its normalised version is
@@ -131,7 +174,7 @@ Inverse cosine &
 \end{table}
 
 Further details about this family of kernels,
-all available in our package `diffusion`,can be found
+all available in our package \Rpackage{diffusion}, can be found
 in the original manuscript \cite{smola}.
 
 On the other hand,
@@ -167,7 +210,7 @@ Monte Carlo permutations.
 \toprule
 Score & $y^+$ & $y^-$ & $y^u$ & Normalised & Stochastic & Reference \\\midrule
 raw & 1 & 0 & 0 & No & No & \cite{hotnet} \\
-ml & 1 & -1 & 0 & No & No & \cite{labelpropagation} \\
+ml & 1 & -1 & 0 & No & No & \cite{fastprotein, labelpropagation} \\
 gm & 1 & -1 & $k$ & No & No & \cite{genemania} \\
 ber\textsubscript{s} & 1 & 0 & 0 & No & No & \cite{mosca} \\
 ber\textsubscript{p} & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
@@ -198,6 +241,7 @@ On the other hand, the classical label propagation
 \cite{labelpropagation} treats positives
 as $y^{+}=1$ and negatives as $y^{-}=-1$, while unlabelled nodes
 remain as $y^{u}=0$, thus making a distinction between the last two.
+A biological example can be found in protein classification \cite{fastprotein}.
 This option is available as \Rcode{ml}, and intuitively scores a
 node by counting if the majority of its neighbours
 vote positive or negative:
@@ -219,7 +263,8 @@ before and after the network smoothing. The score for a
 particular node $i$ can be written as
 $$ f_{ber_s, i} = \frac{f_{raw, i}}{y_{raw, i} + \epsilon}$$
 
-where $\epsilon > 0$ is a parameter.
+where $\epsilon > 0$ is a parameter that regulates the importance of
+the relative change.
 
 \subsubsection{Scores with statistical normalisation}
 
@@ -292,7 +337,8 @@ structures like hubs.
 
 Package \Rpackage{diffusion} is mainly implemented in R \cite{r}, but
 takes advantage of existing classes in \Rpackage{igraph} \cite{igraph} and
-basic data types, thus not introducing any new class.
+basic data types, thus not introducing any new data structure -
+this minimises the learning effort by the final user.
 Inputs and outputs are conceived to require minimal
 formatting effort in the whole analysis.
 The computationally intense
@@ -301,22 +347,20 @@ implemented in C++ through the packages
 \Rpackage{Rcpp} \cite{rcpp}, \Rpackage{RcppArmadillo} \cite{rcpparmadillo}
 and parallelised through \Rpackage{RcppParallel} \cite{rcppparallel}.
 
-Below is a diagram containing the main functions in the R
-package \Rpackage{diffusion}.
-
 \begin{figure}[!tpb]%figure1
 \centerline{\includegraphics[scale=1]{yeast_img/overview3_text2path.eps}}
 \caption{Overview of the main package functions.}
 \label{fig:overview}
 \end{figure}
 
+A diagram containing the main functions in the R
+package \Rpackage{diffusion} can be found in (Fig. \ref{fig:overview}).
 The main funcion is \Rcode{diffuse}, a wrapper for computing diffusion scores
 from several categories at once, stemming from possibly different observed
 backgrounds. Function \Rcode{diffuse} makes use of the deterministic
 \Rcode{diffuse\_raw} or the stochastic \Rcode{diffuse\_mc} implementations
 and combines them to give the desired scores for all the nodes
 in each of the observed backgrounds.
-
 The second wrapper \Rcode{perf} compares the
 result of the diffusion scores to target validation scores.
 Validation scores might include only part of the nodes of the network
@@ -595,10 +639,11 @@ depend on the dataset and scoring method.
 The package \Rpackage{diffusion} is conceived to perform several
 screenings at once. To prove its usefulness, we will generalise
 the procedure in the last section but screening all the
-MIPS categories in the yeast graph.
+categories in the yeast graph.
 
-First of all, the data must meet the
-adequate format.
+First of all, the input data must meet an
+adequate format - a straightforward approach is to
+populate a matrix with the input labels (one category per column).
 
 <<05_scores>>=
 # All classes except NA and unlabelled
@@ -616,9 +661,11 @@ colnames(mat_classes) <- names_classes
 @
 
 The former 50\% known / 50\% unknown approach will be kept
-with the same split - although not all the categories will be
-totally balanced in the splits now - and screen
-the performance of all the methods using the area under the ROC curve
+with the same split, although not all the
+\Sexpr{ncol(mat_classes)} categories will be
+totally balanced in the splits now.
+All the methods will be compared
+using the area under the ROC curve
 (AUC) as a performance index.
 
 <<05_perf>>=
@@ -628,7 +675,9 @@ df_methods <- perf(
     K = K_rl,
     scores = mat_classes[known, ],
     validation = mat_classes[target, ],
-    grid_param = expand.grid(method = list_methods, stringsAsFactors = FALSE),
+    grid_param = expand.grid(
+        method = list_methods,
+        stringsAsFactors = FALSE),
     n.perm = 1000
 )
 @
@@ -646,12 +695,36 @@ ggplot(df_methods, aes(x = method, y = auc)) +
     ggtitle("Methods performance in all categories")
 @
 
+<<05_plotsave, echo=FALSE, eval=FALSE, include=FALSE>>=
+# Save plot for manuscript
+# # library(extrafont)
+setEPS()
+postscript("data-raw/BoxplotAUC.eps", width = 3.38, height = 3.38)
+ggplot(df_methods, aes(x = method, y = auc)) +
+    # geom_boxplot(aes(fill = method), outlier.size = 1) +
+    geom_boxplot(outlier.size = 1) +
+    scale_fill_npg(name = "Method") +
+    theme_bw() +
+    xlab("Method") +
+    ylab("Area under the curve") +
+    # coord_fixed() +
+    ggtitle("Benchmark of protein categories") +
+    theme(
+        text = element_text(size = 10),
+        axis.text.x = element_text(
+            size = 8, angle = 45, vjust = 1,
+            hjust = 1, color = "black"),
+        axis.text.y = element_text(size = 8, color = "black"),
+        plot.title = element_text(size = 12, hjust = .5))
+dev.off()
+@
+
 Scaling up the analysis can be useful for assessing
 how adequate a diffusion score is in the dataset of interest.
 These results suggest that, for the current \Rcode{yeast} interactome
-and MIPS protein functions, the best priorisations are those
+and protein functions, the best priorisations are those
 obtained through a statistical normalisation,
-which might motivate the usage of such scores in other biological
+which might motivate its usage in other biological
 networks.
 
 \newpage

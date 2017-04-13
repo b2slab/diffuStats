@@ -5,7 +5,7 @@
 \title{Generate a random input for graph diffusion}
 \usage{
 generate_input(graph, order, length_inputs, return_matrix = TRUE,
-    seed = NULL)
+  seed = NULL)
 }
 \arguments{
 \item{graph}{an \code{\link[igraph]{igraph}} object, typically from

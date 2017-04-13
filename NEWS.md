@@ -1,5 +1,10 @@
 # Version log
 
+## Version 0.5.3
+
+* Modified main vignette: more proper introduction, more cites
+* Added code chunk to generate the figure in the paper
+
 ## Version 0.5.2
 
 * Added basic sanity checking

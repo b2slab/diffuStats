@@ -17,7 +17,7 @@ inverseCosineKernel(graph)
 pStepKernel(graph, a = 2, p = 5L)
 
 regularisedLaplacianKernel(graph, sigma2 = 1, add_diag = 1,
-    normalized = FALSE)
+  normalized = FALSE)
 }
 \arguments{
 \item{graph}{igraph object}
