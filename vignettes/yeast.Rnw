@@ -17,6 +17,7 @@
 %\textwidth=6.2in \textheight=8.5in
 %\parskip=.3cm \oddsidemargin=.1in \evensidemargin=.1in
 %\headheight=-.3in
+%\VignetteIndexEntry{Case study: predicting protein function}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE}
@@ -25,7 +26,7 @@
 \title{An R package to compute diffusion-based scores
 on biological networks: diffusion}
 \small{\author{Serio Picart-Armada and Alexandre Perera-Lluna}}
-\maketitle %\VignetteIndexEntry{MAIT Vignette}
+\maketitle
 
 \section{Abstract}
 
@@ -40,7 +41,8 @@ effectively smoothing the scores through
 prior annotated knowledge and prioritising novel candidates.
 However, there are several settings to tune
 when defining the diffusion process,
-including the diffusion kernel and
+including the diffusion kernel,
+the numeric 3codification of the labels and
 a recently proposed statistical normalisation of the scores.
 This can have an impact on the results and
 there is no software gathering these possibilities
@@ -115,7 +117,7 @@ One of the main purposes of \Rpackage{diffusion} is to offer
 a battery of approaches to compute and compare diffusion scores.
 The diffusion scores $f$ using an input vector $y$ and
 a diffusion kernel $K$ are generally computed as $$ f = K\cdot y$$
-possibly followed by a normalisation.
+possibly followed by further adjustments or a statistical normalisation.
 
 The decisions taken in the definition of $K$, $y$ and the posterior
 normalisation generally give rise to
@@ -188,8 +190,9 @@ is simply the pseudoinverse
 of the graph Laplacian, $K = L^+$.
 
 The default option in the \Rpackage{diffusion} package is
-the regularised Laplacian kernel, as it is widely used
-and describes many physical models, for instance in \cite{hotnet}.
+the regularised Laplacian kernel, as it is widely adopted
+and describes many physical models, for instance in
+\cite{hotnet, tiedie, electricalmodel}.
 
 \subsection{Diffusion scores}
 
@@ -198,7 +201,7 @@ the presence of a statistical normalisation can lead to important
 differences in the results.
 Table \ref{tab:scores} gives an overview of the implemented scores,
 which will be detailed in the following sections.
-The labels of the
+The numeric values of the
 positive, negative and unlabelled examples are
 respectively $y^+$, $y^-$ and $y^u$.
 Column \textq{normalised} refers to the application of a statistical
@@ -327,7 +330,7 @@ $$f_{z,i} = \frac{f_{raw, i} - E(f_{raw, i}^{null, j})}
 The expectation and variance are computed in a closed form
 and these scores do not require running actual permutations,
 therefore saving on computational time and avoiding
-stochastic models.
+stochastic models. [ADD CITATION TO OUR ARTICLE HERE]
 
 Finally, the authors in \cite{mosca} also suggest a
 combination of a classical score with an statistically normalised one.
@@ -349,9 +352,10 @@ to their definitions.
 Currently \Rcode{mc} scores (and therefore \Rcode{ber\textsubscript{p}}
 scores as well) do not accept quantitative inputs,
 but this will be fixed in future versions.
-Quantitative inputs should be meaningful and one-tailed in order
-to avoid undesired cancellations
-
+Beware that quantitative inputs should be
+meaningful and one-tailed (monotonic) -
+the nature of diffusion processes involves averaging and strong
+effects with opposing signs cancel out instead of adding up.
 
 \subsection{Implementation, functions and classes}
 
@@ -396,7 +400,7 @@ whereas \Rpackage{ggplot2} \cite{ggplot2} is a convenient tool to
 plot the results.
 
 The data for this example is the \Rcode{yeast} interactome with
-GO annotations, as found in the data package \Rcode{igraphdata}
+functional annotations, as found in the data package \Rcode{igraphdata}
 \cite{igraphdata}.
 
 <<01_imports>>=
@@ -468,7 +472,8 @@ head(yeast$Classes)
 Finally, the graph edges have a \Rcode{Confidence} attribute that
 assesses the amount of evidence supporting the interaction.
 All the edges will be kept in this analysis, but
-different confidences might be represented with edge weights.
+different confidences can be weighted to favour diffusion in
+high confidence edges.
 
 <<02_data7>>=
 table(E(yeast)$Confidence)
@@ -487,7 +492,7 @@ Now, using the labels of the known positive and negative
 examples for \Rcode{transport and sensing},
 can we correctly label the remaining 50\%?
 First of all, the list of known and unknown positives is generated.
-The function \Rcode{diffuse} uses (row)names in the input scores matrix
+The function \Rcode{diffuse} uses (row)names in the input scores
 so that unlabelled nodes are accounted as so.
 
 <<03_datasplit>>=
@@ -517,7 +522,7 @@ Now that the input is ready, the diffusion algorithm can be applied
 to rank all the proteins. As a first approach, the
 vanilla diffusion scores will be computed through the \Rcode{raw} method
 and the default regularised Laplacian kernel,
-which is computed on the fly.
+which is calculated on the fly.
 
 <<03_diffuse>>=
 # Vector of scores
@@ -568,7 +573,8 @@ higher diffusion scores than the rest.
 The network analysis can be deepened by examining, for instance,
 the subnetwork containing the proteins with the top 30 diffusion
 scores, highlighting with squares the ones that were
-part of the input
+positive labels in the input.
+Notice the small clusters of proteins:
 
 <<03_diff3, fig=TRUE>>=
 # Top scores subnetwork
@@ -646,7 +652,7 @@ ggplot(subset(df_methods, Target), aes(x = Class, y = DiffusionScore)) +
     facet_wrap( ~ Method, nrow = 1, scales = "free") +
     xlab("Protein class") +
     ylab("Diffusion score") +
-    ggtitle("Target proteins in 'transport and sensing'")
+    ggtitle("Target proteins scores in 'transport and sensing'")
 @
 
 As expected, all the diffusion scores show differences

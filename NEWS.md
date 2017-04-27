@@ -1,5 +1,11 @@
 # Version log
 
+## Version 0.5.5
+
+* Final adjustments in main vignette
+* Added example to quickstart vignette
+* **First internal review version**
+
 ## Version 0.5.4
 
 * Changes in vignette
