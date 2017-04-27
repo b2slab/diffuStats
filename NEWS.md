@@ -1,5 +1,10 @@
 # Version log
 
+## Version 0.5.4
+
+* Changes in vignette
+* Temporarily depends on R>=3.2 to build a zip for iPsych
+
 ## Version 0.5.3
 
 * Modified main vignette: more proper introduction, more cites

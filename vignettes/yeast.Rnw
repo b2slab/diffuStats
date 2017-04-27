@@ -81,9 +81,14 @@ multiple networks
 Label propagation using graph kernels
 has been proven successful in gene-disease
 association \cite{valentini, diffusion_gwas}.
+Equivalent formulations can be found under different terminology,
+like the electrical model applied to prioritise candidate
+genes in eQTL in \cite{electricalmodel}.
 
-The \Rpackage{RANKS}
-R package contains a variety of diffusion kernels and kernelised
+The heterogeneity of applications hinders comparisons among approaches,
+therefore tools gathering the state of the art are highly needed.
+An existing solution is \Rpackage{RANKS}, an
+R package that contains a variety of diffusion kernels and kernelised
 scores for label propagation using a binary input vector.
 Despite easing kernelised scores benchmarking,
 the effect of unlabelled nodes is not explored,
@@ -101,7 +106,7 @@ which can be obtained through Monte Carlo trials or
 a parametric alternative.
 The \Rpackage{diffusion} package uses existent classes and
 provides high-level functions to screen the performance of
-several diffusion scores, in order to facilitate their choice
+several diffusion scores, in order to facilitate their integration
 in any computational biology study.
 
 \section{Methodology}
@@ -149,10 +154,13 @@ $$K = \sum_{j=1}^n r^{-1}(\lambda_j) v_j v_j^T$$
 
 Well known graph kernels belong to this family because
 they can be written as transformations on the Laplacian spectrum.
-The following table summarises them, assuming
+Table \ref{tab:kernels} summarises them, assuming
 the usage of the normalised Laplacian -
 the unnormalised Laplacian can also be used
-as long as the resulting kernel is still positive semidefinite:
+as long as the resulting kernel is still positive semidefinite.
+Further details about this family of kernels,
+all available in our package \Rpackage{diffusion}, can be found
+in the original manuscript \cite{smola}.
 
 \begin{table}[!t]
 \label{tab:kernels}
@@ -173,20 +181,15 @@ Inverse cosine &
 \end{center}
 \end{table}
 
-Further details about this family of kernels,
-all available in our package \Rpackage{diffusion}, can be found
-in the original manuscript \cite{smola}.
-
-On the other hand,
-the commute time kernel, introduced in \cite{ctkernel}
-can be found in our package as well.
+On the other hand, our package includes
+the commute time kernel as well, introduced in \cite{ctkernel}.
 This kernel, also writable in terms of a regularisation function,
 is simply the pseudoinverse
 of the graph Laplacian, $K = L^+$.
 
 The default option in the \Rpackage{diffusion} package is
 the regularised Laplacian kernel, as it is widely used
-and describes many physical models, for instance \cite{hotnet}.
+and describes many physical models, for instance in \cite{hotnet}.
 
 \subsection{Diffusion scores}
 
@@ -206,6 +209,7 @@ Monte Carlo permutations.
 \begin{table}[!t]
 \label{tab:scores}
 \begin{center}
+\resizebox{\textwidth}{!}{
 \begin{tabular}{@{}lllllll@{}}
 \toprule
 Score & $y^+$ & $y^-$ & $y^u$ & Normalised & Stochastic & Reference \\\midrule
@@ -217,6 +221,7 @@ ber\textsubscript{p} & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
 mc & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
 z & 1 & 0 & 0* & Yes & No & \cite{kerneltesting} \\\bottomrule
 \end{tabular}
+}
 \caption{Implemented diffusion scores}
 \end{center}
 \end{table}
@@ -332,6 +337,21 @@ $$f_{ber_p, i} = -\log_{10}(p_i)\cdot f_{raw, i}$$
 This approach corrects the original diffusion scores by
 the effect of the network, in order to mitigate the effect of
 structures like hubs.
+
+\subsubsection{Quantitative inputs}
+
+In its current release, \Rpackage{diffusion} also accepts quantitative
+labels as input in the following scores: \Rcode{raw},
+\Rcode{ber\textsubscript{s}} and \Rcode{z}.
+The scores \Rcode{ml} and
+\Rcode{gm} are naturally excluded from non-binary inputs due
+to their definitions.
+Currently \Rcode{mc} scores (and therefore \Rcode{ber\textsubscript{p}}
+scores as well) do not accept quantitative inputs,
+but this will be fixed in future versions.
+Quantitative inputs should be meaningful and one-tailed in order
+to avoid undesired cancellations
+
 
 \subsection{Implementation, functions and classes}
 
@@ -728,7 +748,8 @@ which might motivate its usage in other biological
 networks.
 
 \newpage
-\bibliographystyle{plain}
+%\bibliographystyle{plain}
+\bibliographystyle{apalike}
 
 \bibliography{bibliography}
 
