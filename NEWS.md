@@ -1,5 +1,15 @@
 # Version log
 
+## Version 0.99.0
+
+* Changes in both vignettes, using Bioconductor style
+* Submitting to Bioconductor
+
+## Version 0.97.0
+
+* Changes in main vignette
+* Ready to submit to Bioconductor
+
 ## Version 0.5.5
 
 * Final adjustments in main vignette

@@ -1,8 +1,12 @@
 ---
 title: "Diffusion in a nutshell"
-author: "Sergio Picart-Armada"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+author: 
+-   name: Sergio Picart-Armada
+    affiliation: B2SLab at Polytechnic University of Catalonia
+    email: sergi.picart@upc.edu
+date: "`r doc_date()`"
+package: "`r pkg_ver('diffusion')`"
+output: BiocStyle::html_document
 bibliography: bibliography.bib
 vignette: >
     %\VignetteIndexEntry{Quick start}
@@ -16,14 +20,14 @@ knitr::opts_chunk$set(
     fig.width = 7, fig.height = 6)
 ```
 
-## Getting started
+# Getting started
 
 `diffusion` is an R package providing several scores 
 for diffusion in networks. 
 While its original purpose lies on biological networks, 
 its usage is not limited to that scope. 
 In general terms, `diffusion` builds several propagation algorithms 
-on the \code{igraph} package classes and methods. 
+on the \code{igraph} package [@igraph] classes and methods. 
 A more detailed analysis and documentation of the implemented 
 methods can be found in the protein function prediction vignette. 
 
@@ -44,7 +48,7 @@ plot(graph_toy)
 In the next section, we will be running diffusion algorithms 
 on this tiny lattice graph. 
 
-## Specifying the input
+# Specifying the input
 
 The package `diffusion` is flexible and allows 
 several inputs at once for a given network. 
@@ -74,7 +78,7 @@ length(input_vec)
 We see that all the nodes have a measure in each of the four score sets. 
 In practice, these score sets could be disease genes, pathways, et cetera.
 
-## The diffusion algorithm
+# The diffusion algorithm
 
 Each one of these columns in the input can be *smoothed* using the network 
 and new value will be derived - unlabelled nodes are also scored. 
@@ -99,7 +103,7 @@ output_vec <- diffusion::diffuse(
 head(output_vec, 15)
 ```
 
-## Diffusion scores visualisation
+# Diffusion scores visualisation
 
 The best way to visualise the scores is overlaying 
 them in the original lattice. 
@@ -123,7 +127,7 @@ Square nodes were labelled as relevant in the input,
 and the diffusion algorithm smoothed these labels over the network - 
 as in the guilt-by-association principle.
 
-## Several inputs, several smoothing scores
+# Several inputs, several smoothing scores
 
 The input to `diffuse` can be more than a vector with scores. 
 It can be provided with a set of score vectors, stored in a matrix 
@@ -187,7 +191,7 @@ Each method has its particularities and, in the end,
 it is all about the question being asked to the data and 
 the particularities of the dataset. 
 
-## Benchmarking
+# Benchmarking
 
 Package `diffusion` offers the option to assess the performance
 of the diffusion scores given user-defined target scores or labels. 
@@ -235,4 +239,10 @@ df_perf <- perf(
 df_perf
 ```
 
-## References
+# R session info {.unnumbered}
+
+```{r}
+sessionInfo()
+```
+
+# References

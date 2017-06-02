@@ -5,7 +5,7 @@
 \title{Translate values into colours}
 \usage{
 scores2colours(x, range = c(min(0, min(x)), max(x)), n.colors = 10,
-  palette = colorRampPalette(c("#3C5488FF", "white", "#F39B7FFF")))
+    palette = colorRampPalette(c("#3C5488FF", "white", "#F39B7FFF")))
 }
 \arguments{
 \item{x}{numeric vector to be colorised}

@@ -1,13 +1,13 @@
 Package: diffusion
 Type: Package
 Title: Diffusion methods for networks
-Version: 0.5.5
+Version: 0.99.0
 Author: Sergio Picart-Armada
 Maintainer: Sergio Picart-Armada <sergi.picart@upc.edu>
 Description: Methods to propagate scores in networks. 
     Designed for biological networks but applicable to 
     any other medium-sized networks.
-Depends: R (>= 3.2)
+Depends: R (>= 3.4)
 Imports: grDevices, 
     stats, 
     methods, 
@@ -29,7 +29,8 @@ Suggests: testthat,
     rmarkdown, 
     ggplot2, 
     ggsci, 
-    igraphdata
+    igraphdata, 
+    BiocStyle
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel 
 SystemRequirements: GNU make
 VignetteBuilder: knitr
