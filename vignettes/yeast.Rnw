@@ -1,5 +1,6 @@
 \documentclass[12pt]{article}
 
+\usepackage{dsfont}
 \usepackage{booktabs}
 \usepackage{fixltx2e} %subscripts
 %\usepackage{hyperref}
@@ -17,15 +18,18 @@
 %\textwidth=6.2in \textheight=8.5in
 %\parskip=.3cm \oddsidemargin=.1in \evensidemargin=.1in
 %\headheight=-.3in
+%\VignetteIndexEntry{Case study: predicting protein function}
 
 \begin{document}
 \SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE}
-\SweaveOpts{fig=FALSE, prefix.string=yeast_latexfiles/}
+%\SweaveOpts{fig=FALSE, prefix.string=yeast_latexfiles/}
 %\setkeys{Gin}{width=1\textwidth}
 \title{An R package to compute diffusion-based scores
 on biological networks: diffusion}
-\small{\author{Serio Picart-Armada and Alexandre Perera-Lluna}}
-\maketitle %\VignetteIndexEntry{MAIT Vignette}
+\small{\author{Sergio Picart-Armada,
+Wesley K. Thompson, \\
+Alfonso Buil and Alexandre Perera-Lluna}}
+\maketitle
 
 \section{Abstract}
 
@@ -34,18 +38,20 @@ procedure in computational biology for giving context
 to molecular entities.
 Node labels, which can derive from gene expression,
 genome-wide association studies,
-protein domains or a metabolomics profiling,
-are propagated to its neighbours,
+protein domains or metabolomics profiling,
+are propagated to their neighbours,
 effectively smoothing the scores through
 prior annotated knowledge and prioritising novel candidates.
 However, there are several settings to tune
 when defining the diffusion process,
-including the diffusion kernel and
-a recently proposed statistical normalisation of the scores.
-This can have an impact on the results and
-there is no software gathering these possibilities
+including the diffusion kernel,
+the numeric codification of the labels and
+a choice of statistical normalisation of the scores.
+These settings can have a large impact
+on results, and there is currently no
+software implementing many of them in one place
 to screen their performance in the application of interest.
-This work provides \Rpackage{diffusion}, an R package with a
+This vignette presents \Rpackage{diffusion}, an R package with a
 collection of diffusion kernels and scores,
 as well as a parallel permutation analysis for the normalised scores,
 that eases the analysis of several sets of molecular entities at once.
@@ -81,9 +87,14 @@ multiple networks
 Label propagation using graph kernels
 has been proven successful in gene-disease
 association \cite{valentini, diffusion_gwas}.
+Equivalent formulations can be found under different terminology,
+like the electrical model applied to prioritise candidate
+genes in eQTL in \cite{electricalmodel}.
 
-The \Rpackage{RANKS}
-R package contains a variety of diffusion kernels and kernelised
+The heterogeneity of applications hinders comparisons among approaches,
+therefore tools gathering the state of the art are highly needed.
+An existing solution is \Rpackage{RANKS}, an
+R package that contains a variety of diffusion kernels and kernelised
 scores for label propagation using a binary input vector.
 Despite easing kernelised scores benchmarking,
 the effect of unlabelled nodes is not explored,
@@ -101,7 +112,7 @@ which can be obtained through Monte Carlo trials or
 a parametric alternative.
 The \Rpackage{diffusion} package uses existent classes and
 provides high-level functions to screen the performance of
-several diffusion scores, in order to facilitate their choice
+several diffusion scores, in order to facilitate their integration
 in any computational biology study.
 
 \section{Methodology}
@@ -110,7 +121,7 @@ One of the main purposes of \Rpackage{diffusion} is to offer
 a battery of approaches to compute and compare diffusion scores.
 The diffusion scores $f$ using an input vector $y$ and
 a diffusion kernel $K$ are generally computed as $$ f = K\cdot y$$
-possibly followed by a normalisation.
+possibly followed by further adjustments or a statistical normalisation.
 
 The decisions taken in the definition of $K$, $y$ and the posterior
 normalisation generally give rise to
@@ -149,13 +160,15 @@ $$K = \sum_{j=1}^n r^{-1}(\lambda_j) v_j v_j^T$$
 
 Well known graph kernels belong to this family because
 they can be written as transformations on the Laplacian spectrum.
-The following table summarises them, assuming
+Table \ref{tab:kernels} summarises them, assuming
 the usage of the normalised Laplacian -
 the unnormalised Laplacian can also be used
-as long as the resulting kernel is still positive semidefinite:
+as long as the resulting kernel is still positive semidefinite.
+Further details about this family of kernels,
+all available in our package \Rpackage{diffusion}, can be found
+in the original manuscript \cite{smola}.
 
 \begin{table}[!t]
-\label{tab:kernels}
 \begin{center}
 \begin{tabular}{@{}ll@{}}
 \toprule
@@ -170,23 +183,20 @@ Inverse cosine &
     $r(\lambda) = (cos(\lambda \frac{\pi}{4}))^{-1}$ \\\bottomrule
 \end{tabular}
 \caption{Implemented diffusion kernels from \cite{smola}}
+\label{tab:kernels}
 \end{center}
 \end{table}
 
-Further details about this family of kernels,
-all available in our package \Rpackage{diffusion}, can be found
-in the original manuscript \cite{smola}.
-
-On the other hand,
-the commute time kernel, introduced in \cite{ctkernel}
-can be found in our package as well.
+Additionally, the \Rpackage{diffusion} package includes
+the commute time kernel, introduced in \cite{ctkernel}.
 This kernel, also writable in terms of a regularisation function,
 is simply the pseudoinverse
 of the graph Laplacian, $K = L^+$.
 
 The default option in the \Rpackage{diffusion} package is
-the regularised Laplacian kernel, as it is widely used
-and describes many physical models, for instance \cite{hotnet}.
+the regularised Laplacian kernel, as it is widely adopted
+and describes many physical models, for instance in
+\cite{hotnet, tiedie, electricalmodel}.
 
 \subsection{Diffusion scores}
 
@@ -195,7 +205,10 @@ the presence of a statistical normalisation can lead to important
 differences in the results.
 Table \ref{tab:scores} gives an overview of the implemented scores,
 which will be detailed in the following sections.
-The labels of the
+The argument \Rfunarg{method} in the function \Rfunction{diffuse}
+can be set to the desired scores in table \ref{tab:scores},
+which are described in the following sections.
+The numeric values of the
 positive, negative and unlabelled examples are
 respectively $y^+$, $y^-$ and $y^u$.
 Column \textq{normalised} refers to the application of a statistical
@@ -204,8 +217,8 @@ enumerates the normalised scores that need actual
 Monte Carlo permutations.
 
 \begin{table}[!t]
-\label{tab:scores}
 \begin{center}
+\resizebox{\textwidth}{!}{
 \begin{tabular}{@{}lllllll@{}}
 \toprule
 Score & $y^+$ & $y^-$ & $y^u$ & Normalised & Stochastic & Reference \\\midrule
@@ -217,7 +230,9 @@ ber\textsubscript{p} & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
 mc & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
 z & 1 & 0 & 0* & Yes & No & \cite{kerneltesting} \\\bottomrule
 \end{tabular}
+}
 \caption{Implemented diffusion scores}
+\label{tab:scores}
 \end{center}
 \end{table}
 
@@ -227,20 +242,27 @@ The base diffusion score \Rcode{raw}, which has been used in
 algorithms like HotNet \cite{hotnet} and TieDIE \cite{tiedie},
 solves a diffusion problem in terms of the
 regularised Laplacian kernel \cite{smola}.
+
 $$ f_{raw} = K\cdot y_{raw} $$
-The positively labelled nodes
-introduce one flow unit in the network ($y^{+}=1$),
+
+$K$ is the kernel matrix and $y_{raw}$ the vector of codified inputs.
+In general, the $i$-th component of $y$
+equals $y^+$ if node $i$ is a positive,
+$y^-$ if $i$ is a negative and $y^u$ if $i$ is unlabelled.
+In the particular case of $y_{raw}$, the positively labelled nodes
+introduce one flow unit in the network ($y_{raw}^{+}=1$),
 whereas the negative and unlabelled nodes are treated
 equivalently and do not introduce anything
-($y^{-}=y^{u}=0$).
-In the physical model,
+($y_{raw}^{-}=y_{raw}^{u}=0$).
+In the physical model using the regularised Laplacian kernel,
 the flow can be evacuated from the graph due to the presence of
-first-order leaking in every node.
+first-order leaking in every node,
+see \cite{hotnet} for further details on this.
 
 On the other hand, the classical label propagation
 \cite{labelpropagation} treats positives
-as $y^{+}=1$ and negatives as $y^{-}=-1$, while unlabelled nodes
-remain as $y^{u}=0$, thus making a distinction between the last two.
+as $y_{ml}^{+}=1$ and negatives as $y_{ml}^{-}=-1$, while unlabelled nodes
+remain as $y_{ml}^{u}=0$, thus making a distinction between the last two.
 A biological example can be found in protein classification \cite{fastprotein}.
 This option is available as \Rcode{ml}, and intuitively scores a
 node by counting if the majority of its neighbours
@@ -249,9 +271,9 @@ $$ f_{ml} = K\cdot y_{ml} $$
 
 The authors of GeneMANIA \cite{genemania} propose a modification
 on the \Rcode{ml} input - they adhere to
-$y^{+}=1$ and $y^{-}=-1$, but introduce a bias term in the
+$y_{gm}^{+}=1$ and $y_{gm}^{-}=-1$, but introduce a bias term in the
 unlabelled nodes
-$$y^{u} = \frac{n^{+}-n^{-}}{n^{+}+n^{-}+n^{u}}$$
+$$y_{gm}^{u} = \frac{n^{+}-n^{-}}{n^{+}+n^{-}+n^{u}}$$
 being $n^{+}$, $n^{-}$ and $n^{u}$ the number of positives,
 negatives and unlabelled entities.
 The \Rcode{gm} score is then computed through
@@ -280,7 +302,7 @@ The cornerstone of normalised scores is
 the empirical p-value \cite{empiricalpvalue}
 that indicates, for a node $i$,
 the proportion of input permutations
-that led to a diffusion score as high as the
+that led to a diffusion score as high or higher than the
 original diffusion score.
 Specifically, $f_{raw}$ is compared
 to scores from random trials $j$,
@@ -312,9 +334,8 @@ the number of runs is large enough.
 For this reason, negatives and unlabelled nodes are not
 equivalent in these scores.
 
-On the other hand, the \Rcode{z} scores are a parametric alternative
-to $f_{mc}$, so that node $i$ is scored through
-the following z-score:
+A parametric alternative to $f_{mc}$, are \Rcode{z} scores,
+where each node $i$ is scored as:
 
 $$f_{z,i} = \frac{f_{raw, i} - E(f_{raw, i}^{null, j})}
 {\sqrt{V(f_{raw, i}^{null, j})}}$$
@@ -323,6 +344,76 @@ The expectation and variance are computed in a closed form
 and these scores do not require running actual permutations,
 therefore saving on computational time and avoiding
 stochastic models.
+The analytical expression proven below also works for the general case
+when the input has quantitative labels.
+
+First of all, note that all the unlabelled nodes will cancel out when
+substracting the expected value, so they can be excluded
+without loss of generality.
+Thus, let the row vector $\tilde{k}_{i}$ be the $i$-th row of the
+submatrix from $K$ including the columns
+indexed by the labelled nodes only, and let
+$n_{lab}$ be the number of labelled nodes.
+Analogously, let $\tilde{y}$ be the (quantitative or
+binary) inputs for the observed nodes,
+with the same indexing as $\tilde{k}_{i}$.
+Consider the following scalar quantities:
+
+$$ Sk_i^I = \sum_{j = 1}^{n_{lab}} (\tilde{k}_{i})_{j} $$
+$$ Sk_i^{II} = \sum_{j = 1}^{n_{lab}} (\tilde{k}_{i})_{j}^2 $$
+
+$$ Sy^I = \sum_{j = 1}^{n_{lab}} \tilde{y}_j $$
+$$ Sy^{II} = \sum_{j = 1}^{n_{lab}} \tilde{y}_j^2 $$
+
+Using these definitions and notation, the raw score
+for node $i$ is
+
+$$f_i = \tilde{k}_{i} \cdot \tilde{y}$$
+
+Its null score using a permuted input score is the random variable
+
+$$ f_i^{null} = \tilde{k}_{i} \cdot X $$
+
+where $X$ is the random variable that arises from permuting $\tilde{y}$.
+In order to compute the z-scores, the expected value and variance
+of $f_i^{null}$ are needed.
+Starting with its expected value,
+
+$$ E_X(f_i^{null}) = E_X(\tilde{k}_{i} \cdot X) =
+\tilde{k}_{i}\cdot E_X(X) =
+\tilde{k}_i \cdot\frac{\sum_{j = 1}^{n_{lab}}
+\tilde{y}_j}{n_{lab}}\cdot\mathds{1}=
+\frac{Sk_i^I \cdot Sy^I}{n_{lab}} $$
+
+where $\mathds{1}$ is the $n_{lab}$-th dimensional
+column vector full of ones.
+Regarding its variance,
+
+$$ V_X(f_i^{null}) = V_X(\tilde{k}_{i} \cdot X) =
+\tilde{k}_{i}\cdot V_X(X)\cdot \tilde{k}_{i}^T $$
+
+The covariance of $X$ can be written as
+
+$$ V_X(X) = \left[ \frac{\sum_{j = 1}^{n_{lab}}
+\tilde{y}_j^2}{n_{lab}} - \left(\frac{\sum_{j = 1}^{n_{lab}}
+\tilde{y}_j}{n_{lab}}\right)^2 \right] \left[ \frac{n_{lab}}{n_{lab} - 1}Id
+- \frac{1}{n_{lab} - 1}\mathds{1}\mathds{1}^T \right]$$
+
+being $Id$ the $n_{lab} \times n_{lab}$ identity matrix.
+Operating, the variance of $f_i^{null}$ can be finally computed as
+
+$$ V_X(f_i^{null}) = \frac{1}{(n_{lab} - 1)n_{lab}^2}
+\left[n_{lab}Sy^{II} - (Sy^I)^2 \right]
+\left[n_{lab}Sk_i^{II} - (Sk_i^I)^2 \right]$$
+
+The z-score for node $i$ is, in terms of the new notation:
+
+$$f_{z,i} = \frac{f_{i} - E_X(f_{i}^{null})}
+{\sqrt{V_X(f_{i}^{null})}}$$
+
+This closes the \Rcode{z} scoring option, which clearly does not require
+any actual permutations but normalises through the theoretical first and second
+statistical moments of the null distribution of the diffusion scores.
 
 Finally, the authors in \cite{mosca} also suggest a
 combination of a classical score with an statistically normalised one.
@@ -333,9 +424,25 @@ This approach corrects the original diffusion scores by
 the effect of the network, in order to mitigate the effect of
 structures like hubs.
 
+\subsubsection{Quantitative inputs}
+
+In its current release, \Rpackage{diffusion} also accepts quantitative
+labels as input in the following scores: \Rcode{raw},
+\Rcode{ber\textsubscript{s}} and \Rcode{z}.
+The scores \Rcode{ml} and
+\Rcode{gm} are naturally excluded from non-binary inputs due
+to their definitions.
+Currently \Rcode{mc} scores (and therefore \Rcode{ber\textsubscript{p}}
+scores as well) do not accept quantitative inputs,
+but this will be updated in future versions.
+Beware that quantitative inputs should be
+meaningful and one-tailed (monotonic) -
+the nature of diffusion processes involves averaging and strong
+effects with opposing signs cancel out instead of adding up.
+
 \subsection{Implementation, functions and classes}
 
-Package \Rpackage{diffusion} is mainly implemented in R \cite{r}, but
+The package \Rpackage{diffusion} is mainly implemented in R \cite{r}, but
 takes advantage of existing classes in \Rpackage{igraph} \cite{igraph} and
 basic data types, thus not introducing any new data structure -
 this minimises the learning effort by the final user.
@@ -346,6 +453,12 @@ stochastic part of the permutation analysis is
 implemented in C++ through the packages
 \Rpackage{Rcpp} \cite{rcpp}, \Rpackage{RcppArmadillo} \cite{rcpparmadillo}
 and parallelised through \Rpackage{RcppParallel} \cite{rcppparallel}.
+Package \Rpackage{diffusion} also contains documented functions and
+unit testing with small cases to spot potential bugs.
+Two vignettes facilitate the user experience: an introductory
+vignette showing the basic usage of the functions on a synthetic
+example and this vignette, which further describes the contents
+of the package and shows an application to real data.
 
 \begin{figure}[!tpb]%figure1
 \centerline{\includegraphics[scale=1]{yeast_img/overview3_text2path.eps}}
@@ -366,6 +479,27 @@ result of the diffusion scores to target validation scores.
 Validation scores might include only part of the nodes of the network
 and these nodes can be background-specific.
 
+Regarding memory and processing power requirements,
+the analysis of networks with more than 10,000 nodes might need
+additional RAM memory and processing power.
+The main reason is the
+manipulation of dense graph kernel matrices that scale quadratically with
+the network order.
+To give a reference, a dense matrix of double-precision real
+numbers with 10,000 rows and columns
+uses roughly 800MB of memory.
+Computing a graph kernel on a large network
+can require -depending on the kernel- matrix diagonalisation, matrix products
+and matrix inversion operations that are likely to use a considerable
+amount of memory and time.
+
+On the other hand, the other computationally demanding part is
+the parallel implementation
+of the stochastic permutation analysis - it has been
+optimised assuming that the number of positives is usually low.
+Lists of scores with a very high amount of positives might
+slow down the permutation analysis.
+
 \section{Getting started}
 
 This vignette contains a classical example of label propagation
@@ -376,7 +510,7 @@ whereas \Rpackage{ggplot2} \cite{ggplot2} is a convenient tool to
 plot the results.
 
 The data for this example is the \Rcode{yeast} interactome with
-GO annotations, as found in the data package \Rcode{igraphdata}
+functional annotations, as found in the data package \Rcode{igraphdata}
 \cite{igraphdata}.
 
 <<01_imports>>=
@@ -448,7 +582,8 @@ head(yeast$Classes)
 Finally, the graph edges have a \Rcode{Confidence} attribute that
 assesses the amount of evidence supporting the interaction.
 All the edges will be kept in this analysis, but
-different confidences might be represented with edge weights.
+different confidences can be weighted to favour diffusion in
+high confidence edges.
 
 <<02_data7>>=
 table(E(yeast)$Confidence)
@@ -467,7 +602,7 @@ Now, using the labels of the known positive and negative
 examples for \Rcode{transport and sensing},
 can we correctly label the remaining 50\%?
 First of all, the list of known and unknown positives is generated.
-The function \Rcode{diffuse} uses (row)names in the input scores matrix
+The function \Rcode{diffuse} uses (row)names in the input scores
 so that unlabelled nodes are accounted as so.
 
 <<03_datasplit>>=
@@ -497,7 +632,7 @@ Now that the input is ready, the diffusion algorithm can be applied
 to rank all the proteins. As a first approach, the
 vanilla diffusion scores will be computed through the \Rcode{raw} method
 and the default regularised Laplacian kernel,
-which is computed on the fly.
+which is calculated on the fly.
 
 <<03_diffuse>>=
 # Vector of scores
@@ -548,7 +683,8 @@ higher diffusion scores than the rest.
 The network analysis can be deepened by examining, for instance,
 the subnetwork containing the proteins with the top 30 diffusion
 scores, highlighting with squares the ones that were
-part of the input
+positive labels in the input.
+Notice the small clusters of proteins:
 
 <<03_diff3, fig=TRUE>>=
 # Top scores subnetwork
@@ -626,7 +762,7 @@ ggplot(subset(df_methods, Target), aes(x = Class, y = DiffusionScore)) +
     facet_wrap( ~ Method, nrow = 1, scales = "free") +
     xlab("Protein class") +
     ylab("Diffusion score") +
-    ggtitle("Target proteins in 'transport and sensing'")
+    ggtitle("Target proteins scores in 'transport and sensing'")
 @
 
 As expected, all the diffusion scores show differences
@@ -636,8 +772,8 @@ depend on the dataset and scoring method.
 
 \subsection{Third example: benchmarking scores with multiple protein functions}
 
-The package \Rpackage{diffusion} is conceived to perform several
-screenings at once. To prove its usefulness, we will generalise
+The package \Rpackage{diffusion} is able to perform several
+screenings at once. To show its usefulness, we will generalise
 the procedure in the last section but screening all the
 categories in the yeast graph.
 
@@ -727,8 +863,36 @@ obtained through a statistical normalisation,
 which might motivate its usage in other biological
 networks.
 
+\section{Conclusions}
+
+The \Rpackage{diffusion} package is a new
+computational tool to compute and compare
+single-network diffusion scores that are object of
+active research in several bioinformatics areas.
+It is an effort to gather a collection of
+settings in the diffusion process like the graph kernel, the
+label codification and the choice of a statistical normalisation.
+The \Rpackage{diffusion} package will
+help the end user in choosing and computing the best performing
+diffusion scores in the application of interest.
+
+\section{Funding}
+This work was supported by the Spanish
+Ministry of Economy and Competitiveness (MINECO)
+[TEC2014-60337-R to A.P.] and the
+National Institutes of Health (NIH) [R01GM104400 to W.T.].
+AP. and S.P. thank for funding the
+Spanish Biomedical Research Centre in Diabetes
+and Associated Metabolic Disorders (CIBERDEM)
+and the Networking Biomedical Research Centre
+in the subject area of Bioengineering,
+Biomaterials and Nanomedicine (CIBER-BBN),
+both initiatives of Instituto de Investigaci\'on Carlos III (ISCIII).
+SP. thanks the AGAUR FI-scholarship programme.
+
 \newpage
-\bibliographystyle{plain}
+%\bibliographystyle{plain}
+\bibliographystyle{apalike}
 
 \bibliography{bibliography}
 

@@ -24,6 +24,8 @@ While its original purpose lies on biological networks,
 its usage is not limited to that scope. 
 In general terms, `diffusion` builds several propagation algorithms 
 on the \code{igraph} package classes and methods. 
+A more detailed analysis and documentation of the implemented 
+methods can be found in the protein function prediction vignette. 
 
 To get started, we will load a toy graph included in the package. 
 
@@ -56,6 +58,7 @@ we should provide a list with a unique column vector
 that contains `1`'s in the labels in the list and `0`'s otherwise.
 
 In this example data, the graph contains one input already. 
+
 ```{r}
 input_vec <- graph_toy$input_vec
 
@@ -77,7 +80,10 @@ Each one of these columns in the input can be *smoothed* using the network
 and new value will be derived - unlabelled nodes are also scored. 
 This is the main purpose of diffusion: to derive new scores that 
 intend to keep the same trends as the scores in the input, 
-but taking into account the network structure.
+but taking into account the network structure. 
+Equivalently, this can be regarded as a label propagation where 
+positive and negative examples propagate their labels to their 
+neighbouring nodes.
 
 Let's start with the simplest case of diffusion: 
 only a vector of values is to be smoothed. 
@@ -210,5 +216,23 @@ This indicates that both methods have a very high
 area under the curve in this example: the ordering of 
 the diffusion scores is very aligned to the class label.
 
+The last example is useful for showing a case in which diffusion 
+scores perform poorly. 
+As the *Small_sample* and *Large_sample* positive labels have been 
+randomly assigned ignoring the network, diffusion is not expected 
+to accurately predict one part of the network using as input another disjoint 
+subset of labelled nodes. 
+Thus, if we try to propagate the labels from nodes $1$ to $20$ and 
+evaluate the performance using nodes from $21$ to $48$, 
+we get a poor result:
+
+```{r}
+df_perf <- perf(
+    graph = graph_toy,
+    scores = graph_toy$input_mat[1:20, 3:4],
+    validation = graph_toy$input_mat[21:48, 3:4],
+    grid_param = expand.grid(method = c("raw", "ml")))
+df_perf
+```
 
 ## References

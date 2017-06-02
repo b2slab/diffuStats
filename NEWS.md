@@ -1,5 +1,21 @@
 # Version log
 
+## Version 0.97.0
+
+* Changes in main vignette
+* Ready to submit to Bioconductor
+
+## Version 0.5.5
+
+* Final adjustments in main vignette
+* Added example to quickstart vignette
+* **First internal review version**
+
+## Version 0.5.4
+
+* Changes in vignette
+* Temporarily depends on R>=3.2 to build a zip for iPsych
+
 ## Version 0.5.3
 
 * Modified main vignette: more proper introduction, more cites
