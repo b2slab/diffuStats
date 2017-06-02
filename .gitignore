@@ -5,3 +5,8 @@
 packrat/lib*/
 packrat/*
 inst/doc
+data-raw/*
+results/*
+*.Rproj
+.Rprofile
+
