@@ -1,5 +1,10 @@
 # Version log
 
+## Version 0.99.1
+
+* Fixed eps that was a symlink
+* Main figure now with the right size
+
 ## Version 0.99.0
 
 * Changes in both vignettes, using Bioconductor style

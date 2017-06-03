@@ -481,7 +481,7 @@ example and this vignette, which further describes the contents
 of the package and shows an application to real data.
 
 \begin{figure}[!tpb]%figure1
-\centerline{\includegraphics[scale=1]{yeast_img/overview3_text2path.eps}}
+{\includegraphics{yeast_fig_overview.eps}}
 \caption{Overview of the main package functions.}
 \label{fig:overview}
 \end{figure}
