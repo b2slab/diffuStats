@@ -1,5 +1,9 @@
 # Version log
 
+## Version 0.99.2
+
+* Same as 0.99.1
+
 ## Version 0.99.1
 
 * Fixed eps that was a symlink
