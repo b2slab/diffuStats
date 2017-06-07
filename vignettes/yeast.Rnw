@@ -31,9 +31,9 @@ BiocStyle::latex2()
 \SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE}
 %\SweaveOpts{fig=FALSE, prefix.string=yeast_latexfiles/}
 %\setkeys{Gin}{width=1\textwidth}
-\bioctitle[The diffusion R package]{An R package to compute
+\bioctitle[The diffuStats R package]{An R package to compute
 diffusion-based scores
-on biological networks: diffusion}
+on biological networks: diffuStats}
 \author[1,2]{Sergio Picart-Armada\thanks{\email{sergi.picart@upc.edu}}}
 \author[3,4]{Wesley K. Thompson}
 \author[3]{Alfonso Buil}
@@ -71,7 +71,7 @@ These settings can have a large impact
 on results, and there is currently no
 software implementing many of them in one place
 to screen their performance in the application of interest.
-This vignette presents \Rpackage{diffusion}, an R package with a
+This vignette presents \Rpackage{diffuStats}, an R package with a
 collection of diffusion kernels and scores,
 as well as a parallel permutation analysis for the normalised scores,
 that eases the analysis of several sets of molecular entities at once.
@@ -124,20 +124,20 @@ In addition, statistical normalisations such as in \cite{mosca}
 remove the effect of network structures like hubs and
 should be taken into account when choosing a diffusion scoring
 method.
-This motivates the introduction of our \Rpackage{diffusion}
+This motivates the introduction of our \Rpackage{diffuStats}
 R package, which collects widely adopted input codifications and
 explicitly accounts for unlabelled nodes.
 It also includes three statistically normalised scores,
 which can be obtained through Monte Carlo trials or
 a parametric alternative.
-The \Rpackage{diffusion} package uses existent classes and
+The \Rpackage{diffuStats} package uses existent classes and
 provides high-level functions to screen the performance of
 several diffusion scores, in order to facilitate their integration
 in any computational biology study.
 
 \section{Methodology}
 
-One of the main purposes of \Rpackage{diffusion} is to offer
+One of the main purposes of \Rpackage{diffuStats} is to offer
 a battery of approaches to compute and compare diffusion scores.
 The diffusion scores $f$ using an input vector $y$ and
 a diffusion kernel $K$ are generally computed as $$ f = K\cdot y$$
@@ -185,7 +185,7 @@ the usage of the normalised Laplacian -
 the unnormalised Laplacian can also be used
 as long as the resulting kernel is still positive semidefinite.
 Further details about this family of kernels,
-all available in our package \Rpackage{diffusion}, can be found
+all available in our package \Rpackage{diffuStats}, can be found
 in the original manuscript \cite{smola}.
 
 \begin{table}[!t]
@@ -207,13 +207,13 @@ Inverse cosine &
 \end{center}
 \end{table}
 
-Additionally, the \Rpackage{diffusion} package includes
+Additionally, the \Rpackage{diffuStats} package includes
 the commute time kernel, introduced in \cite{ctkernel}.
 This kernel, also writable in terms of a regularisation function,
 is simply the pseudoinverse
 of the graph Laplacian, $K = L^+$.
 
-The default option in the \Rpackage{diffusion} package is
+The default option in the \Rpackage{diffuStats} package is
 the regularised Laplacian kernel, as it is widely adopted
 and describes many physical models, for instance in
 \cite{hotnet, tiedie, electricalmodel}.
@@ -446,7 +446,7 @@ structures like hubs.
 
 \subsubsection{Quantitative inputs}
 
-In its current release, \Rpackage{diffusion} also accepts quantitative
+In its current release, \Rpackage{diffuStats} also accepts quantitative
 labels as input in the following scores: \Rcode{raw},
 \Rcode{ber\_s} and \Rcode{z}.
 The scores \Rcode{ml} and
@@ -462,7 +462,7 @@ effects with opposing signs cancel out instead of adding up.
 
 \subsection{Implementation, functions and classes}
 
-The package \Rpackage{diffusion} is mainly implemented in R \cite{r}, but
+The package \Rpackage{diffuStats} is mainly implemented in R \cite{r}, but
 takes advantage of existing classes in \Rpackage{igraph} \cite{igraph} and
 basic data types, thus not introducing any new data structure -
 this minimises the learning effort by the final user.
@@ -473,7 +473,7 @@ stochastic part of the permutation analysis is
 implemented in C++ through the packages
 \Rpackage{Rcpp} \cite{rcpp}, \Rpackage{RcppArmadillo} \cite{rcpparmadillo}
 and parallelised through \Rpackage{RcppParallel} \cite{rcppparallel}.
-Package \Rpackage{diffusion} also contains documented functions and
+Package \Rpackage{diffuStats} also contains documented functions and
 unit testing with small cases to spot potential bugs.
 Two vignettes facilitate the user experience: an introductory
 vignette showing the basic usage of the functions on a synthetic
@@ -487,7 +487,7 @@ of the package and shows an application to real data.
 \end{figure}
 
 A diagram containing the main functions in the R
-package \Rpackage{diffusion} can be found in (Fig. \ref{fig:overview}).
+package \Rpackage{diffuStats} can be found in (Fig. \ref{fig:overview}).
 The main funcion is \Rcode{diffuse}, a wrapper for computing diffusion scores
 from several categories at once, stemming from possibly different observed
 backgrounds. Function \Rcode{diffuse} makes use of the deterministic
@@ -525,7 +525,7 @@ slow down the permutation analysis.
 This vignette contains a classical example of label propagation
 on a biological network. The core tools for this analysis are
 the \Rpackage{igraph} R package \cite{igraph} and the
-\Rpackage{diffusion} package,
+\Rpackage{diffuStats} package,
 whereas \Rpackage{ggplot2} \cite{ggplot2} is a convenient tool to
 plot the results.
 
@@ -536,7 +536,7 @@ functional annotations, as found in the data package \Rcode{igraphdata}
 <<01_imports>>=
 # Core
 library(igraph)
-library(diffusion)
+library(diffuStats)
 
 # Plotting
 library(ggplot2)
@@ -563,7 +563,7 @@ although the algorithms can handle graphs
 with several connected components.
 
 <<02_data2>>=
-yeast <- diffusion::largest_cc(yeast)
+yeast <- diffuStats::largest_cc(yeast)
 @
 
 This yields to a graph with \Sexpr{format(vcount(yeast))} nodes and
@@ -659,7 +659,7 @@ which is calculated on the fly.
 scores_A <- setNames((known %in% known_A)*1, known)
 
 # Diffusion
-diff <- diffusion::diffuse(
+diff <- diffuStats::diffuse(
     yeast,
     scores = scores_A,
     method = "raw"
@@ -715,9 +715,9 @@ yeast_top <- igraph::induced.subgraph(yeast, vertex_ids)
 # use tkplot for interactive plotting
 igraph::plot.igraph(
     yeast_top,
-    vertex.color = diffusion::scores2colours(
+    vertex.color = diffuStats::scores2colours(
         df_plot$DiffusionScore[vertex_ids]),
-    vertex.shape = diffusion::scores2shapes(
+    vertex.shape = diffuStats::scores2shapes(
         df_plot$Protein[vertex_ids] %in% known_A),
     vertex.label.color = "gray10",
     main = "Top 30 proteins from diffusion scores"
@@ -732,10 +732,10 @@ to compute all the implemented scores for the
 target nodes in \Rcode{transport and sensing}.
 
 <<04_kernel>>=
-K_rl <- diffusion::regularisedLaplacianKernel(yeast)
+K_rl <- diffuStats::regularisedLaplacianKernel(yeast)
 @
 
-Functions \Rcode{diffusion} and \Rcode{perf} do accept,
+Functions \Rcode{diffuse} and \Rcode{perf} do accept,
 however, an \Rcode{igraph} object as well, and compute the kernel
 automatically.
 For medium networks (10,000 nodes or more)
@@ -749,7 +749,7 @@ list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 df_methods <- plyr::ldply(
     list_methods,
     function(method) {
-        diff <- diffusion::diffuse(
+        diff <- diffuStats::diffuse(
             K = K_rl,
             scores = scores_A,
             method = method,
@@ -792,7 +792,7 @@ depend on the dataset and scoring method.
 
 \subsection{Third example: benchmarking scores with multiple protein functions}
 
-The package \Rpackage{diffusion} is able to perform several
+The package \Rpackage{diffuStats} is able to perform several
 screenings at once. To show its usefulness, we will generalise
 the procedure in the last section but screening all the
 categories in the yeast graph.
@@ -885,14 +885,14 @@ networks.
 
 \section{Conclusions}
 
-The \Rpackage{diffusion} package is a new
+The \Rpackage{diffuStats} package is a new
 computational tool to compute and compare
 single-network diffusion scores that are object of
 active research in several bioinformatics areas.
 It is an effort to gather a collection of
 settings in the diffusion process like the graph kernel, the
 label codification and the choice of a statistical normalisation.
-The \Rpackage{diffusion} package will
+The \Rpackage{diffuStats} package will
 help the end user in choosing and computing the best performing
 diffusion scores in the application of interest.
 

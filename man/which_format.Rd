@@ -17,6 +17,6 @@ Tell apart vector, matrix or list of matrices
 }
 \examples{
 data(graph_toy)
-diffusion:::which_format(graph_toy$input_vec)
-diffusion:::which_format(graph_toy$input_mat)
+diffuStats:::which_format(graph_toy$input_vec)
+diffuStats:::which_format(graph_toy$input_mat)
 }

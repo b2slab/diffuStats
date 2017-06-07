@@ -9,7 +9,7 @@ generate_input(graph, order, length_inputs, return_matrix = TRUE,
 }
 \arguments{
 \item{graph}{an \code{\link[igraph]{igraph}} object, typically from
-\code{\link[diffusion]{generate_input}}}
+\code{\link[diffuStats]{generate_input}}}
 
 \item{order}{numeric or vector, order of the neighbourhoods that generate
 the list}

@@ -33,7 +33,7 @@
 #' @import plyr
 #' @importFrom stats setNames
 #' @importFrom methods as
-# ' @useDynLib diffusion ParallelHeatrank
+# ' @useDynLib diffuStats ParallelHeatrank
 #'
 #' @examples
 #' # Using a list as input (needed)

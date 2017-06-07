@@ -8,7 +8,7 @@
 #' @return A list of variables
 #'
 #' @examples
-#' diffusion:::named.list(LETTERS, mean)
+#' diffuStats:::named.list(LETTERS, mean)
 named.list <- function(...) {
     setNames(list(...), as.character(match.call()[-1]))
 }
@@ -106,8 +106,8 @@ scores2shapes <- function(
 #'
 #' @examples
 #' data(graph_toy)
-#' diffusion:::which_format(graph_toy$input_vec)
-#' diffusion:::which_format(graph_toy$input_mat)
+#' diffuStats:::which_format(graph_toy$input_vec)
+#' diffuStats:::which_format(graph_toy$input_mat)
 which_format <- function(x) {
     if (is.numeric(x) & is.null(dim(x))) return("vector")
     if (is.numeric(x)) return("matrix")
@@ -127,8 +127,8 @@ which_format <- function(x) {
 #'
 #' @examples
 #' data(graph_toy)
-#' x_v <- diffusion:::to_list(graph_toy$input_vec)
-#' x_m <- diffusion:::to_list(graph_toy$input_mat)
+#' x_v <- diffuStats:::to_list(graph_toy$input_vec)
+#' x_m <- diffuStats:::to_list(graph_toy$input_mat)
 to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
     s_format <- which_format(scores)
 
@@ -164,10 +164,10 @@ to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
 #'
 #' @examples
 #' data(graph_toy)
-#' x_v <- diffusion:::to_x_from_list(
-#'     diffusion:::to_list(graph_toy$input_vec), "vector")
-#' x_m <- diffusion:::to_x_from_list(
-#'     diffusion:::to_list(graph_toy$input_vec), "matrix")
+#' x_v <- diffuStats:::to_x_from_list(
+#'     diffuStats:::to_list(graph_toy$input_vec), "vector")
+#' x_m <- diffuStats:::to_x_from_list(
+#'     diffuStats:::to_list(graph_toy$input_vec), "matrix")
 to_x_from_list <- function(scores, x) {
     if (x == "list") return(scores)
     if (x == "matrix") return(scores[[1]])

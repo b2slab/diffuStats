@@ -54,12 +54,12 @@ Does not check for spd
 }
 \examples{
 data(graph_toy)
-diffusion:::.check_scores(diffusion:::to_list(graph_toy$input_mat))
-diffusion:::.check_method("raw")
-diffusion:::.check_metric(list(auc = Metrics::auc))
+diffuStats:::.check_scores(diffuStats:::to_list(graph_toy$input_mat))
+diffuStats:::.check_method("raw")
+diffuStats:::.check_metric(list(auc = Metrics::auc))
 data(graph_toy)
-diffusion:::.check_graph(graph_toy)
+diffuStats:::.check_graph(graph_toy)
 data(graph_toy)
-diffusion:::.check_K(regularisedLaplacianKernel(graph_toy))
+diffuStats:::.check_K(regularisedLaplacianKernel(graph_toy))
 }
 \keyword{datasets}

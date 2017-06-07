@@ -7,7 +7,7 @@
 #' (automatically added through \code{generate_graph})
 #'
 #' @param graph an \code{\link[igraph]{igraph}} object, typically from
-#' \code{\link[diffusion]{generate_input}}
+#' \code{\link[diffuStats]{generate_input}}
 #' @param order numeric or vector, order of the neighbourhoods that generate
 #' the list
 #' @param length_inputs numeric, number of nodes in the generated inputs

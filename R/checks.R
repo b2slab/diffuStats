@@ -11,7 +11,7 @@
 #' @importFrom stats sd
 #' @examples
 #' data(graph_toy)
-#' diffusion:::.check_scores(diffusion:::to_list(graph_toy$input_mat))
+#' diffuStats:::.check_scores(diffuStats:::to_list(graph_toy$input_mat))
 .check_scores <- function(scores) {
     form <- which_format(scores)
     scores_names <- names(scores)
@@ -96,7 +96,7 @@
 #' @rdname checks
 #'
 #' @examples
-#' diffusion:::.check_method("raw")
+#' diffuStats:::.check_method("raw")
 .check_method <- function(method) {
     if (!is.character(method) & !is.factor(method))
         stop(
@@ -131,7 +131,7 @@
 #' @rdname checks
 #'
 #' @examples
-#' diffusion:::.check_metric(list(auc = Metrics::auc))
+#' diffuStats:::.check_metric(list(auc = Metrics::auc))
 .check_metric <- function(metric) {
     if (!is.list(metric))
         stop(
@@ -195,7 +195,7 @@
 #'
 #' @examples
 #' data(graph_toy)
-#' diffusion:::.check_graph(graph_toy)
+#' diffuStats:::.check_graph(graph_toy)
 .check_graph <- function(graph) {
     if (missing(graph) | is.null(graph)) return(invisible())
     if (!is.igraph(graph))
@@ -242,7 +242,7 @@
 #'
 #' @examples
 #' data(graph_toy)
-#' diffusion:::.check_K(regularisedLaplacianKernel(graph_toy))
+#' diffuStats:::.check_K(regularisedLaplacianKernel(graph_toy))
 .check_K <- function(K) {
     if (!is.matrix(K))
         stop("'K' must be a matrix")

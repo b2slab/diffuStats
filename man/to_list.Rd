@@ -19,6 +19,6 @@ Convert any input to list format
 }
 \examples{
 data(graph_toy)
-x_v <- diffusion:::to_list(graph_toy$input_vec)
-x_m <- diffusion:::to_list(graph_toy$input_mat)
+x_v <- diffuStats:::to_list(graph_toy$input_vec)
+x_m <- diffuStats:::to_list(graph_toy$input_mat)
 }

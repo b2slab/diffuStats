@@ -1,11 +1,11 @@
 ---
-title: "Diffusion in a nutshell"
+title: "Diffusion using diffuStats in a nutshell"
 author: 
 -   name: Sergio Picart-Armada
     affiliation: B2SLab at Polytechnic University of Catalonia
     email: sergi.picart@upc.edu
 date: "`r doc_date()`"
-package: "`r pkg_ver('diffusion')`"
+package: "`r pkg_ver('diffuStats')`"
 output: BiocStyle::html_document
 bibliography: bibliography.bib
 vignette: >
@@ -22,11 +22,11 @@ knitr::opts_chunk$set(
 
 # Getting started
 
-`diffusion` is an R package providing several scores 
+`diffuStats` is an R package providing several scores 
 for diffusion in networks. 
 While its original purpose lies on biological networks, 
 its usage is not limited to that scope. 
-In general terms, `diffusion` builds several propagation algorithms 
+In general terms, `diffuStats` builds several propagation algorithms 
 on the \code{igraph} package [@igraph] classes and methods. 
 A more detailed analysis and documentation of the implemented 
 methods can be found in the protein function prediction vignette. 
@@ -34,7 +34,7 @@ methods can be found in the protein function prediction vignette.
 To get started, we will load a toy graph included in the package. 
 
 ```{r}
-library(diffusion)
+library(diffuStats)
 data("graph_toy")
 ```
 
@@ -50,7 +50,7 @@ on this tiny lattice graph.
 
 # Specifying the input
 
-The package `diffusion` is flexible and allows 
+The package `diffuStats` is flexible and allows 
 several inputs at once for a given network. 
 The input format is, in its most general form, 
 a list of matrices, where each matrix contains 
@@ -95,7 +95,7 @@ Note that these
 **values must be named and must be a subset or all of the graph nodes**.
 
 ```{r}
-output_vec <- diffusion::diffuse(
+output_vec <- diffuStats::diffuse(
     graph = graph_toy, 
     method = "raw", 
     scores = input_vec)
@@ -107,15 +107,15 @@ head(output_vec, 15)
 
 The best way to visualise the scores is overlaying 
 them in the original lattice. 
-`diffusion` also comes with basic mapping functions 
+`diffuStats` also comes with basic mapping functions 
 for graphical purposes. 
 Let's see an example:
 
 ```{r}
 igraph::plot.igraph(
     graph_toy, 
-    vertex.color = diffusion::scores2colours(output_vec),
-    vertex.shape = diffusion::scores2shapes(input_vec),
+    vertex.color = diffuStats::scores2colours(output_vec),
+    vertex.shape = diffuStats::scores2shapes(input_vec),
     main = "Diffusion scores in our lattice"
 )
 ```
@@ -167,7 +167,7 @@ whereas the rest are deterministic.
 For instance, let's smooth through `mc` the input matrix:
 
 ```{r}
-output_mc <- diffusion::diffuse(
+output_mc <- diffuStats::diffuse(
     graph = graph_toy, 
     method = "mc", 
     scores = input_mat)
@@ -181,8 +181,8 @@ We can plot the result of the fourth column *Large_sample*:
 score_col <- 4
 igraph::plot.igraph(
     graph_toy, 
-    vertex.color = diffusion::scores2colours(output_mc[, score_col]),
-    vertex.shape = diffusion::scores2shapes(input_mat[, score_col]),
+    vertex.color = diffuStats::scores2colours(output_mc[, score_col]),
+    vertex.shape = diffuStats::scores2shapes(input_mat[, score_col]),
     main = "Diffusion scores in our lattice"
 )
 ```
@@ -193,7 +193,7 @@ the particularities of the dataset.
 
 # Benchmarking
 
-Package `diffusion` offers the option to assess the performance
+Package `diffuStats` offers the option to assess the performance
 of the diffusion scores given user-defined target scores or labels. 
 
 The validation must be supplied with the same format as 

@@ -1,4 +1,4 @@
 library(testthat)
-library(diffusion)
+library(diffuStats)
 
-test_check("diffusion")
+test_check("diffuStats")

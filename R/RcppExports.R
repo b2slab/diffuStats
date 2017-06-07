@@ -12,7 +12,7 @@
 #'
 #' @return an arma::sp_mat object
 convertSparse <- function(mat) {
-    .Call('diffusion_convertSparse', PACKAGE = 'diffusion', mat)
+    .Call(diffuStats_convertSparse, mat)
 }
 
 #' Sparsify arma::mat into arma::sp_mat
@@ -26,7 +26,7 @@ convertSparse <- function(mat) {
 #'
 #' @return an arma::sp_mat object
 sparsify2 <- function(perm, nrow, header) {
-    .Call('diffusion_sparsify2', PACKAGE = 'diffusion', perm, nrow, header)
+    .Call(diffuStats_sparsify2, perm, nrow, header)
 }
 
 #' Compute heatrank for a single case
@@ -41,7 +41,7 @@ sparsify2 <- function(perm, nrow, header) {
 #'
 #' @return an arma::vec with node heatranks
 serialHeatrank <- function(R, perm, G, ind) {
-    .Call('diffusion_serialHeatrank', PACKAGE = 'diffusion', R, perm, G, ind)
+    .Call(diffuStats_serialHeatrank, R, perm, G, ind)
 }
 
 #' Compute heatrank in parallel
@@ -65,6 +65,6 @@ serialHeatrank <- function(R, perm, G, ind) {
 #' warmer the node.
 #'
 ParallelHeatrank <- function(R, perm, G) {
-    .Call('diffusion_ParallelHeatrank', PACKAGE = 'diffusion', R, perm, G)
+    .Call(diffuStats_ParallelHeatrank, R, perm, G)
 }
 

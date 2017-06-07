@@ -34,7 +34,7 @@
 #' @return a connected igraph object
 #' @examples
 #' library(igraph)
-#' g <- diffusion:::.connect_undirected_graph(
+#' g <- diffuStats:::.connect_undirected_graph(
 #'     graph.empty(10, directed = FALSE))
 #' g
 #' @rdname connect_undirected_graph

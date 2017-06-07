@@ -17,5 +17,5 @@ Create a list with variables and name the slots using
 the variables names
 }
 \examples{
-diffusion:::named.list(LETTERS, mean)
+diffuStats:::named.list(LETTERS, mean)
 }

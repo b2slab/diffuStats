@@ -8,20 +8,20 @@ Check these declarations against the C/Fortran source code.
 */
 
 /* .Call calls */
-extern SEXP diffusion_convertSparse(SEXP);
-extern SEXP diffusion_ParallelHeatrank(SEXP, SEXP, SEXP);
-extern SEXP diffusion_serialHeatrank(SEXP, SEXP, SEXP, SEXP);
-extern SEXP diffusion_sparsify2(SEXP, SEXP, SEXP);
+extern SEXP diffuStats_convertSparse(SEXP);
+extern SEXP diffuStats_ParallelHeatrank(SEXP, SEXP, SEXP);
+extern SEXP diffuStats_serialHeatrank(SEXP, SEXP, SEXP, SEXP);
+extern SEXP diffuStats_sparsify2(SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"diffusion_convertSparse",    (DL_FUNC) &diffusion_convertSparse,    1},
-    {"diffusion_ParallelHeatrank", (DL_FUNC) &diffusion_ParallelHeatrank, 3},
-    {"diffusion_serialHeatrank",   (DL_FUNC) &diffusion_serialHeatrank,   4},
-    {"diffusion_sparsify2",        (DL_FUNC) &diffusion_sparsify2,        3},
+    {"diffuStats_convertSparse",    (DL_FUNC) &diffuStats_convertSparse,    1},
+    {"diffuStats_ParallelHeatrank", (DL_FUNC) &diffuStats_ParallelHeatrank, 3},
+    {"diffuStats_serialHeatrank",   (DL_FUNC) &diffuStats_serialHeatrank,   4},
+    {"diffuStats_sparsify2",        (DL_FUNC) &diffuStats_sparsify2,        3},
     {NULL, NULL, 0}
 };
 
-void R_init_diffusion(DllInfo *dll)
+void R_init_diffuStats(DllInfo *dll)
 {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);

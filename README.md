@@ -3,7 +3,7 @@
 ## Install
 
 For the development version, change directory to the
-`diffusion` path and execute
+`diffuStats` path and execute
 
 ```
 devtools::install()
@@ -12,11 +12,11 @@ You can also install the package through `R CMD INSTALL` on the zip file or thro
 
 ## Get started
 
-`diffusion` is suitable for medium-sized networks (thousands of nodes) and is conceived to be used in biological networks. 
+`diffuStats` is suitable for medium-sized networks (thousands of nodes) and is conceived to be used in biological networks. 
 
 Get started by looking at the package help
 
 ```
-?diffusion
+?diffuStats
 ```
 

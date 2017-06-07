@@ -1,5 +1,10 @@
 # Version log
 
+## Version 0.99.4
+
+* Changed the package name to `diffuStats`
+* More detailed package description in the `DESCRIPTION` file
+
 ## Version 0.99.3
 
 * Same as 0.99.1
