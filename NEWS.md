@@ -1,5 +1,9 @@
 # Version log
 
+## Version 0.99.8
+
+* Fixed check NOTE in vignette
+
 ## Version 0.99.7
 
 * Same as 0.99.4

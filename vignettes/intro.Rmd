@@ -4,8 +4,8 @@ author:
 -   name: Sergio Picart-Armada
     affiliation: B2SLab at Polytechnic University of Catalonia
     email: sergi.picart@upc.edu
-date: "`r doc_date()`"
-package: "`r pkg_ver('diffuStats')`"
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('diffuStats')`"
 output: BiocStyle::html_document
 bibliography: bibliography.bib
 vignette: >
