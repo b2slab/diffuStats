@@ -1,5 +1,9 @@
 # Version log
 
+## Version 0.99.7
+
+* Same as 0.99.4
+
 ## Version 0.99.6
 
 * Same as 0.99.4
