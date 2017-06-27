@@ -4,12 +4,9 @@
 #'
 #' @rdname default_graph_param
 #'
-# #' @importFrom ggsci pal_npg
 #' @import igraph
 .default_graph_param <- function(){
     data.frame(
-        # class = c("source", "filler", "end"),
-        # color = ggsci::pal_npg()(3),
         color = c("#E64B35FF", "#4DBBD5FF", "#00A087FF"),
         shape = "circle",
         frame.color = "gray20",
@@ -41,7 +38,6 @@
 #'
 #' @import igraph
 .connect_undirected_graph <- function(g) {
-    # browser()
     g.clusters <- clusters(g)
 
     # Partition nodes: in/out largest cc
@@ -113,7 +109,6 @@ generate_graph <- function(
     fun_curate = .connect_undirected_graph,
     seed = NULL
 ) {
-    # browser()
     if (!is.null(seed)) set.seed(seed)
 
     # Generate network using provided function
@@ -121,21 +116,6 @@ generate_graph <- function(
     n <- vcount(g)
     V(g)$name <- paste0("V", 1:n)
 
-    # Assign vertex classes
-    # class <- (class_prop/sum(class_prop))*n
-    # class_char <- character()
-    # for (i in names(class))
-    #   class_char <- c(
-    #     class_char,
-    #     rep(i, class[i]))
-    # n_out <- length(class_char)
-    # if (n_out < n) {
-    #   n_diff <- n - n_out
-    #   class_char <- c(
-    #     class_char,
-    #     rep(utils::tail(names(class), 1), n_diff))
-    # }
-    #
     # First assign classes
     if (is.null(class_label)) {
         message("Using default class proportions...")

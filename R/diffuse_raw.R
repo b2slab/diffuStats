@@ -34,8 +34,6 @@ diffuse_raw <- function(
     K = NULL,
     ...) {
     # sanity checks
-    # if (!missing(graph))
-    # if (!is.null(K))
     .check_scores(scores)
 
     # Kernel matrix
@@ -45,7 +43,6 @@ diffuse_raw <- function(
             "Kernel not supplied. ",
             "Computing regularised Laplacian kernel ...")
         K <- regularisedLaplacianKernel(graph = graph)
-        gc()
         message("Done")
     } else {
         .check_K(K)
@@ -53,13 +50,9 @@ diffuse_raw <- function(
     }
 
     # Compute scores
-    # browser()
     ans.all <- plyr::llply(
         stats::setNames(names(scores), names(scores)),
         function(scores.name) {
-            # n <- nrow(R.whole)
-            # scores.name <- "bkgd1"
-            # browser()
             # match indices (NO NAMES, careful)
             bkgd.names <- rownames(scores[[scores.name]])
             input.names <- colnames(scores[[scores.name]])
@@ -70,11 +63,9 @@ diffuse_raw <- function(
             # raw scores
             diff.raw <- K[, bkgd.names] %*% scores.mat
 
-            # browser()
             rownames(diff.raw) <- rownames(K)
             colnames(diff.raw) <- input.names
 
-            gc()
             # Return base matrix if it is raw
             # Continue if we want z-scores
             if (z == FALSE) return(as.matrix(diff.raw))
@@ -88,22 +79,6 @@ diffuse_raw <- function(
             const_mean <- .rowSums/n
             const_var <-  (n*.rowSums2 - .rowSums**2)/((n - 1)*(n**2))
 
-            # diff.z <- apply(
-            #   diff.raw,
-            #   2,
-            #   function(col) {
-            #     s1 <- sum(col)
-            #     s2 <- sum(col**2)
-            #
-            #     # means and vars depend on first and second moments
-            #     # of the input. This should be valid for non-binary
-            #     # inputs as well
-            #     score_means <- const_mean*s1
-            #     score_vars <- const_var*(n*s2 - s1**2)
-            #
-            #     (col - score_means)/sqrt(score_vars)
-            #   }
-            # )
             diff.z <- sapply(
                 1:ncol(diff.raw),
                 function(col_ind) {
@@ -125,14 +100,10 @@ diffuse_raw <- function(
             # Give correct names
             dimnames(diff.z) <- dimnames(diff.raw)
 
-            # browser()
-            # if (any(is.na(diff.z))) browser()
-            #
             # This is already a base matrix
             return(diff.z)
         }
     )
 
     return(ans.all)
-
 }

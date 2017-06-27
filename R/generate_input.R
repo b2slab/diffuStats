@@ -94,15 +94,6 @@ generate_input <- function(
             pos <- source.chosen
             neg <- setdiff(id.source, pos)
 
-            # # if we ask for names and they are available, return them
-            # if (return_names & "name" %in% list.vertex.attributes(graph)) {
-            #   return(
-            #     list(
-            #       input = V(graph)[input]$name,
-            #       pos = V(graph)[pos]$name,
-            #       neg = V(graph)[neg]$name))
-            # }
-            # otherwise return vertex ids
             return(
                 list(
                     input = input,

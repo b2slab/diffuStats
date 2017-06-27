@@ -60,7 +60,6 @@ perf_eval <- function(
     .check_scores(val)
     .check_metric(metric)
 
-    # browser()
     ans <- plyr::ldply(
         # iterate over backgrounds
         names(pred),
@@ -80,7 +79,6 @@ perf_eval <- function(
             mat_val <- val[[bkgd]][common_names, , drop = FALSE]
             mat_pred <- pred[[bkgd]][common_names, , drop = FALSE]
 
-            # browser()
             # iterate over columns to compute metrics
             df_values <- plyr::ldply(
                 col_names,

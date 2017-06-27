@@ -1,7 +1,6 @@
 context("Input transforms for diffusion")
 
 library(igraph)
-#library(magrittr)
 
 set.seed(3)
 
@@ -34,9 +33,7 @@ test_that("Transforms on the input are accurate", {
   out <- plyr::llply(
     setNames(methods_raw, methods_raw),
     function(method) {
-      # message(method)
       expect_error({
-        # if (method == "z") browser()
         ans <- diffuse(
           graph = g,
           scores = list(bkgd1 = mat),
@@ -63,9 +60,7 @@ test_that("Input can be introduced as a vector", {
   out <- plyr::llply(
     setNames(methods_raw, methods_raw),
     function(method) {
-      # message(method)
       expect_error({
-        # if (method == "z") browser()
         ans <- diffuse(
           graph = g,
           scores = vec_input,
@@ -92,9 +87,7 @@ test_that("Input can be introduced as a matrix", {
   out <- plyr::llply(
     setNames(methods_raw, methods_raw),
     function(method) {
-      # message(method)
       expect_error({
-        # if (method == "z") browser()
         ans <- diffuse(
           graph = g,
           scores = mat_input,
@@ -124,9 +117,7 @@ test_that("Graph can be introduced as a kernel (deterministic)", {
   out <- plyr::llply(
     setNames(methods_all, methods_all),
     function(method) {
-      # message(method)
       expect_error({
-        # if (method == "z") browser()
         ans <- diffuse(
           K = K,
           scores = mat_input,

@@ -16,7 +16,6 @@ test_that("helpers", {
 })
 
 test_that("generate_graph", {
-  # class_prop <- c(source = 50, filler = 450, end = 500)
   list_params <- list(
     barabasi = list(
       fun_gen = barabasi.game,
@@ -45,10 +44,9 @@ test_that("generate_graph", {
     function(lst) {
       # Generate graph flawlessly
       expect_error({
-        # lst$class_prop = class_prop
         g <- do.call(generate_graph, lst)
       }, NA)
-      # ALl must be connected, with 3 vertices and with vertex class
+      # All must be connected, with 3 vertices and with vertex class
       expect_true(is.connected(g))
       expect_equal(vcount(g), 1000)
       expect_length(table(V(g)$class), 3)
@@ -83,7 +81,4 @@ test_that("generate_input", {
       expect_false(any(colSums(g_in$mat_source) == 0))
     }
   )
-
-  # browser()
-
 })

@@ -26,7 +26,6 @@
         function(mat_name) {
             mat <- scores[[mat_name]]
 
-            # browser()
             if (!is.numeric(mat) & !("dgCMatrix" %in% class(mat))) {
                 stop(
                     "The scores in background ",
@@ -59,7 +58,6 @@
             std <- apply(mat, 2, stats::sd)
             std_zero <- which(std == 0)
             std_na <- which(is.na(std))
-
 
             if (length(std_na))
                 warning(
@@ -146,7 +144,6 @@
     plyr::l_ply(
         names_metric,
         function(met) {
-            # browser()
             fun_met <- (metric[[met]])
             if (!is.function(fun_met))
                 stop(

@@ -26,7 +26,6 @@ commuteTimeKernel <- function(graph, normalized = FALSE) {
 #' that involves matrix exponentiation. It has a "bandwidth" parameter
 #' \eqn{\sigma^2}
 #'
-# #' @template kernels
 #' @rdname kernels
 #' @import Matrix
 #' @import igraph
@@ -43,7 +42,6 @@ diffusionKernel <- function(graph, sigma2 = 1, normalized = TRUE) {
 #' kernel, which is based on a cosine transform on the spectrum of
 #' the normalized Laplacian matrix
 #'
-# #' @template kernels
 #' @rdname kernels
 #' @import Matrix
 #' @import igraph
@@ -56,13 +54,10 @@ inverseCosineKernel <- function(graph) {
     ans <- tcrossprod(svd.L$u %*% diag(cos(svd.L$d)), svd.L$u)
     rownames(ans) <- colnames(ans) <- V(graph)$name
     ans
-    # matrixcalc::is.positive.semi.definite(round(kk, 10))
 }
 
 #' @description Function \code{pStepKernel}
 #' computes the p-step random walk kernel
-#'
-# #' @template kernels
 #'
 #' @rdname kernels
 #' @importFrom expm %^%
@@ -90,7 +85,6 @@ pStepKernel <- function(graph, a = 2, p = 5L) {
 #' biological networks. It allows to control the constant terms summed
 #' to the diagonal
 #'
-# #' @template kernels
 #' @rdname kernels
 #' @import Matrix
 #' @import igraph

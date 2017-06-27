@@ -52,7 +52,6 @@
 #'     method = "raw")
 #'
 #' @import igraph
-# ' @import magrittr
 #' @export
 diffuse <- function(
     graph,
@@ -86,14 +85,12 @@ diffuse <- function(
                 mat
             }
         )
-        # browser()
         ans <- (diffuse_raw(graph = graph, scores = scores_ml, ...))
     }
     if (method == "gm") {
         scores_gm <- lapply(
             scores,
             function(mat) {
-                # browser()
                 # Have to match rownames with background
                 # If the kernel is provided...
                 if (format_network == "graph") {
@@ -101,32 +98,35 @@ diffuse <- function(
                 } else if (format_network == "kernel") {
                     names_ordered <- rownames(list(...)[["K"]])
                 }
-                #
+                
                 # If the graph is defined...
                 ids_nobkgd <- setdiff(names_ordered, rownames(mat))
                 n_tot <- length(names_ordered)
                 n_bkgd <- nrow(mat)
+                n_col <- ncol(mat)
 
                 # normalisation has to be performed
                 # for each column, as it depends
                 # on the number of positives and negatives...
-                mat_complete <- apply(
-                    mat,
-                    2,
-                    function(col) {
-                        n_pos <- sum(col)
-                        n_neg <- n_bkgd - n_pos
-
-                        col[col == 0] <- -1
-
-                        p <- (n_pos - n_neg)/(n_tot)
-                        c(col, rep(p, n_tot - n_bkgd))
-                    }
-                )
-                rownames(mat_complete) <- c(rownames(mat), ids_nobkgd)
-
+                # n_pos and n_neg are vectors counting the number of 
+                # positives and negatives in each column
+                n_pos <- colSums(mat)
+                n_neg <- n_bkgd - n_pos
+                # biases
+                p <- (n_pos - n_neg)/n_tot
+                
+                mat[mat == 0] <- -1
+                # add biases (each column has its bias)
+                mat.rbind <- matrix(
+                    nrow = n_tot - n_bkgd, 
+                    ncol = n_col, 
+                    data = rep(p, each = n_tot - n_bkgd))
+                rownames(mat.rbind) <- ids_nobkgd
+                
+                mat <- rbind(as.matrix(mat), mat.rbind)
+                
                 # sort the names as in the original graph
-                mat_complete[names_ordered, , drop = FALSE]
+                mat[names_ordered, , drop = FALSE]
             }
         )
         ans <- (diffuse_raw(graph = graph, scores = scores_gm, ...))

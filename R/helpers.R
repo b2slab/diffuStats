@@ -61,10 +61,12 @@ scores2colours <- function(
     x,
     range = c(min(0, min(x)), max(x)),
     n.colors = 10,
-    # number 4 and 1 from ggsci::pal_npg()(5)
     palette = colorRampPalette(c("#3C5488FF", "white", "#F39B7FFF"))) {
     pal <- do.call(palette, list(n.colors))
 
+    # colors in default argument come from 
+    # number 4 and 1 from ggsci::pal_npg()(5)
+    
     x[x < range[1]] <- range[1]
     x[x > range[2]] <- range[2]
 
@@ -133,16 +135,12 @@ to_list <- function(scores, dummy_column = "X1", dummy_list = "X1") {
     s_format <- which_format(scores)
 
     if (s_format == "vector") {
-        # message("Reshaping score vector to matrix...")
-
         names_scores <- names(scores)
         scores <- matrix(scores, ncol = 1)
         rownames(scores) <- names_scores
         colnames(scores) <- dummy_column
     }
     if (s_format %in% c("matrix", "vector")) {
-        # message("Reshaping score matrix to list...")
-
         scores <- list(scores)
         names(scores) <- dummy_list
     }

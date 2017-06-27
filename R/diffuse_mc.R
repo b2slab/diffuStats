@@ -25,7 +25,6 @@
 #'
 #' @return A list containing matrices of heatrank scores
 #'
-# ' @import Rcpp
 #' @importFrom RcppParallel RcppParallelLibs
 #' @import RcppArmadillo
 #' @import igraph
@@ -33,7 +32,6 @@
 #' @import plyr
 #' @importFrom stats setNames
 #' @importFrom methods as
-# ' @useDynLib diffuStats ParallelHeatrank
 #'
 #' @examples
 #' # Using a list as input (needed)
@@ -53,12 +51,8 @@ diffuse_mc <- function(
     oneminusHeatRank = TRUE,
     K = NULL,
     ...)
-    # id.latent,
-    # p.adjust = "fdr")
 {
     # sanity checks
-    # if (!missing(graph))
-    # if (!is.null(K))
     .check_scores(scores)
 
     # Kernel matrix
@@ -68,21 +62,16 @@ diffuse_mc <- function(
             "Kernel not supplied. ",
             "Computing regularised Laplacian kernel ...")
         K <- regularisedLaplacianKernel(graph = graph)
-        gc()
         message("Done")
     } else {
         .check_K(K)
         message("Using supplied kernel matrix...")
     }
 
-    # browser()
     # Iterate over all scores backgrounds
     ans.all <- plyr::llply(
         stats::setNames(names(scores), names(scores)),
         function(scores.name) {
-            # n <- nrow(R.whole)
-            # scores.name <- "bkgd1"
-            # browser()
             # match indices (NO NAMES, careful)
             bkgd.names <- rownames(scores[[scores.name]])
             input.names <- colnames(scores[[scores.name]])
@@ -96,8 +85,7 @@ diffuse_mc <- function(
                     "Check that the rownames of the input are ",
                     "contained in the names of the graph nodes."
                 )
-            # bkgd <- as.numeric(names(sample.prob[[scores.name]]))
-            # prob <- as.numeric(sample.prob[[scores.name]])
+            
             prob <- (sample.prob[[scores.name]])
             if(!is.null(prob) & (length(prob) != length(bkgd.names)))
                 stop(
@@ -112,30 +100,6 @@ diffuse_mc <- function(
             # Generating permutations...
             message(paste0(scores.name, ": permuting scores..."))
 
-            # library(snow)
-            # cl <- snow::makeCluster(c("localhost", "localhost"),
-            # type = "SOCK")
-            # snow::clusterSetupRNG(cl)
-            # snow::clusterExport(cl, c("prob", "max.sample"),
-            # envir = environment())
-            #
-            # perms <- do.call(
-            #   "cbind",
-            #   snow::clusterApply(
-            #     cl,
-            #     seq(n.perm),
-            #     function(x) {
-            #       base::sample(
-            #         x = seq_along(prob),
-            #         prob = prob,
-            #         size = max.sample,
-            #         replace = F
-            #       )
-            #     })
-            #   )
-
-            # doParallel::registerDoParallel(cl)
-            # parallel::clusterExport(cl, c("prob", "max.sample"))
             # Generate permutations with R
             message("Permuting...")
             set.seed(seed)
@@ -143,7 +107,6 @@ diffuse_mc <- function(
                 seq(n.perm),
                 function(dummy) {
                     sample(
-                        # x = seq_along(prob),
                         x = seq_along(bkgd.names),
                         prob = prob,
                         size = max.sample,
@@ -151,9 +114,6 @@ diffuse_mc <- function(
                     )
                 },
                 .parallel = FALSE))
-            # .parallel = F, .progress = "text"))
-            # snow::stopCluster(cl)
-            gc()
 
             # .. and compute scores using c++ code
             message(paste0(scores.name, ": computing heatRank..."))
@@ -162,32 +122,9 @@ diffuse_mc <- function(
                 perms,
                 scores.mat
             )
-            # browser()
             rownames(ans) <- rownames(K)
             colnames(ans) <- input.names
-
-            # To check for numeric accuracy....
-            # compare to R
-            # When tested, the answers were equal (precision 1e-15)
-            # ans2 <- apply(
-            #   seq(ncol(scores.mat)),
-            #   function(col) {
-            #     R.subset <- R.whole[, bkgd.names]
-            #     T.final <- R.subset %*% scores.mat[, col]
-            #     n.in <- sum(scores.mat[, col])
-            #     g.null <- as(numeric(nrow(scores.mat)), "sparseMatrix")
-            #     scores.null <- plyr::aaply(perms, 2, function(colnull) {
-            #       # browser()
-            #       g.null[head(colnull, n.in)] <- 1
-            #       as.numeric(R.subset %*% g.null)
-            #     }, .progress = "text")
-            #     heatrank <- rowSums(t(scores.null) > as.numeric(T.final))
-            #     heatrank <- (heatrank + 1)/(n.perm + 1)
-            #     heatrank
-            #   }
-            # )
-
-            gc()
+            
             # Make sure we return a matrix
             if (oneminusHeatRank) return(as.matrix(1 - ans))
 

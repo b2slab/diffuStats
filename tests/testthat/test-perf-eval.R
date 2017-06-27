@@ -85,7 +85,6 @@ test_that("Format convertion", {
   expect_equal(dim(perf_scores), c(2, 4))
 
   # with vectors
-
   expect_error({perf_scores <- perf_eval(v1, v2, metrics)}, NA)
   expect_true({
     all(

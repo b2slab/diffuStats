@@ -15,7 +15,6 @@ seed <- 1
 # Directed graph
 graph <- barabasi.game(n, directed = F)
 V(graph)$name <- paste0("A", 1:n)
-# diag.sum <- 1:n/n*150
 
 # Random scores
 scores <- list(
@@ -95,9 +94,7 @@ test_that("'diffuse' consistency check", {
         function(method) {
             # Apply main function
             message(method)
-            # browser()
             expect_error({
-                # if (method == "ber_s") browser()
                 final <- diffuse(
                     graph = graph,
                     scores = scores,

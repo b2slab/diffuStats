@@ -1,5 +1,17 @@
 # Version log
 
+## Version 0.99.9
+
+This version addresses the first reviews from Bioconductor
+
+* Changed the vignette name from `yeast.Rnw` to `diffuStats.Rnw`
+* Fixed some references in vignette
+* Remove commented out code lines
+* Remove calls to `gc()` 
+* Remove commented calls to `browser()`
+* Remove `Cpp` commented code
+* Vectorised code in `diffuse.R` (`gm` method)
+
 ## Version 0.99.8
 
 * Fixed check NOTE in vignette

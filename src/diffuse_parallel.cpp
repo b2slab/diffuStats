@@ -46,19 +46,6 @@ arma::sp_mat convertSparse(S4 mat) {// slight improvement with two non-nested lo
   return(res);
 }
 
-// hello world functions
-//
-// // [[Rcpp::export]]
-// int intNew(int n) {
-//   return int(n);
-// }
-//
-//
-// // [[Rcpp::export]]
-// arma::vec vecOnes(int n) {
-//   return ones<vec>(n);
-// }
-
 //' Sparsify arma::mat into arma::sp_mat
 //'
 //' Return permutations as a 1-0 sparse matrix
@@ -72,7 +59,6 @@ arma::sp_mat convertSparse(S4 mat) {// slight improvement with two non-nested lo
 // [[Rcpp::export]]
 arma::sp_mat sparsify2(const arma::mat& perm, int nrow, int header) {
   unsigned int ncol = perm.n_cols;
-  // arma::vec inds = arma::vectorise(perm);
 
   arma::vec inds = arma::vectorise(perm.head_rows(header)) - 1;
 
@@ -117,18 +103,14 @@ arma::vec serialHeatrank(
     int ind) {
   int m = R.n_rows ;
   int n = perm.n_cols ;
-  // cout << "Rows: " << m << endl;
-  // cout << "Number of perms: " << n << endl;
+  
   arma::vec Tf = R * G.col(ind) ;
-  // cout << "Sum of generation: " << sum(G.col(ind)) << endl;
+  
   arma::vec ans(m, fill::zeros) ;
-  // cout << "Sum of perms: ";
+  
   for (int i = 0; i < n; i++) {
-    // cout << sum(perm.col(i)) << " ";
-    // cout << perm.col(i) << endl;
     ans = ans + (( R * perm.col(i)) > Tf) ;
   }
-  // cout << endl;
   return((ans + 1)/(n + 1)) ;
 }
 
@@ -166,19 +148,13 @@ struct parallelHeatrank : public Worker
     const arma::mat& perm,
     const arma::sp_mat& G) : R(R), perm(perm), G(G), n_bkgd(R.n_cols),
     n_nodes(R.n_rows), output(n_nodes, G.n_cols, fill::zeros) {
-    // cout << "n_bkgd: " << n_bkgd << endl;
-    // cout << "n_nodes: " << n_nodes << endl;
-    // cout << "Number of scores sets: " << G.n_cols << endl;
-    // cout << "Number of permutations: " << perm.n_cols << endl;
   }
 
   // process just the elements of the range I've been asked to
   void operator()(std::size_t begin, std::size_t end) {
     for (std::size_t i = begin; i < end; i++) {
       unsigned int sumGi = nonzeros(G.col(i)).size();
-      // cout << "n_input: " << sumGi << endl;
       sp_mat permSp = sparsify2(perm, n_bkgd, sumGi);
-      // cout << "PermSp: " << permSp.n_rows << "x" << permSp.n_cols << endl;
       output.col(i) = serialHeatrank(R, permSp, G, i);
     }
   }
@@ -209,8 +185,7 @@ arma::mat ParallelHeatrank(const arma::mat& R,
                            const arma::mat& perm,
                            const S4& G) {
 
-  // arma::sp_mat Ps = convertSparse(perm) ;
-  arma::sp_mat Gs = convertSparse(G) ;
+  arma::sp_mat Gs = convertSparse(G);
 
   // declare the instance that takes a pointer to the vector data
   parallelHeatrank PH(R, perm, Gs);

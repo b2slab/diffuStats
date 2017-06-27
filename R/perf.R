@@ -71,7 +71,6 @@ perf <- function(
         grid_param,
         1,
         function(row_param) {
-            # browser()
             # params for do.call
             list_param <- as.list(setNames(row_param, names_param))
 

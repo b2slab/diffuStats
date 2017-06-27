@@ -116,9 +116,14 @@ therefore tools gathering the state of the art are highly needed.
 An existing solution is \Rpackage{RANKS}, an
 R package that contains a variety of diffusion kernels and kernelised
 scores for label propagation using a binary input vector.
-Despite easing kernelised scores benchmarking,
-the effect of unlabelled nodes is not explored,
-neither is the possible numeric codifications of the labels
+\Rpackage{RANKS} eases kernelised scores benchmarking
+and models it as a \textq{one-class} classification semi-supervised 
+learning problem, in which only some members 
+of the class (positives) are known.
+Another possibility is to divide nodes into labelled positive, 
+negative and unlabelled, like in \cite{genemania}, 
+which poses questions like the effect of unlabelled nodes
+and possible numeric codifications of the labels,
 or the option to include quantitative data in the labels.
 In addition, statistical normalisations such as in \cite{mosca}
 remove the effect of network structures like hubs and
@@ -278,6 +283,8 @@ In the physical model using the regularised Laplacian kernel,
 the flow can be evacuated from the graph due to the presence of
 first-order leaking in every node,
 see \cite{hotnet} for further details on this.
+This formulation is proportional up to a scaling factor
+to the average score in \Rpackage{RANKS}. 
 
 On the other hand, the classical label propagation
 \cite{labelpropagation} treats positives
@@ -481,7 +488,7 @@ example and this vignette, which further describes the contents
 of the package and shows an application to real data.
 
 \begin{figure}[!tpb]%figure1
-{\includegraphics{yeast_fig_overview.eps}}
+{\includegraphics{diffustats_fig_overview.eps}}
 \caption{Overview of the main package functions.}
 \label{fig:overview}
 \end{figure}
