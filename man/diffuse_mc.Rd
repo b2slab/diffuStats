@@ -10,7 +10,8 @@ diffuse_mc(graph, scores, n.perm = 10000, sample.prob = NULL, seed = 1,
 \arguments{
 \item{graph}{igraph object}
 
-\item{scores}{Recursive list}
+\item{scores}{Recursive list, can have either binary or quantitative
+scores}
 
 \item{n.perm}{Numeric, number of permutations}
 
@@ -35,7 +36,9 @@ A list containing matrices of heatrank scores
 }
 \description{
 Function \code{diffuse_mc} has an implemented parallelisation of the
-Monte Carlo trials for diffusion in a (sparse) network.
+Monte Carlo trials for diffusion in a network.
+The input scores are assumed to be sparse, so very dense scores 
+migth take time with current implementation.
 }
 \examples{
 # Using a list as input (needed)

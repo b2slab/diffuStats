@@ -1,5 +1,12 @@
 # Version log
 
+## Version 0.99.10
+
+* Modified `diffuse_mc` so that it accepts quantitative inputs
+(but still should better be sparse)
+* Scores `ml` and `gm` now throw an error if fed with quantitative inputs
+* This version will be proposed to Bioconductor
+
 ## Version 0.99.9
 
 This version addresses the first reviews from Bioconductor

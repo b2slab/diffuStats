@@ -48,35 +48,41 @@ arma::sp_mat convertSparse(S4 mat) {// slight improvement with two non-nested lo
 
 //' Sparsify arma::mat into arma::sp_mat
 //'
-//' Return permutations as a 1-0 sparse matrix
+//' Return permutations as a numeric sparse matrix
+//' (can be binary or continuous)
 //'
 //' @param perm dense matrix with the permutations
 //' @param nrow number of rows for the sparse matrix
-//' @param header Number of rows required from \code{perm} (will depend
-//' on the size of the input list)
+//' @param G sparse column matrix
 //'
 //' @return an arma::sp_mat object
 // [[Rcpp::export]]
-arma::sp_mat sparsify2(const arma::mat& perm, int nrow, int header) {
+arma::sp_mat sparsify2(const arma::mat& perm, int nrow, const arma::sp_mat& G) {
   unsigned int ncol = perm.n_cols;
+  unsigned int header = G.n_nonzero;
 
+  // Indices of non-null elements
   arma::vec inds = arma::vectorise(perm.head_rows(header)) - 1;
 
+  // Positions of column breaks in the vectorised permutations
   arma::urowvec pos(ncol + 1);
   for (int i = 0; i < pos.size(); ++i) {
     pos(i) = i*header;
   }
-  // For compatibility with sparse Matrix in R
-  // Rows must be sorted
-  for (int i = 1; i < pos.size(); ++i) {
-    std::sort(inds.begin() + pos(i - 1), inds.begin() + pos(i));
-  }
+  // For compatibility with sparse Matrix in R -- REMOVED, 
+  // now numeric values are not symmetrical
+  // Repeat the values that are being permuted in a matrix, then
+  // assign it by column and melt it by column when calling sp_mat
+  // This does what's it's supposed to do (checked)
+  arma::colvec Gnonzero = nonzeros(G);
+  arma::mat Gdatarep(header, ncol);
+  Gdatarep.each_col() = Gnonzero; 
 
-  arma::vec ones = arma::vec(ncol*header, fill::ones);
+  // Sparse matrix with the permutations
   arma::sp_mat permSp = arma::sp_mat(
     conv_to<uvec>::from(inds),
     pos,
-    ones,
+    arma::vectorise(Gdatarep),
     nrow,
     ncol
   );
@@ -105,7 +111,6 @@ arma::vec serialHeatrank(
   int n = perm.n_cols ;
   
   arma::vec Tf = R * G.col(ind) ;
-  
   arma::vec ans(m, fill::zeros) ;
   
   for (int i = 0; i < n; i++) {
@@ -153,8 +158,7 @@ struct parallelHeatrank : public Worker
   // process just the elements of the range I've been asked to
   void operator()(std::size_t begin, std::size_t end) {
     for (std::size_t i = begin; i < end; i++) {
-      unsigned int sumGi = nonzeros(G.col(i)).size();
-      sp_mat permSp = sparsify2(perm, n_bkgd, sumGi);
+      sp_mat permSp = sparsify2(perm, n_bkgd, G.col(i));
       output.col(i) = serialHeatrank(R, permSp, G, i);
     }
   }

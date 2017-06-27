@@ -18,15 +18,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // sparsify2
-arma::sp_mat sparsify2(const arma::mat& perm, int nrow, int header);
-RcppExport SEXP diffuStats_sparsify2(SEXP permSEXP, SEXP nrowSEXP, SEXP headerSEXP) {
+arma::sp_mat sparsify2(const arma::mat& perm, int nrow, const arma::sp_mat& G);
+RcppExport SEXP diffuStats_sparsify2(SEXP permSEXP, SEXP nrowSEXP, SEXP GSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::mat& >::type perm(permSEXP);
     Rcpp::traits::input_parameter< int >::type nrow(nrowSEXP);
-    Rcpp::traits::input_parameter< int >::type header(headerSEXP);
-    rcpp_result_gen = Rcpp::wrap(sparsify2(perm, nrow, header));
+    Rcpp::traits::input_parameter< const arma::sp_mat& >::type G(GSEXP);
+    rcpp_result_gen = Rcpp::wrap(sparsify2(perm, nrow, G));
     return rcpp_result_gen;
 END_RCPP
 }

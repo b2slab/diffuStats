@@ -6,10 +6,13 @@
 #' Compute the heatrank using permutations
 #'
 #' Function \code{diffuse_mc} has an implemented parallelisation of the
-#' Monte Carlo trials for diffusion in a (sparse) network.
+#' Monte Carlo trials for diffusion in a network.
+#' The input scores are assumed to be sparse, so very dense scores 
+#' migth take time with current implementation.
 #'
 #' @param graph igraph object
-#' @param scores Recursive list
+#' @param scores Recursive list, can have either binary or quantitative
+#' scores
 #' @param n.perm Numeric, number of permutations
 #' @param sample.prob Numeric, probabilities (needn't be scaled) to permute the
 #' input. This is passed to \code{\link[base]{sample}}'s \code{prob} argument.
@@ -95,7 +98,8 @@ diffuse_mc <- function(
                     length(bkgd.names))
 
             scores.mat <- methods::as(scores[[scores.name]], "sparseMatrix")
-            max.sample <- max(Matrix::colSums(scores.mat))
+            # maximum number of non-zero entries
+            max.sample <- max(Matrix::colSums(scores.mat != 0))
 
             # Generating permutations...
             message(paste0(scores.name, ": permuting scores..."))

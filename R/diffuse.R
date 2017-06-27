@@ -81,6 +81,8 @@ diffuse <- function(
         scores_ml <- lapply(
             scores,
             function(mat) {
+                if (!all(as.numeric(mat) %in% c(0, 1))) 
+                    stop("Input scores for ", method, " must be binary")
                 mat[mat == 0] <- -1
                 mat
             }
@@ -91,6 +93,8 @@ diffuse <- function(
         scores_gm <- lapply(
             scores,
             function(mat) {
+                if (!all(as.numeric(mat) %in% c(0, 1))) 
+                    stop("Input scores for ", method, " must be binary")
                 # Have to match rownames with background
                 # If the kernel is provided...
                 if (format_network == "graph") {

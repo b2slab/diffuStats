@@ -4,19 +4,19 @@
 \alias{sparsify2}
 \title{Sparsify arma::mat into arma::sp_mat}
 \usage{
-sparsify2(perm, nrow, header)
+sparsify2(perm, nrow, G)
 }
 \arguments{
 \item{perm}{dense matrix with the permutations}
 
 \item{nrow}{number of rows for the sparse matrix}
 
-\item{header}{Number of rows required from \code{perm} (will depend
-on the size of the input list)}
+\item{G}{sparse column matrix}
 }
 \value{
 an arma::sp_mat object
 }
 \description{
-Return permutations as a 1-0 sparse matrix
+Return permutations as a numeric sparse matrix
+(can be binary or continuous)
 }

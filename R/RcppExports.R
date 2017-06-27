@@ -17,16 +17,16 @@ convertSparse <- function(mat) {
 
 #' Sparsify arma::mat into arma::sp_mat
 #'
-#' Return permutations as a 1-0 sparse matrix
+#' Return permutations as a numeric sparse matrix
+#' (can be binary or continuous)
 #'
 #' @param perm dense matrix with the permutations
 #' @param nrow number of rows for the sparse matrix
-#' @param header Number of rows required from \code{perm} (will depend
-#' on the size of the input list)
+#' @param G sparse column matrix
 #'
 #' @return an arma::sp_mat object
-sparsify2 <- function(perm, nrow, header) {
-    .Call(diffuStats_sparsify2, perm, nrow, header)
+sparsify2 <- function(perm, nrow, G) {
+    .Call(diffuStats_sparsify2, perm, nrow, G)
 }
 
 #' Compute heatrank for a single case
