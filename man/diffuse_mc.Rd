@@ -37,7 +37,8 @@ A list containing matrices of heatrank scores
 \description{
 Function \code{diffuse_mc} has an implemented parallelisation of the
 Monte Carlo trials for diffusion in a network.
-The input scores are assumed to be sparse, so very dense scores 
+The input scores are assumed to be sparse and are 
+internally sparsified, so very dense scores 
 migth take time with current implementation.
 }
 \examples{

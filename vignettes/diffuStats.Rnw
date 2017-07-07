@@ -455,13 +455,13 @@ structures like hubs.
 
 In its current release, \Rpackage{diffuStats} also accepts quantitative
 labels as input in the following scores: \Rcode{raw},
-\Rcode{ber\_s} and \Rcode{z}.
+\Rcode{ber\_s}, \Rcode{z}, \Rcode{ber\_p} and \Rcode{mc}.
 The scores \Rcode{ml} and
 \Rcode{gm} are naturally excluded from non-binary inputs due
 to their definitions.
 Currently \Rcode{mc} scores (and therefore \Rcode{ber\_p}
-scores as well) do not accept quantitative inputs,
-but this will be updated in future versions.
+scores as well) are assumed to work with sparse inputs,
+but this will be extended in future versions.
 Beware that quantitative inputs should be
 meaningful and one-tailed (monotonic) -
 the nature of diffusion processes involves averaging and strong
