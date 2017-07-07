@@ -1,5 +1,9 @@
 # Version log
 
+## Version 0.99.11
+
+* No changes
+
 ## Version 0.99.10
 
 * Modified `diffuse_mc` so that it accepts quantitative inputs
