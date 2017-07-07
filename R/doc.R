@@ -23,7 +23,7 @@
 #' implemented methods with a practical case study 
 #' using a yeast protein dataset.
 #'
-#' @author Sergio Picart-Armada <sergi.picart@upc.edu>
+#' @author Sergio Picart-Armada <sergi.picart@upc.edu>, Alexandre Perera-Lluna
 #' @docType package
 #' @name diffuStats
 NULL
