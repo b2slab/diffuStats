@@ -1,5 +1,10 @@
 # Version log
 
+## Version 0.99.12
+
+* Small changes in vignette
+* Pushing to see if bot notices
+
 ## Version 0.99.11
 
 * No changes

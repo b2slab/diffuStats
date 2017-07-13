@@ -1,9 +1,11 @@
 ---
 title: "Diffusion using diffuStats in a nutshell"
 author: 
--   name: Sergio Picart-Armada and Alexandre Perera-Lluna
+-   name: Sergio Picart-Armada
     affiliation: B2SLab at Polytechnic University of Catalonia
     email: sergi.picart@upc.edu
+-   name: Alexandre Perera-Lluna
+    affiliation: B2SLab at Polytechnic University of Catalonia
 date: "`r BiocStyle::doc_date()`"
 package: "`r BiocStyle::pkg_ver('diffuStats')`"
 output: BiocStyle::html_document
