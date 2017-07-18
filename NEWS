@@ -1,0 +1,15 @@
+CHANGES IN VERSION 1.0.0
+------------------------
+
+    o Five diffusion kernels available, they can be computed
+      from an 'igraph' object.
+
+    o Diffusion implementations divided between 'diffuse_raw'
+      for deterministic scores and 'diffuse_mc' for permutation
+      analysis, which is parallelised. In total, seven diffusion scores
+      are accessible through the 'diffuse' function.
+
+    o Performance evaluation wrapped in the 'perf' function.
+
+    o Helper functions in helpers.R (to plot diffusion scores, to check if a
+      kernel matrix is actually a kernel, to extract largest CC from a graph)

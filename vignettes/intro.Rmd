@@ -1,0 +1,250 @@
+---
+title: "Diffusion using diffuStats in a nutshell"
+author: 
+-   name: Sergio Picart-Armada
+    affiliation: B2SLab at Polytechnic University of Catalonia
+    email: sergi.picart@upc.edu
+-   name: Alexandre Perera-Lluna
+    affiliation: B2SLab at Polytechnic University of Catalonia
+date: "`r BiocStyle::doc_date()`"
+package: "`r BiocStyle::pkg_ver('diffuStats')`"
+output: BiocStyle::html_document
+bibliography: bibliography.bib
+vignette: >
+    %\VignetteIndexEntry{Quick start}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+    echo = TRUE, message = FALSE, error = FALSE, 
+    fig.width = 7, fig.height = 6)
+```
+
+# Getting started
+
+`diffuStats` is an R package providing several scores 
+for diffusion in networks. 
+While its original purpose lies on biological networks, 
+its usage is not limited to that scope. 
+In general terms, `diffuStats` builds several propagation algorithms 
+on the \code{igraph} package [@igraph] classes and methods. 
+A more detailed analysis and documentation of the implemented 
+methods can be found in the protein function prediction vignette. 
+
+To get started, we will load a toy graph included in the package. 
+
+```{r}
+library(diffuStats)
+data("graph_toy")
+```
+
+Let's take a look in the graph:
+
+```{r}
+graph_toy
+plot(graph_toy)
+```
+
+In the next section, we will be running diffusion algorithms 
+on this tiny lattice graph. 
+
+# Specifying the input
+
+The package `diffuStats` is flexible and allows 
+several inputs at once for a given network. 
+The input format is, in its most general form, 
+a list of matrices, where each matrix contains 
+measured nodes in rows and specific scores in columns. 
+**Differents sets of scores may have different backgrounds**, 
+meaning that we can specifically tag sets of nodes as **unlabelled**. 
+If we dispose of a unique list of nodes for label propagation, 
+we should provide a list with a unique column vector 
+that contains `1`'s in the labels in the list and `0`'s otherwise.
+
+In this example data, the graph contains one input already. 
+
+```{r}
+input_vec <- graph_toy$input_vec
+
+head(input_vec, 15)
+```
+
+Let's check how many nodes have values
+
+```{r}
+length(input_vec)
+```
+
+We see that all the nodes have a measure in each of the four score sets. 
+In practice, these score sets could be disease genes, pathways, et cetera.
+
+# The diffusion algorithm
+
+Each one of these columns in the input can be *smoothed* using the network 
+and new value will be derived - unlabelled nodes are also scored. 
+This is the main purpose of diffusion: to derive new scores that 
+intend to keep the same trends as the scores in the input, 
+but taking into account the network structure. 
+Equivalently, this can be regarded as a label propagation where 
+positive and negative examples propagate their labels to their 
+neighbouring nodes.
+
+Let's start with the simplest case of diffusion: 
+only a vector of values is to be smoothed. 
+Note that these 
+**values must be named and must be a subset or all of the graph nodes**.
+
+```{r}
+output_vec <- diffuStats::diffuse(
+    graph = graph_toy, 
+    method = "raw", 
+    scores = input_vec)
+
+head(output_vec, 15)
+```
+
+# Diffusion scores visualisation
+
+The best way to visualise the scores is overlaying 
+them in the original lattice. 
+`diffuStats` also comes with basic mapping functions 
+for graphical purposes. 
+Let's see an example:
+
+```{r}
+igraph::plot.igraph(
+    graph_toy, 
+    vertex.color = diffuStats::scores2colours(output_vec),
+    vertex.shape = diffuStats::scores2shapes(input_vec),
+    main = "Diffusion scores in our lattice"
+)
+```
+
+Here, we have mapped the scores to colours using `scores2colours` 
+and we have highlighted the nodes that were in the 
+original input using `scores2shapes` on the original scores.
+Square nodes were labelled as relevant in the input, 
+and the diffusion algorithm smoothed these labels over the network - 
+as in the guilt-by-association principle.
+
+# Several inputs, several smoothing scores
+
+The input to `diffuse` can be more than a vector with scores. 
+It can be provided with a set of score vectors, stored in a matrix 
+by columns, where rownames should contain 
+the nodes that are being scored. 
+As different score sets might have different labelled/unlabelled nodes,
+`diffuse` also accepts a list of score matrices that may have 
+a different amount of rows.
+
+In this section, we will diffuse using a matrix of scores that 
+contains four sets of scores, with four different names. 
+These example names refer to what the input contains:
+
+* Single: a single node is labelled as positive
+* Row: a row of nodes in the lattice graph are positives
+* Small_sample: a randomly generated small sample of the lattice nodes 
+are positives
+* Large_sample: a randomly generated sample with half of the lattice nodes 
+are positives
+
+```{r}
+input_mat <- graph_toy$input_mat
+
+head(input_mat)
+```
+
+On the other hand, there are a variety of methods 
+to compute the diffusion scores. 
+At the moment, the following: `raw`, `ml` and `gm` for 
+classical propagation; `z` and `mc` for scores normalised 
+through a statistical model, and similarly `ber_s` and `ber_p`, 
+as described in [@mosca]. 
+The scoring methods `mc` and `ber_p` require permutations 
+-thus being computationally intense- 
+whereas the rest are deterministic. 
+
+For instance, let's smooth through `mc` the input matrix:
+
+```{r}
+output_mc <- diffuStats::diffuse(
+    graph = graph_toy, 
+    method = "mc", 
+    scores = input_mat)
+
+head(output_mc)
+```
+
+We can plot the result of the fourth column *Large_sample*:
+
+```{r}
+score_col <- 4
+igraph::plot.igraph(
+    graph_toy, 
+    vertex.color = diffuStats::scores2colours(output_mc[, score_col]),
+    vertex.shape = diffuStats::scores2shapes(input_mat[, score_col]),
+    main = "Diffusion scores in our lattice"
+)
+```
+
+Each method has its particularities and, in the end, 
+it is all about the question being asked to the data and 
+the particularities of the dataset. 
+
+# Benchmarking
+
+Package `diffuStats` offers the option to assess the performance
+of the diffusion scores given user-defined target scores or labels. 
+
+The validation must be supplied with the same format as 
+the input scores, but 
+the labels of the nodes might be different. 
+For example, we can diffuse labels on all the nodes of a 
+graph but evaluate using only a specific subset of nodes 
+and target labels. 
+A small example: we want to evaluate how good the diffusion scores 
+`raw` and `ml` are at recovering the original labels of the 
+first 15 nodes 
+when diffusing in the example network. 
+
+```{r}
+df_perf <- perf(
+    graph = graph_toy,
+    scores = graph_toy$input_mat,
+    validation = graph_toy$input_mat[1:15, ],
+    grid_param = expand.grid(method = c("raw", "ml")))
+df_perf
+```
+
+This indicates that both methods have a very high 
+area under the curve in this example: the ordering of 
+the diffusion scores is very aligned to the class label.
+
+The last example is useful for showing a case in which diffusion 
+scores perform poorly. 
+As the *Small_sample* and *Large_sample* positive labels have been 
+randomly assigned ignoring the network, diffusion is not expected 
+to accurately predict one part of the network using as input another disjoint 
+subset of labelled nodes. 
+Thus, if we try to propagate the labels from nodes $1$ to $20$ and 
+evaluate the performance using nodes from $21$ to $48$, 
+we get a poor result:
+
+```{r}
+df_perf <- perf(
+    graph = graph_toy,
+    scores = graph_toy$input_mat[1:20, 3:4],
+    validation = graph_toy$input_mat[21:48, 3:4],
+    grid_param = expand.grid(method = c("raw", "ml")))
+df_perf
+```
+
+# R session info {.unnumbered}
+
+```{r}
+sessionInfo()
+```
+
+# References
