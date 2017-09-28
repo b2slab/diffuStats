@@ -121,9 +121,9 @@ test_that("Metric testing", {
     # flawless execution
     expect_error(
         .check_metric(list(
-            auc = Metrics::auc,
-            rmse = Metrics::rmse,
-            logLoss = Metrics::logLoss
+            auc = metric_fun(curve = "ROC"),
+            pauc = metric_fun(curve = "ROC", partial = c(0, 0.1)),
+            prc = metric_fun(curve = "PRC")
         )),
         NA
     )

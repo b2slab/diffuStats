@@ -4,7 +4,8 @@
 \alias{perf_eval}
 \title{Compute performance of diffusion scores on a single case}
 \usage{
-perf_eval(prediction, validation, metric = list(auc = Metrics::auc))
+perf_eval(prediction, validation, metric = list(auc = metric_fun(curve =
+    "ROC")))
 }
 \arguments{
 \item{prediction}{smoothed scores; either a named numeric vector,

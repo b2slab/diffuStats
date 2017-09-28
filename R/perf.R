@@ -56,7 +56,7 @@ perf <- function(
     scores,
     validation,
     grid_param,
-    metric = list(auc = Metrics::auc),
+    metric = list(auc = metric_fun(curve = "ROC")),
     ...) {
 
     # parameter names

@@ -239,21 +239,24 @@ respectively $y^+$, $y^-$ and $y^u$.
 Column \textq{normalised} refers to the application of a statistical
 model involving permutations, whereas \textq{stochastic}
 enumerates the normalised scores that need actual
-Monte Carlo permutations.
+Monte Carlo permutations. 
+The scores that also accept quantitative inputs instead of binary labels 
+are listed in the \textq{quantitative} column.
 
 \begin{table}[!t]
 \begin{center}
 \resizebox{\textwidth}{!}{
-\begin{tabular}{@{}lllllll@{}}
+\begin{tabular}{@{}llllllll@{}}
 \toprule
-Score & $y^+$ & $y^-$ & $y^u$ & Normalised & Stochastic & Reference \\\midrule
-raw & 1 & 0 & 0 & No & No & \cite{hotnet} \\
-ml & 1 & -1 & 0 & No & No & \cite{fastprotein, labelpropagation} \\
-gm & 1 & -1 & $k$ & No & No & \cite{genemania} \\
-ber\textsubscript{s} & 1 & 0 & 0 & No & No & \cite{mosca} \\
-ber\textsubscript{p} & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
-mc & 1 & 0 & 0* & Yes & Yes & \cite{mosca} \\
-z & 1 & 0 & 0* & Yes & No & \cite{kerneltesting} \\\bottomrule
+Score & $y^+$ & $y^-$ & $y^u$ & Normalised & Stochastic & 
+Quantitative & Reference \\\midrule
+raw & 1 & 0 & 0 & No & No & Yes & \cite{hotnet} \\
+ml & 1 & -1 & 0 & No & No & No & \cite{fastprotein, labelpropagation} \\
+gm & 1 & -1 & $k$ & No & No & No & \cite{genemania} \\
+ber\textsubscript{s} & 1 & 0 & 0 & No & No & Yes & \cite{mosca} \\
+ber\textsubscript{p} & 1 & 0 & 0* & Yes & Yes & Yes & \cite{mosca} \\
+mc & 1 & 0 & 0* & Yes & Yes & Yes & \cite{mosca} \\
+z & 1 & 0 & 0* & Yes & No & Yes & \cite{kerneltesting} \\\bottomrule
 \end{tabular}
 }
 \caption{Implemented diffusion scores}
@@ -290,7 +293,8 @@ On the other hand, the classical label propagation
 \cite{labelpropagation} treats positives
 as $y_{ml}^{+}=1$ and negatives as $y_{ml}^{-}=-1$, while unlabelled nodes
 remain as $y_{ml}^{u}=0$, thus making a distinction between the last two.
-A biological example can be found in protein classification \cite{fastprotein}.
+A biological example can be found 
+in protein classification \cite{fastprotein}.
 This option is available as \Rcode{ml}, and intuitively scores a
 node by counting if the majority of its neighbours
 vote positive or negative:
@@ -439,7 +443,8 @@ $$f_{z,i} = \frac{f_{i} - E_X(f_{i}^{null})}
 {\sqrt{V_X(f_{i}^{null})}}$$
 
 This closes the \Rcode{z} scoring option, which clearly does not require
-any actual permutations but normalises through the theoretical first and second
+any actual permutations but normalises 
+through the theoretical first and second
 statistical moments of the null distribution of the diffusion scores.
 
 Finally, the authors in \cite{mosca} also suggest a
@@ -460,7 +465,9 @@ The scores \Rcode{ml} and
 \Rcode{gm} are naturally excluded from non-binary inputs due
 to their definitions.
 Currently \Rcode{mc} scores (and therefore \Rcode{ber\_p}
-scores as well) are assumed to work with sparse inputs,
+scores as well) accept quantitative inputs 
+that are treated as sparse. 
+Dense continuous inputs might take more time to compute, 
 but this will be extended in future versions.
 Beware that quantitative inputs should be
 meaningful and one-tailed (monotonic) -
@@ -495,13 +502,15 @@ of the package and shows an application to real data.
 
 A diagram containing the main functions in the R
 package \Rpackage{diffuStats} can be found in (Fig. \ref{fig:overview}).
-The main funcion is \Rcode{diffuse}, a wrapper for computing diffusion scores
+The main funcion is \Rfunction{diffuse}, 
+a wrapper for computing diffusion scores
 from several categories at once, stemming from possibly different observed
-backgrounds. Function \Rcode{diffuse} makes use of the deterministic
-\Rcode{diffuse\_raw} or the stochastic \Rcode{diffuse\_mc} implementations
+backgrounds. Function \Rfunction{diffuse} makes use of the deterministic
+\Rfunction{diffuse\_raw} or the stochastic 
+\Rfunction{diffuse\_mc} implementations
 and combines them to give the desired scores for all the nodes
 in each of the observed backgrounds.
-The second wrapper \Rcode{perf} compares the
+The second wrapper \Rfunction{perf} compares the
 result of the diffusion scores to target validation scores.
 Validation scores might include only part of the nodes of the network
 and these nodes can be background-specific.
@@ -520,12 +529,40 @@ can require -depending on the kernel- matrix diagonalisation, matrix products
 and matrix inversion operations that are likely to use a considerable
 amount of memory and time.
 
-On the other hand, the other computationally demanding part is
-the parallel implementation
-of the stochastic permutation analysis - it has been
-optimised assuming that the number of positives is usually low.
+\subsection{Limitations}
+
+The kernel framework is known to scale poorly with the number
+of nodes of the network when the kernel is explicitly computed and dense. 
+Therefore, \Rpackage{diffuStats} is best suited for manipulating biological 
+networks of a medium size - few tenths of thousands of nodes.
+Protein-protein interaction networks can have around 20,000 nodes, 
+which is also the limit of the capabilities \Rpackage{diffuStats}, 
+as it is now, in a standard workstation with 16GB of physical memory.
+
+In particular, the explicit kernel computation is a demanding step, 
+although it only has to be performed once with a given network.
+Figure \ref{fig:profiling} contains a profiling on the kernel computation
+using a Compaq q8100 workstation 
+(intel core i5 650 @3.20GHz, 16GB physical memory). 
+This should give an approximation of what to expect in terms of 
+time and memory consumption. 
+The same figure contains the memory usage of the kernel matrix per se.
+
+\begin{figure}[!tpb]%figure1
+{\includegraphics{diffustats_fig_profiling.eps}}
+\caption{Profiling of the computation of the regularised Laplacian kernel
+on a synthetic n-th order network. 
+Undirected networks are generated through \Rfunction{barabasi.game} 
+in \CRANpkg{igraph} using default parameters and \Rfunarg{m = 6}
+(each node adds 6 edges).}
+\label{fig:profiling}
+\end{figure}
+
+On the other hand, the parallel implementation
+of the stochastic permutation analysis is another demanding task. 
+It has been optimised assuming that the number of positives is usually low.
 Lists of scores with a very high amount of positives might
-slow down the permutation analysis.
+slow down the permutation analysis, but not the parametric \Rcode{z}.
 
 \section{Getting started}
 
@@ -629,7 +666,7 @@ Now, using the labels of the known positive and negative
 examples for \Rcode{transport and sensing},
 can we correctly label the remaining 50\%?
 First of all, the list of known and unknown positives is generated.
-The function \Rcode{diffuse} uses (row)names in the input scores
+The function \Rfunction{diffuse} uses (row)names in the input scores
 so that unlabelled nodes are accounted as so.
 
 <<03_datasplit>>=
@@ -657,7 +694,7 @@ scores_true <- V(yeast)$Class %in% "A"
 
 Now that the input is ready, the diffusion algorithm can be applied
 to rank all the proteins. As a first approach, the
-vanilla diffusion scores will be computed through the \Rcode{raw} method
+vanilla diffusion scores will be computed through the \Rfunarg{raw} method
 and the default regularised Laplacian kernel,
 which is calculated on the fly.
 
@@ -742,7 +779,7 @@ target nodes in \Rcode{transport and sensing}.
 K_rl <- diffuStats::regularisedLaplacianKernel(yeast)
 @
 
-Functions \Rcode{diffuse} and \Rcode{perf} do accept,
+Functions \Rfunction{diffuse} and \Rfunction{perf} do accept,
 however, an \Rcode{igraph} object as well, and compute the kernel
 automatically.
 For medium networks (10,000 nodes or more)
@@ -750,54 +787,57 @@ the kernel computation can be computationally expensive in
 memory and time, so precomputing it avoids unnecessary
 recalculations.
 
+The diffusion scores can be computed over 
+a list of methods or sets of parameters. 
+This can be achieved with instructions like \Rfunction{lapply}, 
+but \Rpackage{diffuStats} contains a wrapper to facilitate this 
+task.
+The function \Rfunction{diffuse\_grid} takes the specified 
+combinations of parameters -which can include the scoring method as well-
+and computes the diffusion scores for each one. 
+The results are concatenated in a data frame that can be 
+easily plotted:
+
+
 <<04_diff>>=
 list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
 
-df_methods <- plyr::ldply(
-    list_methods,
-    function(method) {
-        diff <- diffuStats::diffuse(
-            K = K_rl,
-            scores = scores_A,
-            method = method,
-            n.perm = 1000
-        )
-
-        data.frame(
-            Protein = V(yeast)$name,
-            Class = ifelse(
-                scores_true,
-                "Transport and sensing", "Other"),
-            DiffusionScore = diff,
-            Target = target_id,
-            Method = method,
-            stringsAsFactors = FALSE
-        )
-    }
+df_diff <- diffuse_grid(
+    K = K_rl,
+    scores = scores_A,
+    grid_param = expand.grid(method = list_methods),
+    n.perm = 1000 
 )
-df_methods$Method <- factor(df_methods$Method, levels = list_methods)
+df_diff$transport <- ifelse(
+    df_diff$node_id %in% nodes_A, 
+    "Transport and sensing", 
+    "Other"
+)
 @
 
 The results can be directly plotted:
 
 <<04_plot, fig=TRUE>>=
-ggplot(subset(df_methods, Target), aes(x = Class, y = DiffusionScore)) +
-    geom_boxplot(aes(fill = Method)) +
+df_plot <- subset(df_diff, node_id %in% target)
+ggplot(df_plot, aes(x = transport, y = node_score)) +
+    geom_boxplot(aes(fill = method)) +
     scale_fill_npg() +
     theme_bw() +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
-    facet_wrap( ~ Method, nrow = 1, scales = "free") +
+    theme(axis.text.x = element_text(
+        angle = 45, vjust = 1, hjust = 1)) +
+    facet_wrap( ~ method, nrow = 1, scales = "free") +
     xlab("Protein class") +
     ylab("Diffusion score") +
     ggtitle("Target proteins scores in 'transport and sensing'")
 @
 
-As expected, all the diffusion scores show differences
+As expected, all the diffusion scores qualitatively show differences
 between positive and negative labels, but the quality
 of class separation will generally
 depend on the dataset and scoring method.
 
-\subsection{Third example: benchmarking scores with multiple protein functions}
+\subsection{Third example: 
+benchmarking scores with multiple protein functions}
 
 The package \Rpackage{diffuStats} is able to perform several
 screenings at once. To show its usefulness, we will generalise
@@ -829,7 +869,16 @@ with the same split, although not all the
 totally balanced in the splits now.
 All the methods will be compared
 using the area under the ROC curve
-(AUC) as a performance index.
+(AUROC) as a performance index.
+
+Please note that \Rpackage{diffuStats} is equipped with basic 
+performance measures for rankers: the AUROC, the 
+area under the Precision-Recall curve, or AUPRC, and 
+their partial versions. 
+These are available through the helper function \Rfunction{metric\_fun} 
+and can be passed in list format to \Rfunction{perf}.
+These measures are based on the \CRANpkg{precrec} R package - 
+further detail can be found in the original manuscript \cite{precrec}.
 
 <<05_perf>>=
 list_methods <- c("raw", "ml", "gm", "ber_s", "ber_p", "mc", "z")
@@ -880,6 +929,15 @@ ggplot(df_methods, aes(x = method, y = auc)) +
         axis.text.y = element_text(size = 8, color = "black"),
         plot.title = element_text(size = 12, hjust = .5))
 dev.off()
+
+# Build table for manuscript
+df_perf <- reshape2::acast(df_methods, Column~method, value.var = "auc")
+df_test <- perf_wilcox(
+    df_perf, 
+    digits_p = 1, 
+    adjust = function(p) p.adjust(p, method = "fdr"), 
+    scientific = FALSE)
+xtable::xtable(df_test)
 @
 
 Scaling up the analysis can be useful for assessing
@@ -889,6 +947,27 @@ and protein functions, the best priorisations are those
 obtained through a statistical normalisation,
 which might motivate its usage in other biological
 networks.
+
+The user can also statistically compare the performance metrics 
+through the function \Rfunction{perf\_wilcox}. 
+This generates a table with (i) the estimates on the differences 
+on performance between the methods in rows and columns, with 
+their confidence intervals and (ii)
+their associated p-value (Wilcoxon test). 
+Positive and negative estimates respectively favour the method 
+in the row and the column.
+
+<<05_test, results=tex>>=
+# Format the data
+df_perf <- reshape2::acast(df_methods, Column~method, value.var = "auc")
+# Compute the comparison matrix
+df_test <- perf_wilcox(
+    df_perf, 
+    digits_p = 1, 
+    adjust = function(p) p.adjust(p, method = "fdr"), 
+    scientific = FALSE)
+knitr::kable(df_test, format = "latex")
+@
 
 \section{Conclusions}
 

@@ -4,7 +4,8 @@
 \alias{perf}
 \title{Compare diffusions to a target score on a grid of parameters}
 \usage{
-perf(scores, validation, grid_param, metric = list(auc = Metrics::auc), ...)
+perf(scores, validation, grid_param, metric = list(auc = metric_fun(curve =
+    "ROC")), ...)
 }
 \arguments{
 \item{scores}{scores to be smoothed; either a named numeric vector,

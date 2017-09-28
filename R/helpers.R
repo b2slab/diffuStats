@@ -197,3 +197,149 @@ is_kernel <- function(x, tol = 1e-8) {
     eig_values <- eigen(x, only.values = TRUE)$values
     return(all(eig_values >= -tol))
 }
+
+#' Compute the area under the curves (ROC, PRC)
+#'
+#' Function \code{metric_auc} computes the AUROC 
+#' (Area Under the Receiver Operating Characteristic Curve) 
+#' and the AUPRC 
+#' (Area Under the Precision Recall Curve), measures of goodness 
+#' of a ranking in a binary classification problem. 
+#' Partial areas are also supported.
+#' Important: the higher ranked classes are assumed to 
+#' ideally target positives (label = \code{1}) whereas 
+#' lower ranks correspond to negatives (label = \code{0}).
+#' 
+#' The AUROC is a scalar value: the probability of a 
+#' randomly chosen positive having a higher rank than a randomly 
+#' chosen negative. 
+#' AUROC is cutoff-free and an informative of the performance of a 
+#' ranker. Likewise, AUPRC is the area under the Precision-Recall curve 
+#' and is also a standard metric for binary classification. 
+#' Both measures can be found in [Saito, 2017].
+#' 
+#' AUROC and AUPRC have their partial counterparts, in which 
+#' only the area enclosed up to a certain false positive rate (AUROC) 
+#' or recall (AUPRC) is accounted for. 
+#' This can be useful when assessing the goodness of the ranking, 
+#' focused on the top entities.
+#' 
+#' The user can, however, define his or her custom performance 
+#' metric. AUROC and AUPRC are common choices, but other 
+#' problem-specific metrics might be of interest. 
+#' For example, number of hits in the top k nodes. 
+#' Machine learning metrics can be found in packages such as 
+#' \code{Metrics} and \code{MLmetrics} from the CRAN repository
+#' (\url{http://cran.r-project.org/}).
+#'
+#' @param actual numeric, binary labels of the negatives (\code{0}) 
+#' and positives (\code{1})
+#' @param predicted numeric, prediction used to rank the entities - 
+#' this will typically be the diffusion scores
+#' @param curve character, either \code{"ROC"} for computing the 
+#' AUROC or \code{"PRC"} for the AUPRC
+#' @param partial vector with two numeric values for computing partial 
+#' areas. The numeric values are the limits in the \code{x} axis 
+#' of the curve, as implemented in the \code{"xlim"} argument 
+#' in \code{\link[precrec]{part}}. Defaults to \code{c(0,1)}, i.e. the 
+#' whole area
+#' @param standardized logical, should partial areas be standardised
+#' to range in [0, 1]? Defaults to \code{FALSE} and only affects 
+#' partial areas.
+#' 
+#' @return \code{metric_auc} returns a numeric value, the 
+#' area under the specified curve
+#'
+#' @examples
+#' # generate class and numeric ranking
+#' set.seed(1)
+#' n <- 50
+#' actual <- rep(0:1, each = n/2)
+#' predicted <- ifelse(
+#'     actual == 1, 
+#'     runif(n, min = 0.2, max = 1), 
+#'     runif(n, min = 0, max = 0.8))
+#' 
+#' # AUROC
+#' metric_auc(actual, predicted, curve = "ROC")
+#' 
+#' # partial AUC (up until false positive rate of 10%)
+#' metric_auc(
+#'     actual, predicted, curve = "ROC", 
+#'     partial = c(0, 0.1))
+#' 
+#' # The same are, but standardised in (0, 1)
+#' metric_auc(
+#'     actual, predicted, curve = "ROC", 
+#'     partial = c(0, 0.1), standardized = TRUE)
+#' 
+#' # AUPRC
+#' metric_auc(actual, predicted, curve = "PRC")
+#'
+#' # Generate performance functions for perf and perf_eval
+#' f_roc <- metric_fun(
+#'     curve = "ROC", partial = c(0, 0.5), 
+#'     standardized = TRUE)
+#' f_roc
+#' f_roc(actual = actual, predicted = predicted)
+#'
+#' @references Saito, T., & Rehmsmeier, M. (2017). 
+#' Precrec: fast and accurate precision–recall 
+#' and ROC curve calculations in R. 
+#' Bioinformatics, 33(1), 145-147.
+#' 
+#' @importFrom precrec evalmod part pauc 
+#' 
+#' @export
+metric_auc <- function(
+    actual, 
+    predicted, 
+    curve = "ROC", 
+    partial = c(0, 1), 
+    standardized = FALSE) {
+    # compute "prediction" object
+    # browser()
+    pred <- try({
+        mod <- precrec::evalmod(
+            scores = predicted, labels = actual)
+    })
+    
+    # return NA if the area cannot be computed
+    if (inherits(pred, "try-error")) return(NA)
+    
+    # compute the requested areas
+    areas <- precrec::part(mod, xlim = partial)
+    
+    # as a data frame
+    ans_df <- precrec::pauc(areas)
+    ans_df <- ans_df[ans_df$curvetypes == curve, ]
+
+    # return desired metric
+    if (standardized) {
+        return(ans_df$spaucs)
+    } else {
+        return(ans_df$paucs)
+    }
+}
+
+#' Helper function to build a metric evaluation function
+#' 
+#' Function \code{metric_fun} is a wrapper on \code{metric_auc} that 
+#' returns a function for performance evaluation. This function takes 
+#' as input actual and predicted values and outputs a performance metric. 
+#' This is needed for functions such as \code{\link[diffuStats]{perf}} 
+#' and \code{\link[diffuStats]{perf_eval}}, which iterate over a 
+#' list of such metric functions and return the performance 
+#' measured through each of them.
+#' 
+#' @param ... parameters to pass to \code{\link[diffuStats]{metric_auc}}
+#' 
+#' @return \code{metric_fun} returns a function (performance metric) 
+#' 
+#' @rdname metric_auc
+#' @export
+metric_fun <- function(...) {
+    function(actual, predicted) {
+        metric_auc(actual = actual, predicted = predicted, ...)
+    }
+}

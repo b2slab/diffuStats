@@ -186,3 +186,15 @@ test_that("Graph can be introduced as a kernel (deterministic)", {
                 sol[[method]])
     )
 })
+
+test_that("The grid approach 'diffuse_grid' works", {
+    # Use mat for inputs
+    mat_input <- mat
+    
+    expect_error({
+        ans <- diffuse_grid(
+            graph = g,
+            scores = mat_input,
+            grid_param = expand.grid(method = methods_all))
+    }, NA)
+})

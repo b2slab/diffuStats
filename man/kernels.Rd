@@ -22,17 +22,20 @@ regularisedLaplacianKernel(graph, sigma2 = 1, add_diag = 1,
 \arguments{
 \item{graph}{igraph object}
 
-\item{normalized}{logical, normalize Laplacian matrix?}
+\item{normalized}{logical, should the normalised (\code{TRUE}) or 
+unnormalised (\code{FALSE}) graph Laplacian matrix be used?}
 
-\item{sigma2}{numeric value, parameter \eqn{\sigma^2} of the kernel}
+\item{sigma2}{numeric value, parameter \eqn{\sigma^2} of the kernel - 
+higher values force more spreading in the network}
 
 \item{a}{numeric value greater or equal to 2, which acts as a
-regularisation term}
+regularisation term. 
+Can also be a vector of length \code{vcount(graph)}}
 
 \item{p}{integer greater than 0, the number of steps for the random walk}
 
-\item{add_diag}{numeric value or vector equalling \code{vcount(graph)},
-constant term to regularise the spectrum of the Laplacian}
+\item{add_diag}{numeric value or vector of length \code{vcount(graph)},
+term to regularise the spectrum of the Laplacian}
 }
 \value{
 A kernel matrix with adequate dimnames
@@ -41,25 +44,87 @@ A kernel matrix with adequate dimnames
 Function \code{commuteTimeKernel}
 computes the conmute-time kernel,
 which is the expected time of going back and forth
-between a couple of nodes
+between a couple of nodes. 
+If the network is connected, then the commute time kernel
+will be totally dense, therefore reflecting global properties 
+of the network.
+For further details, see [Yen, 2007].
+This kernel can be computed using both the unnormalised and 
+normalised graph Laplacian.
 
 Function \code{diffusionKernel}
 computes the classical diffusion kernel
 that involves matrix exponentiation. It has a "bandwidth" parameter
-\eqn{\sigma^2}
+\eqn{\sigma^2} that controls the extent of the spreading.
+Quoting [Smola, 2003]: 
+K(x1,x2) can be visualized as the quantity of some substance 
+that would accumulate at vertex x2 after a given amount of time 
+if we injected the substance at vertex x1 and let it diffuse 
+through the graph along the edges.
+This kernel can be computed using both the unnormalised and 
+normalised graph Laplacian.
 
 Function \code{inverseCosineKernel}
 computes the inverse cosine
 kernel, which is based on a cosine transform on the spectrum of
-the normalized Laplacian matrix
+the normalized Laplacian matrix.
+Quoting [Smola, 2003]: the inverse cosine kernel 
+treats lower complexity functions almost
+equally, with a significant reduction in the upper end of the spectrum.
+This kernel is computed using the normalised graph Laplacian.
 
 Function \code{pStepKernel}
-computes the p-step random walk kernel
+computes the p-step random walk kernel. 
+This kernel is more focused on local properties
+of the nodes, because random walks are limited in terms 
+of length. 
+Therefore, if \code{p} is small, only a fraction of 
+the values K(x1,x2) will be non-null if the network is sparse
+[Smola, 2003].
+The parameter \code{a} is a regularising term that is summed 
+to the spectrum of the normalised Laplacian matrix, 
+and has to be \code{2} or greater.
+The p-step kernels can be cheaper to compute and have been successful 
+in biological tasks, see the benchmark in [Valentini, 2014].
 
 Function \code{regularisedLaplacianKernel} computes
 the regularised Laplacian kernel, which is a standard in
-biological networks. It allows to control the constant terms summed
-to the diagonal
+biological networks. 
+The regularised Laplacian kernel arises in numerous situations, 
+such as the finite difference formulation of the diffusion equation 
+and in Gaussian process estimation.
+Sticking to the heat diffusion model, this function 
+allows to control the constant terms summed
+to the diagonal through \code{add_diag}, 
+i.e. the strength of the leaking in each node.
+If a node has diagonal term of \code{0}, it is not allowed to 
+disperse heat. 
+The larger the diagonal term of a node, the stronger the first order 
+heat dispersion in it, provided that it is positive. 
+Every connected component in the graph should be able to disperse heat, 
+i.e. have at least a node \code{i} with \code{add_diag[i] > 0}. 
+If this is not the case, the result diverges.
+More details on the parameters can be found in [Smola, 2003]. 
+This kernel can be computed using both the unnormalised and 
+normalised graph Laplacian.
+}
+\details{
+Please be aware that the kernel computation can be rather slow and 
+memory demanding. 
+This is a reference table of the peak memory usage and computing time
+for the regularised Laplacian kernel
+given the order of the network: 
+
+5k: 900MB & 250s  
+
+10k: 3,200MB & 2,200s
+
+15k: 8,000MB & 8,000s
+
+20k: 13,000MB & 21,000s
+
+However, given a network to study, 
+this step is a one-time task than can be stored and reused.
 }
 \examples{
 data(graph_toy)
@@ -69,4 +134,25 @@ K_pstep <- pStepKernel(graph_toy)
 K_ct <- commuteTimeKernel(graph_toy)
 K_ic <- inverseCosineKernel(graph_toy)
 is_kernel(K_lap)
+
+}
+\references{
+The regularised Laplacian, diffusion, p-step and 
+inverse cosine kernels: 
+Smola, A. J., & Kondor, R. (2003, August). 
+Kernels and regularization on graphs. 
+In COLT (Vol. 2777, pp. 144-158).
+
+The commute time kernel: 
+Yen, L., Fouss, F., Decaestecker, C., Francq, P., 
+& Saerens, M. (2007). Graph nodes clustering based on 
+the commute-time kernel. 
+Advances in Knowledge Discovery and Data Mining, 1037-1045.
+
+Benchmark on kernels:
+Valentini, G., Paccanaro, A., Caniza, H., Romero, A. E., & Re, M. (2014). 
+An extensive analysis of disease-gene associations 
+using network integration and fast kernel-based 
+gene prioritization methods. 
+Artificial Intelligence in Medicine, 61(2), 63–78.
 }

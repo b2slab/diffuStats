@@ -129,7 +129,7 @@
 #' @rdname checks
 #'
 #' @examples
-#' diffuStats:::.check_metric(list(auc = Metrics::auc))
+#' diffuStats:::.check_metric(list(auc = metric_fun(curve = "ROC")))
 .check_metric <- function(metric) {
     if (!is.list(metric))
         stop(

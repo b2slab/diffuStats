@@ -56,7 +56,7 @@ Does not check for spd
 data(graph_toy)
 diffuStats:::.check_scores(diffuStats:::to_list(graph_toy$input_mat))
 diffuStats:::.check_method("raw")
-diffuStats:::.check_metric(list(auc = Metrics::auc))
+diffuStats:::.check_metric(list(auc = metric_fun(curve = "ROC")))
 data(graph_toy)
 diffuStats:::.check_graph(graph_toy)
 data(graph_toy)

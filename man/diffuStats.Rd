@@ -18,6 +18,22 @@ a detailed explanation of the
 implemented methods with a practical case study 
 using a yeast protein dataset.
 }
+\references{
+General references:
+
+Most of the graph kernels can be found in:
+Smola, A. J., & Kondor, R. (2003, August). 
+Kernels and regularization on graphs. 
+In COLT (Vol. 2777, pp. 144-158).
+
+The statistical normalisation of the diffusion scores, 
+which has interest per se, has been introduced in: 
+Bersanelli, M., Mosca, E., Remondini, D., 
+Castellani, G., & Milanesi, L. (2016). 
+Network diffusion-based analysis of high-throughput data 
+for the detection of differentially enriched modules. 
+Scientific reports, 6.
+}
 \author{
 Sergio Picart-Armada <sergi.picart@upc.edu>, Alexandre Perera-Lluna
 }

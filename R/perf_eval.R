@@ -33,13 +33,13 @@
 #' df_perf
 #'
 #' @import plyr
-#' @import Metrics
 # ' @import magrittr
 #' @export
 perf_eval <- function(
     prediction,
     validation,
-    metric = list(auc = Metrics::auc)) {
+    metric = list(auc = metric_fun(curve = "ROC"))
+    ) {
 
     # find out the input format
     format_pred <- which_format(prediction)

@@ -1,5 +1,27 @@
 # Version log
 
+## Version 0.101.0
+
+This version includes the requests from the reviewers
+
+* Documentation is more complete now, especially in `diffuse`. 
+    - Examples on more scores, not only `raw`
+    - Illustration on binary/continuous, differences in unlabelled/negatives
+    - Definition of the different scores not only in the vignette, but 
+    (briefly) in `?diffuse`
+    - Description of kernels in `?kernels`
+    - References to the original publications
+* Added the following functions, along with documentation, examples
+and unit testing:
+    - `perf_wilcox`: test metrics through Wilcox test
+    - `diffuse_grid`: sweep parameters to compute diffusion scores
+    - `metric_auc`, `metric_fun`: provide basic performance metrics
+* Switched dependency from `Metrics` to `precrec`
+* Added `reshape2` as a dependency in `Suggests`, 
+for its usefulness in `cast`
+* Changes in main vignette, to comply with former points
+* Small update on the main figure in the vignette
+
 ## Version 0.99.12
 
 * Small changes in vignette
