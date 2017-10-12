@@ -1,5 +1,8 @@
 # diffuStats: compute diffusion scores over networks
 
+[![Travis-CI Build Status](https://travis-ci.org/b2slab/diffuStats.svg?branch=master)](https://travis-ci.org/b2slab/diffuStats)
+[![codecov.io](https://codecov.io/github/b2slab/diffuStats/coverage.svg?branch=master)](https://codecov.io/github/b2slab/diffuStats?branch=master)
+
 ## Install
 
 For the development version, change directory to the

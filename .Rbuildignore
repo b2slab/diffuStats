@@ -6,3 +6,4 @@ data-raw
 results
 man-roxygen
 LOGS
+^\.travis\.yml$
