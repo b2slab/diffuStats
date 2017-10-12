@@ -3,11 +3,11 @@
 language: r
 r: bioc-release
 
-sudo: required
+sudo: false
 cache: packages
 
 before_install:
-- sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-fonts-extra texlive-latex-extra texlive-fonts-recommended dvipng texlive-latex-recommended
+  - tlmgr install beramono
 
 # code coverage
 r_github_packages:
