@@ -1,18 +1,18 @@
 # R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-r: bioc-release
+r: 
+   - bioc-release
+
 r_build_args: "--no-build-vignettes"
-r_check_args: "--no-build-vignettes --as-cran"
+r_check_args: "--no-vignettes"
 
 sudo: false
 cache: packages
 
-before_install:
-  - tlmgr install bera
-  - tlmgr install nowidow
-  - tlmgr install parnotes
-  - tlmgr install marginfix
+# BiocCheck
+bioc_packages:
+  - BiocCheck
 
 # code coverage
 r_github_packages:
@@ -20,3 +20,4 @@ r_github_packages:
 
 after_success:
   - Rscript -e 'library(covr);codecov()'
+  - R CMD BiocCheck .
