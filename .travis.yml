@@ -2,6 +2,8 @@
 
 language: r
 r: bioc-release
+r_build_args: "--no-build-vignettes"
+r_check_args: "--no-build-vignettes --as-cran"
 
 sudo: false
 cache: packages
