@@ -1,5 +1,9 @@
 # Version log
 
+## Version 0.101.1
+
+* Added `CITATION` to the manuscript
+
 ## Version 0.101.0
 
 This version includes the requests from the reviewers

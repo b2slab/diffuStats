@@ -1,0 +1,20 @@
+utils::citHeader("To cite 'diffuStats' in publications use:")
+
+utils::citEntry(
+    entry = "article",
+	title = "An R package to compute diffusion-based scores on biological networks: {diffuStats}",
+    author = utils::personList(
+        utils::as.person("Sergio Picart-Armada"),
+		utils::as.person("Wesley K Thompson"), 
+		utils::as.person("Alfonso Buil"), 
+		utils::as.person("Alexandre Perera-Lluna")),
+	journal = "Bioinformatics",
+    pages = "btx632",
+    year = "2017",
+    doi = "10.1093/bioinformatics/btx632",
+    textVersion = paste0(
+        "Sergio Picart-Armada, Wesley K Thompson, Alfonso Buil, ", 
+        "Alexandre Perera-Lluna. An R package to compute ", 
+        "diffusion-based scores on biological networks: diffuStats. ", 
+        "Bioinformatics, btx632, https://doi.org/10.1093/bioinformatics/btx632")
+)
