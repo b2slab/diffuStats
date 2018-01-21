@@ -1,5 +1,9 @@
 # Version log
 
+## Version 0.103.2
+
+* Reversed changes in `Rcpp`
+
 ## Version 0.103.1
 
 * Changed defunct `latex2` to `latex` 

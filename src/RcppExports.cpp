@@ -8,7 +8,7 @@ using namespace Rcpp;
 
 // convertSparse
 arma::sp_mat convertSparse(S4 mat);
-RcppExport SEXP _diffuStats_convertSparse(SEXP matSEXP) {
+RcppExport SEXP diffuStats_convertSparse(SEXP matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // sparsify2
 arma::sp_mat sparsify2(const arma::mat& perm, int nrow, const arma::sp_mat& G);
-RcppExport SEXP _diffuStats_sparsify2(SEXP permSEXP, SEXP nrowSEXP, SEXP GSEXP) {
+RcppExport SEXP diffuStats_sparsify2(SEXP permSEXP, SEXP nrowSEXP, SEXP GSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -32,7 +32,7 @@ END_RCPP
 }
 // serialHeatrank
 arma::vec serialHeatrank(const arma::mat& R, const arma::sp_mat& perm, const arma::sp_mat& G, int ind);
-RcppExport SEXP _diffuStats_serialHeatrank(SEXP RSEXP, SEXP permSEXP, SEXP GSEXP, SEXP indSEXP) {
+RcppExport SEXP diffuStats_serialHeatrank(SEXP RSEXP, SEXP permSEXP, SEXP GSEXP, SEXP indSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -46,7 +46,7 @@ END_RCPP
 }
 // ParallelHeatrank
 arma::mat ParallelHeatrank(const arma::mat& R, const arma::mat& perm, const S4& G);
-RcppExport SEXP _diffuStats_ParallelHeatrank(SEXP RSEXP, SEXP permSEXP, SEXP GSEXP) {
+RcppExport SEXP diffuStats_ParallelHeatrank(SEXP RSEXP, SEXP permSEXP, SEXP GSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
