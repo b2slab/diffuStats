@@ -19,6 +19,8 @@
 #' @import igraph
 #' @export
 commuteTimeKernel <- function(graph, normalized = FALSE) {
+    if (is.directed(graph)) stop("'graph' must be undirected")
+    
     L <- graph.laplacian(graph = graph, normalized = normalized) %>% as.matrix
 
     # pseudo-inverse (moore-penrose)
@@ -44,6 +46,8 @@ commuteTimeKernel <- function(graph, normalized = FALSE) {
 #' @import igraph
 #' @export
 diffusionKernel <- function(graph, sigma2 = 1, normalized = TRUE) {
+    if (is.directed(graph)) stop("'graph' must be undirected")
+    
     L <- graph.laplacian(graph = graph, normalized = normalized)
 
     EL <- -sigma2/2*L
@@ -64,6 +68,8 @@ diffusionKernel <- function(graph, sigma2 = 1, normalized = TRUE) {
 #' @import igraph
 #' @export
 inverseCosineKernel <- function(graph) {
+    if (is.directed(graph)) stop("'graph' must be undirected")
+    
     L <- graph.laplacian(graph = graph, normalized = TRUE) %>% as.matrix
 
     # need to decompose
@@ -93,6 +99,8 @@ inverseCosineKernel <- function(graph) {
 #' @import igraph
 #' @export
 pStepKernel <- function(graph, a = 2, p = 5L) {
+    if (is.directed(graph)) stop("'graph' must be undirected")
+    
     minusL <- -graph.laplacian(graph = graph, normalized = TRUE)
 
     # Not optimal but kept for clarity
@@ -138,6 +146,8 @@ regularisedLaplacianKernel <- function(
     sigma2 = 1,
     add_diag = 1,
     normalized = FALSE) {
+    if (is.directed(graph)) stop("'graph' must be undirected")
+    
     L <- graph.laplacian(graph = graph, normalized = normalized)
 
     RL <- sigma2*L

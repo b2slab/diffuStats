@@ -7,7 +7,7 @@
 diffuse_raw(graph, scores, z = FALSE, K = NULL, ...)
 }
 \arguments{
-\item{graph}{\code{\link[igraph]{igraph}} object for the diffusion}
+\item{graph}{\pkg{igraph} object for the diffusion}
 
 \item{scores}{list of score matrices. For a single input with a
 single background, supply a list with a vector column}
@@ -24,7 +24,7 @@ dimensions as \code{scores}
 }
 \description{
 Function \code{diffuse} takes a network in
-\code{\link[igraph]{igraph}} format and an initial state
+\pkg{igraph} format and an initial state
 to score all the nodes in the network.
 }
 \examples{

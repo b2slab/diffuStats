@@ -1,5 +1,11 @@
 # Version log
 
+## Version 0.103.1
+
+* Changed defunct `latex2` to `latex` 
+* Fixed links in doc files
+* Checks on `graph`: must be undirected
+
 ## Version 0.101.1
 
 * Added `CITATION` to the manuscript

@@ -17,7 +17,7 @@ the range will be collapsed to the closest limit)}
 
 \item{palette}{palette function that generates a scale of
 colours given the number of desired colours. Defaults to a
-blue-white-red scale by \code{\link[grDevices]{colorRampPalette}}}
+blue-white-red scale by \code{\link[grDevices:colorRamp]{colorRampPalette}}}
 }
 \value{
 Character vector with hex colours

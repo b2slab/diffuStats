@@ -8,7 +8,7 @@
 \documentclass[12pt]{article}
 
 <<style-Sweave, eval=TRUE, echo=FALSE, results=tex>>=
-BiocStyle::latex2()
+BiocStyle::latex()
 @
 
 \usepackage{dsfont}

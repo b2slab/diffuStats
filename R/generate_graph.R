@@ -64,12 +64,12 @@
 #' Generate a random graph
 #'
 #' Function \code{generate_graph} generates a random network
-#' using \code{\link[igraph]{igraph}} graph generators. Several models are
+#' using \pkg{igraph} graph generators. Several models are
 #' available, and
 #'
 #' @param fun_gen function to generate the graphs. Typically from
-#' \code{\link[igraph]{igraph}}, like \code{\link[igraph]{barabasi.game}},
-#' \code{\link[igraph]{watts.strogatz.game}},
+#' \pkg{igraph}, like \code{\link[igraph:sample_pa]{barabasi.game}},
+#' \code{\link[igraph:sample_smallworld]{watts.strogatz.game}},
 #' \code{\link[igraph]{erdos.renyi.game}},
 #' \code{\link[igraph]{make_lattice}}, etc.
 #' @param param_gen list with parameters to pass to \code{fun_gen}
@@ -87,7 +87,7 @@
 #' largest connected component are randomly wired to a node in it.
 #' @param seed numeric, seed for random number generator
 #'
-#' @return An \code{\link[igraph]{igraph}} object
+#' @return An \pkg{igraph} object
 #'
 #' @examples
 #' g <- generate_graph(

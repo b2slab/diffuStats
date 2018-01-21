@@ -5,7 +5,7 @@
 #' provided by the user.
 #'
 #' Function \code{perf} takes a network in
-#' \code{\link[igraph]{igraph}} format, an initial state
+#' \pkg{igraph} format, an initial state
 #' to score all the nodes in the network, a target score set.
 #' To explore the parameter combinations, it needs a grid and a
 #' list of metrics to apply. The validation scores might be only

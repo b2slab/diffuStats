@@ -47,7 +47,7 @@ largest_cc <- function(g) {
 #' @param n.colors integer, number of colors in the palette
 #' @param palette palette function that generates a scale of
 #' colours given the number of desired colours. Defaults to a
-#' blue-white-red scale by \code{\link[grDevices]{colorRampPalette}}
+#' blue-white-red scale by \code{\link[grDevices:colorRamp]{colorRampPalette}}
 #'
 #' @return Character vector with hex colours
 #'

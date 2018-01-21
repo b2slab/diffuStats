@@ -1,7 +1,7 @@
 #' Function \code{diffuse_grid} computes diffusion scores on a grid of
 #' parameters. It is a convenient wrapper on \code{diffuse} that 
 #' takes a network in
-#' \code{\link[igraph]{igraph}} format or a kernel, initial scores
+#' \pkg{igraph} format or a kernel, initial scores
 #' to compute the diffusion scores for all the nodes in the network 
 #' and a grid of parameters to 
 #' explore. The diffusion scores are computed for every combination 

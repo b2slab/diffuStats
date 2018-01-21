@@ -1,13 +1,13 @@
 #' Generate a random input for graph diffusion
 #'
 #' Function \code{generate_input} generates a random list of
-#' nodes from an \code{\link[igraph]{igraph}} object.
+#' nodes from an \pkg{igraph} object.
 #' It also specifies the true solution generating the
 #' list. The graph object needs to have some attributes
 #' (automatically added through \code{generate_graph})
 #'
-#' @param graph an \code{\link[igraph]{igraph}} object, typically from
-#' \code{\link[diffuStats]{generate_input}}
+#' @param graph an \pkg{igraph} object, typically from
+#' \code{\link{generate_input}}
 #' @param order numeric or vector, order of the neighbourhoods that generate
 #' the list
 #' @param length_inputs numeric, number of nodes in the generated inputs

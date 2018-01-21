@@ -8,8 +8,8 @@ generate_input(graph, order, length_inputs, return_matrix = TRUE,
     seed = NULL)
 }
 \arguments{
-\item{graph}{an \code{\link[igraph]{igraph}} object, typically from
-\code{\link[diffuStats]{generate_input}}}
+\item{graph}{an \pkg{igraph} object, typically from
+\code{\link{generate_input}}}
 
 \item{order}{numeric or vector, order of the neighbourhoods that generate
 the list}
@@ -28,7 +28,7 @@ signal itself
 }
 \description{
 Function \code{generate_input} generates a random list of
-nodes from an \code{\link[igraph]{igraph}} object.
+nodes from an \pkg{igraph} object.
 It also specifies the true solution generating the
 list. The graph object needs to have some attributes
 (automatically added through \code{generate_graph})

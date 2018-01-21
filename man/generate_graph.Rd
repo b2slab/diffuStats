@@ -10,8 +10,8 @@ generate_graph(fun_gen, param_gen, class_label = NULL,
 }
 \arguments{
 \item{fun_gen}{function to generate the graphs. Typically from
-\code{\link[igraph]{igraph}}, like \code{\link[igraph]{barabasi.game}},
-\code{\link[igraph]{watts.strogatz.game}},
+\pkg{igraph}, like \code{\link[igraph:sample_pa]{barabasi.game}},
+\code{\link[igraph:sample_smallworld]{watts.strogatz.game}},
 \code{\link[igraph]{erdos.renyi.game}},
 \code{\link[igraph]{make_lattice}}, etc.}
 
@@ -35,11 +35,11 @@ largest connected component are randomly wired to a node in it.}
 \item{seed}{numeric, seed for random number generator}
 }
 \value{
-An \code{\link[igraph]{igraph}} object
+An \pkg{igraph} object
 }
 \description{
 Function \code{generate_graph} generates a random network
-using \code{\link[igraph]{igraph}} graph generators. Several models are
+using \pkg{igraph} graph generators. Several models are
 available, and
 }
 \examples{

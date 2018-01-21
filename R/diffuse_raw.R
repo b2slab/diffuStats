@@ -1,10 +1,10 @@
 #' Diffuse scores on a network
 #'
 #' Function \code{diffuse} takes a network in
-#' \code{\link[igraph]{igraph}} format and an initial state
+#' \pkg{igraph} format and an initial state
 #' to score all the nodes in the network.
 #'
-#' @param graph \code{\link[igraph]{igraph}} object for the diffusion
+#' @param graph \pkg{igraph} object for the diffusion
 #' @param scores list of score matrices. For a single input with a
 #' single background, supply a list with a vector column
 #' @param z logical, should z-scores be computed instead of raw scores?

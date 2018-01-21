@@ -2,7 +2,7 @@
 #'
 #' @description 
 #' Function \code{diffuse} takes a network in
-#' \code{\link[igraph]{igraph}} format (or a graph kernel matrix
+#' \pkg{igraph} format (or a graph kernel matrix
 #' stemming from a graph) and an initial state
 #' to score all the nodes in the network.
 #' The seven diffusion scores hereby provided differ on 
@@ -114,7 +114,7 @@
 #' This is because these nodes are neither annotated with experimental 
 #' not network (topology) data.
 #'
-#' @param graph \code{\link[igraph]{igraph}} object for the diffusion.
+#' @param graph \pkg{igraph} object for the diffusion.
 #' Alternatively, a kernel matrix can be provided through the 
 #' argument \code{K} insted of the igraph object.
 #' @param scores scores to be smoothed; either a named numeric vector,

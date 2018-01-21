@@ -9,7 +9,7 @@
 graph_toy
 }
 \value{
-An \code{\link[igraph]{igraph}} object
+An \pkg{igraph} object
 }
 \description{
 Small graph that can easily be plotted and experimented with.

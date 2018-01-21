@@ -10,7 +10,7 @@ diffuse(graph, scores, method, ...)
 diffuse_grid(scores, grid_param, ...)
 }
 \arguments{
-\item{graph}{\code{\link[igraph]{igraph}} object for the diffusion.
+\item{graph}{\pkg{igraph} object for the diffusion.
 Alternatively, a kernel matrix can be provided through the 
 argument \code{K} insted of the igraph object.}
 
@@ -46,7 +46,7 @@ combinations of parameters
 }
 \description{
 Function \code{diffuse} takes a network in
-\code{\link[igraph]{igraph}} format (or a graph kernel matrix
+\pkg{igraph} format (or a graph kernel matrix
 stemming from a graph) and an initial state
 to score all the nodes in the network.
 The seven diffusion scores hereby provided differ on 
@@ -142,7 +142,7 @@ Further details on the scores can be found in the main vignette.
 Function \code{diffuse_grid} computes diffusion scores on a grid of
 parameters. It is a convenient wrapper on \code{diffuse} that 
 takes a network in
-\code{\link[igraph]{igraph}} format or a kernel, initial scores
+\pkg{igraph} format or a kernel, initial scores
 to compute the diffusion scores for all the nodes in the network 
 and a grid of parameters to 
 explore. The diffusion scores are computed for every combination 
