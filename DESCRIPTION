@@ -1,7 +1,7 @@
 Package: diffuStats
 Type: Package
 Title: Diffusion scores on biological networks
-Version: 0.103.2
+Version: 0.103.3
 Author: Sergio Picart-Armada and Alexandre Perera-Lluna
 Maintainer: Sergio Picart-Armada <sergi.picart@upc.edu>
 Description: Label propagation approaches are a widely used 

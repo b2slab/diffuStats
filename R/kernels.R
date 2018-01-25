@@ -13,6 +13,7 @@
 #' 
 #' @template kernels
 #' 
+#' @name kernels
 #' @rdname kernels
 #' @import MASS
 #' @import Matrix

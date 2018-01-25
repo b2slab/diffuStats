@@ -12,7 +12,7 @@
 #' diffuStats: an R package to compute and benchmark diffusion scores
 #'
 #' The \code{diffuStats} package consists of (i) functions to compute 
-#' graph kernels, see \code{\link{kernels}}, (ii)
+#' graph kernels, see \code{\link[=kernels]{kernels}}, (ii)
 #' the function \code{\link{diffuse}} to compute the 
 #' diffusion scores and (iii) the function 
 #' \code{\link{perf_eval}} and its wrapper 
