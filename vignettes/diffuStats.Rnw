@@ -31,9 +31,8 @@ BiocStyle::latex()
 \SweaveOpts{concordance=TRUE, include = TRUE, echo=TRUE}
 %\SweaveOpts{fig=FALSE, prefix.string=yeast_latexfiles/}
 %\setkeys{Gin}{width=1\textwidth}
-\bioctitle[The diffuStats R package]{An R package to compute
-diffusion-based scores
-on biological networks: diffuStats}
+\bioctitle[The diffuStats R package]{diffuStats: an R package to compute
+diffusion-based scores on biological networks}
 \author[1,2]{Sergio Picart-Armada\thanks{\email{sergi.picart@upc.edu}}}
 \author[3,4]{Wesley K. Thompson}
 \author[3]{Alfonso Buil}

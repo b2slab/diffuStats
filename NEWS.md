@@ -1,5 +1,11 @@
 # Version log
 
+## Version 1.3.1
+
+* Fixed vignette title and citation
+* Small changes to documentation
+* Version number not malformed anymore
+
 ## Version 0.103.4
 
 * Fix bug

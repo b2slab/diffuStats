@@ -15,7 +15,8 @@
 #' However, given a network to study, 
 #' this step is a one-time task than can be stored and reused.
 #' 
-#' @param graph igraph object
+#' @param graph undirected igraph object. 
+#' If the edges have weights, those should typically be non-negative.
 #' @param sigma2 numeric value, parameter \eqn{\sigma^2} of the kernel - 
 #' higher values force more spreading in the network
 #' @param add_diag numeric value or vector of length \code{vcount(graph)},
