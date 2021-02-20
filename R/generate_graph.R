@@ -49,9 +49,10 @@
     if (length(nodes.addEdges) == 0) return(g)
 
     # For each node out, add one edge to a random node in
-    g.newEdges <- sapply(
+    g.newEdges <- vapply(
         nodes.addEdges,
-        function(dummy) sample(nodes.largest.cc, 1))
+        function(dummy) sample(nodes.largest.cc, 1), 
+        1L)
 
     g <- add.edges(
         graph = g,
@@ -95,9 +96,6 @@
 #'     param_gen = list(n = 100, m = 3, directed = FALSE),
 #'     seed = 1)
 #' g
-#' \dontrun{
-#' plot(g)
-#' }
 #'
 #' @import igraph
 #' @export
@@ -114,7 +112,7 @@ generate_graph <- function(
     # Generate network using provided function
     g <- do.call(fun_gen, param_gen)
     n <- vcount(g)
-    V(g)$name <- paste0("V", 1:n)
+    V(g)$name <- paste0("V", seq_len(n))
 
     # First assign classes
     if (is.null(class_label)) {

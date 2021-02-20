@@ -79,8 +79,8 @@ diffuse_raw <- function(
             const_mean <- .rowSums/n
             const_var <-  (n*.rowSums2 - .rowSums**2)/((n - 1)*(n**2))
 
-            diff.z <- sapply(
-                1:ncol(diff.raw),
+            diff.z <- vapply(
+                seq_len(ncol(diff.raw)),
                 function(col_ind) {
                     col_in <- scores.mat[, col_ind]
                     col_raw <- diff.raw[, col_ind]
@@ -95,7 +95,10 @@ diffuse_raw <- function(
                     score_vars <- const_var*(n*s2 - s1**2)
 
                     (col_raw - score_means)/sqrt(score_vars)
-                }
+                }, 
+                # expected length of each column's z-scores
+                # (raw and z should have the same dimensions)
+                numeric(nrow(diff.raw))
             )
             # Give correct names
             dimnames(diff.z) <- dimnames(diff.raw)

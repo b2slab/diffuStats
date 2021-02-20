@@ -1,10 +1,38 @@
 # Version log
 
+## Version 1.10.1/1.11.0
+
+* Fixed issue in Rcpp code, due to deprecation in `arma`, 
+info [here](https://github.com/b2slab/diffuStats/issues/5)
+* Updated some warnings and notes from `BiocCheck()`
+* Updated readme to link to bioconductor and the journal publications
+
+## Version 1.3.1
+
+* Fixed vignette title and citation
+
 ## Version 1.3.1
 
 * Fixed vignette title and citation
 * Small changes to documentation
 * Version number not malformed anymore
+
+## Version 1.0.0
+
+Overall summary:
+
+* Five diffusion kernels available, they can be computed
+from an 'igraph' object.
+
+* Diffusion implementations divided between 'diffuse_raw'
+for deterministic scores and 'diffuse_mc' for permutation
+analysis, which is parallelised. In total, seven diffusion scores
+are accessible through the 'diffuse' function.
+
+* Performance evaluation wrapped in the 'perf' function.
+
+* Helper functions in helpers.R (to plot diffusion scores, to check if a
+kernel matrix is actually a kernel, to extract largest CC from a graph)
 
 ## Version 0.103.4
 

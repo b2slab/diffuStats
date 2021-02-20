@@ -1,4 +1,4 @@
-utils::citHeader("To cite 'diffuStats' in publications use:")
+utils::citHeader("To cite 'diffuStats' in publications please use Picart2018, to refer to guidelines on choosing between diffusion scores use Picart2020:")
 
 utils::citEntry(
     entry = "article",
@@ -20,4 +20,23 @@ utils::citEntry(
         "diffusion-based scores on biological networks. ", 
         "Bioinformatics, 2017, vol. 34, no 3, p. 533-534. ", 
         "https://doi.org/10.1093/bioinformatics/btx632")
+)
+
+utils::citEntry(
+    entry = "article",
+	  title = "The effect of statistical normalisation on network propagation scores",
+    author = utils::personList(
+        utils::as.person("Sergio Picart-Armada"),
+		    utils::as.person("Wesley K Thompson"), 
+		    utils::as.person("Alfonso Buil"), 
+		    utils::as.person("Alexandre Perera-Lluna")),
+	  journal = "Bioinformatics",
+    year = "2020",
+    doi = "10.1093/bioinformatics/btaa896",
+    textVersion = paste0(
+        "Sergio Picart-Armada, Wesley K Thompson, Alfonso Buil, ", 
+        "Alexandre Perera-Lluna. The effect of statistical normalisation ", 
+        "on network propagation scores. ", 
+        "Bioinformatics, 2020, btaa896. ", 
+        "https://doi.org/10.1093/bioinformatics/btaa896")
 )
