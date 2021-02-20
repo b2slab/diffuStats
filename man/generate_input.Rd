@@ -4,8 +4,7 @@
 \alias{generate_input}
 \title{Generate a random input for graph diffusion}
 \usage{
-generate_input(graph, order, length_inputs, return_matrix = TRUE,
-    seed = NULL)
+generate_input(graph, order, length_inputs, return_matrix = TRUE, seed = NULL)
 }
 \arguments{
 \item{graph}{an \pkg{igraph} object, typically from

@@ -4,8 +4,16 @@
 \alias{diffuse_mc}
 \title{Compute the heatrank using permutations}
 \usage{
-diffuse_mc(graph, scores, n.perm = 10000, sample.prob = NULL, seed = 1,
-    oneminusHeatRank = TRUE, K = NULL, ...)
+diffuse_mc(
+    graph,
+    scores,
+    n.perm = 10000,
+    sample.prob = NULL,
+    seed = 1,
+    oneminusHeatRank = TRUE,
+    K = NULL,
+    ...
+)
 }
 \arguments{
 \item{graph}{igraph object}

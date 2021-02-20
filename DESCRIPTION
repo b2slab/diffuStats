@@ -1,7 +1,7 @@
 Package: diffuStats
 Type: Package
 Title: Diffusion scores on biological networks
-Version: 1.9.0
+Version: 1.11.2
 Authors@R: c(
     person(
         "Sergio", "Picart-Armada", role = c("aut", "cre"),
@@ -20,7 +20,7 @@ Description: Label propagation approaches are a widely used
     prior annotated knowledge and prioritising novel candidates.
     The R package diffuStats contains a 
     collection of diffusion kernels and scoring approaches
-    that facilitates their computation and benchmarking.
+    that facilitates their computation, characterisation and benchmarking.
 Depends: R (>= 3.4)
 Imports: grDevices, 
     stats, 

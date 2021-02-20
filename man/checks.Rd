@@ -9,7 +9,9 @@
 \alias{.check_graph}
 \alias{.check_K}
 \title{Sanity checks for input}
-\format{An object of class \code{character} of length 7.}
+\format{
+An object of class \code{character} of length 7.
+}
 \usage{
 .check_scores(scores)
 

@@ -17,11 +17,11 @@ inverseCosineKernel(graph)
 
 pStepKernel(graph, a = 2, p = 5L)
 
-regularisedLaplacianKernel(graph, sigma2 = 1, add_diag = 1,
-    normalized = FALSE)
+regularisedLaplacianKernel(graph, sigma2 = 1, add_diag = 1, normalized = FALSE)
 }
 \arguments{
-\item{graph}{igraph object}
+\item{graph}{undirected igraph object. 
+If the edges have weights, those should typically be non-negative.}
 
 \item{normalized}{logical, should the normalised (\code{TRUE}) or 
 unnormalised (\code{FALSE}) graph Laplacian matrix be used?}

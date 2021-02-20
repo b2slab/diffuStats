@@ -3,7 +3,6 @@
 \docType{package}
 \name{diffuStats}
 \alias{diffuStats}
-\alias{diffuStats-package}
 \title{diffuStats: an R package to compute and benchmark diffusion scores}
 \description{
 The \code{diffuStats} package consists of (i) functions to compute 

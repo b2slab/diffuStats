@@ -25,7 +25,9 @@ of the colnames of K)}
 \item{mu_y, var_y}{(scalar) mean and variance of the input, see details}
 }
 \value{
-A kernel matrix with adequate dimnames
+\code{get_mu_reference()}, \code{get_var_reference()} and 
+\code{get_mu()} return a vector, whereas \code{get_covar()} returns
+a square matrix.
 }
 \description{
 Function \code{get_mu()} computes the exact expected values

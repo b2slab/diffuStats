@@ -5,8 +5,13 @@
 \alias{metric_fun}
 \title{Compute the area under the curves (ROC, PRC)}
 \usage{
-metric_auc(actual, predicted, curve = "ROC", partial = c(0, 1),
-    standardized = FALSE)
+metric_auc(
+    actual,
+    predicted,
+    curve = "ROC",
+    partial = c(0, 1),
+    standardized = FALSE
+)
 
 metric_fun(...)
 }

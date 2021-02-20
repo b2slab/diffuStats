@@ -4,8 +4,14 @@
 \alias{perf_wilcox}
 \title{Compute column-wise statistics in a performance matrix}
 \usage{
-perf_wilcox(perf_mat, adjust = function(p) stats::p.adjust(p, method = "fdr"),
-    ci = 0.95, digits_ci = 2, digits_p = 3, ...)
+perf_wilcox(
+    perf_mat,
+    adjust = function(p) stats::p.adjust(p, method = "fdr"),
+    ci = 0.95,
+    digits_ci = 2,
+    digits_p = 3,
+    ...
+)
 }
 \arguments{
 \item{perf_mat}{Numeric matrix whose columns contain performance 

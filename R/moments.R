@@ -22,7 +22,9 @@
 #' of the colnames of K)
 #' @param mu_y,var_y (scalar) mean and variance of the input, see details
 #' 
-#' @return A kernel matrix with adequate dimnames
+#' @return  \code{get_mu_reference()}, \code{get_var_reference()} and 
+#' \code{get_mu()} return a vector, whereas \code{get_covar()} returns
+#' a square matrix. 
 #'
 #' @examples
 #' data(graph_toy)
