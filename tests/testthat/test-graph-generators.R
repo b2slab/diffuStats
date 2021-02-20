@@ -19,23 +19,23 @@ test_that("generate_graph", {
   list_params <- list(
     barabasi = list(
       fun_gen = barabasi.game,
-      param_gen = list(n = 1000, m = 5, directed = F)
+      param_gen = list(n = 1000, m = 5, directed = FALSE)
     ),
     lattice = list(
       fun_gen = graph.lattice,
-      param_gen = list(length = 10, dim = 3, directed = F)
+      param_gen = list(length = 10, dim = 3, directed = FALSE)
     ),
     watts = list(
       fun_gen = watts.strogatz.game,
       param_gen = list(
         dim = 3, size = 10, nei = 1,
-        p = .1, loops = F, multiple = F)
+        p = .1, loops = FALSE, multiple = FALSE)
     ),
     erdos = list(
       fun_gen = erdos.renyi.game,
       param_gen = list(
         n = 1000, p.or.m = 3000, type = "gnm",
-        directed = F, loops = F)
+        directed = FALSE, loops = FALSE)
     )
   )
 
@@ -59,7 +59,7 @@ test_that("generate_input", {
   expect_error({
     g <- generate_graph(
       fun_gen = barabasi.game,
-      param_gen = list(n = 1000, m = 5, directed = F)
+      param_gen = list(n = 1000, m = 5, directed = FALSE)
     )
   }, NA)
 

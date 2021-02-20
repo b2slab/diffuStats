@@ -13,7 +13,7 @@ n.cores <- 2
 seed <- 1
 
 # Directed graph
-graph <- barabasi.game(n, directed = F)
+graph <- barabasi.game(n, directed = FALSE)
 V(graph)$name <- paste0("A", 1:n)
 
 # Random scores
@@ -63,8 +63,9 @@ test_that("'diffuse_mc' consistency check and agreement with z-scores", {
     expect_true(all(heatrank$bkgd1 <= 1))
     expect_true(all(heatrank$bkgd2 <= 1))
 
-    # small correction, heatrank should never be zero
-    expect_false(any(heatrank$bkgd1 == 0))
+    # small correction, heatrank should never be zero (and therefore
+    # 1-heatrank should never be 1)
+    expect_false(any(heatrank$bkgd1 == 1))
     
     # expect that, in general, source nodes have higher scores
     # because oneminusHeatRank = TRUE, best scores should be those of
