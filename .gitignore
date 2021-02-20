@@ -9,3 +9,6 @@ data-raw/*
 results/*
 *.Rproj
 .Rprofile
+
+% other intermediate files
+src/symbols.rds
