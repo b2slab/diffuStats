@@ -3,7 +3,8 @@
 language: r
 r: 
   - bioc-release
-  - bioc-devel
+# Error: Bioconductor version '3.13' requires R version '4.1'
+#  - bioc-devel
 
 warnings_are_errors: false
 

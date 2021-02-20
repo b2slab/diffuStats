@@ -18,6 +18,9 @@ General guidelines on how to choose the scores, along with mathematical properti
 
 > Picart-Armada, S., Thompson, W. K., Buil, A., & Perera-Lluna, A. (2020). The effect of statistical normalisation on network propagation scores. Bioinformatics, btaa896.
 
+From versions 1.10.2/1.11.2 onwards, `diffuStats` provides functions to export the exact statistical moments (means and variances), see `?moments`.
+Now the users can characterise the systematic biases in the diffusion scores in their domain of application.
+
 ## Installation
 
 `diffuStats` is part of Bioconductor, and can be installed using

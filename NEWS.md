@@ -1,6 +1,11 @@
 # Version log
 
-## Version 1.10.1/1.11.0
+## Version 1.10.2/1.11.2
+
+* Added helper functions to compute the exact moments, so that the user can
+characterise the systematic biases in the diffusion scores
+
+## Version 1.10.1/1.11.1
 
 * Fixed issue in Rcpp code, due to deprecation in `arma`, 
 info [here](https://github.com/b2slab/diffuStats/issues/5)
