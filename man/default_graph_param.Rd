@@ -5,7 +5,9 @@
 \alias{.default_graph_param}
 \alias{.default_prop}
 \title{Generate data.frame with default vertex attributes}
-\format{An object of class \code{numeric} of length 3.}
+\format{
+An object of class \code{numeric} of length 3.
+}
 \usage{
 .default_graph_param()
 

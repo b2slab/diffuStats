@@ -138,15 +138,6 @@ Quantitative inputs are naturally defined on
 by extending the definitions above, and are readily available 
 in \code{diffuStats}.
 Further details on the scores can be found in the main vignette.
-
-Function \code{diffuse_grid} computes diffusion scores on a grid of
-parameters. It is a convenient wrapper on \code{diffuse} that 
-takes a network in
-\pkg{igraph} format or a kernel, initial scores
-to compute the diffusion scores for all the nodes in the network 
-and a grid of parameters to 
-explore. The diffusion scores are computed for every combination 
-of parameters provided and returned in a long-format data frame.
 }
 \details{
 Input scores can be specified in three formats.

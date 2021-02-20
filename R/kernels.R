@@ -14,7 +14,6 @@
 #' @template kernels
 #' 
 #' @name kernels
-#' @rdname kernels
 #' @import MASS
 #' @import Matrix
 #' @import igraph
@@ -42,7 +41,7 @@ commuteTimeKernel <- function(graph, normalized = FALSE) {
 #' This kernel can be computed using both the unnormalised and 
 #' normalised graph Laplacian.
 #'
-#' @rdname kernels
+#' @name kernels
 #' @import Matrix
 #' @import igraph
 #' @export
@@ -64,7 +63,7 @@ diffusionKernel <- function(graph, sigma2 = 1, normalized = TRUE) {
 #' equally, with a significant reduction in the upper end of the spectrum.
 #' This kernel is computed using the normalised graph Laplacian.
 #'
-#' @rdname kernels
+#' @name kernels
 #' @import Matrix
 #' @import igraph
 #' @export
@@ -94,7 +93,7 @@ inverseCosineKernel <- function(graph) {
 #' The p-step kernels can be cheaper to compute and have been successful 
 #' in biological tasks, see the benchmark in [Valentini, 2014].
 #'
-#' @rdname kernels
+#' @name kernels
 #' @importFrom expm %^%
 #' @import Matrix
 #' @import igraph
@@ -138,7 +137,7 @@ pStepKernel <- function(graph, a = 2, p = 5L) {
 #' This kernel can be computed using both the unnormalised and 
 #' normalised graph Laplacian.
 #'
-#' @rdname kernels
+#' @name kernels
 #' @import Matrix
 #' @import igraph
 #' @export

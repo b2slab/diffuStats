@@ -64,7 +64,7 @@ perf <- function(
 
     # function names are needed
     if (is.null(names(metric))) {
-        names(metric) <- sapply(metric, function(f) deparse(quote(f)))
+        names(metric) <- vapply(metric, function(f) deparse(quote(f)), "a")
     }
 
     plyr::adply(

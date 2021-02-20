@@ -4,7 +4,9 @@
 \name{graph_toy}
 \alias{graph_toy}
 \title{Toy graph to play with diffusion}
-\format{An object of class \code{igraph} of length 10.}
+\format{
+An object of class \code{igraph} of length 10.
+}
 \usage{
 graph_toy
 }

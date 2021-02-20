@@ -82,7 +82,7 @@ perf_wilcox <- function(
     
     # This "for" is not expected to have a large amount of iterations
     # as this function is expected to return human-readable tables
-    for (r in 1:nrow(grid_method)) {
+    for (r in seq_len(nrow(grid_method))) {
         # method names
         met1 <- grid_method[r, 1]
         met2 <- grid_method[r, 2]
